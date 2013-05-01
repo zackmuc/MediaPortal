@@ -1,5 +1,6 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.decrypt import *
+from Plugins.Extensions.MediaPortal.resources.captcha import *
 import HTMLParser
 
 ck = {}
@@ -191,11 +192,11 @@ class oasetvFilmListeScreen(Screen):
 	def findStream(self, data):
 		stream_list = []
 		stream_name = self['filmList'].getCurrent()[0][0]
-		#get_embed = re.findall('http://180upload.com/embed-(.*?)-', data, re.S)
-		#if get_embed:
-		#	url = "http://180upload.com/" + get_embed[0]
-		#	print url
-		#	stream_list.append(("180upload", url))
+		get_embed = re.findall('http://180upload.com/embed-(.*?)-', data, re.S)
+		if get_embed:
+			url = "http://180upload.com/" + get_embed[0]
+			print url
+			stream_list.append(("180upload", url))
 		get_wupfile = re.findall('(http://wupfile.com.*?)"', data, re.S)
 		if get_wupfile:
 			print get_wupfile[0]
@@ -303,37 +304,68 @@ class oasetvCDListeScreen(Screen):
 		streamLink = self['filmList'].getCurrent()[0][1]
 		self.keyLocked = True
 		if name == "180upload":
-			getPage(streamLink, agent=std_headers, cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.readPostData, streamLink).addErrback(self.dataError)
+			getPage(streamLink, cookies=ck, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.readPostData, streamLink).addErrback(self.dataError)
 		elif name == "Wupfile":
 			getPage(streamLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData).addErrback(self.dataError)
 		elif name == "MightyUpload":
 			getPage(streamLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData2).addErrback(self.dataError)
+
+	def dowloadCatpchaDone(self, data):
+		if fileExists("/tmp/captcha.jpg"):
+			print "Captcha.jpg gefunden.."
+			self.session.openWithCallback(self.captchaCallback, VirtualKeyBoardmod, title = (_("Captcha Eingabe:")), text = "")
+		else:
+			self.keyLocked = False
+			message = self.session.open(MessageBox, _("Stream not found."), MessageBox.TYPE_INFO, timeout=3)
 		
+	def captchaCallback(self, callback = None, entry = None):
+		if callback != None or callback != "":
+			print callback
+			self.form_values["code"] = str(callback)
+			self.form_values = urllib.urlencode(self.form_values)
+			os.system('rm -rf "/tmp/captcha.jpg"')
+			getPage(self.url, method='POST', cookies=ck, postdata=self.form_values, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData).addErrback(self.dataError)
+
 	def readPostData(self, data, url):
+		self.url = url
 		html_parser = HTMLParser.HTMLParser()
-		form_values = {}
+
+		self.form_values = {}
 		for i in re.finditer('<input.*?name="(.*?)".*?value="(.*?)">', data):
-			form_values[i.group(1)] = i.group(2)
+			self.form_values[i.group(1)] = i.group(2)
 
-		codes = re.findall("<span style='position:absolute;padding-left:.*?px;padding-top:.*?px;'>(.*?)</span>", data, re.S)
-		if codes:
-			code = ""
-			for each in codes:
-				print html_parser.unescape(each)
-				code += html_parser.unescape(each)
-			
-		if code:
-			form_values["code"] = str(code)
+		print self.form_values
 
-		print form_values
-		
-		print ck
+		if re.match('.*?<img src="http://180upload.com/captchas/', data, re.S):
+			bild = re.findall('<img src="(http://180upload.com/captchas.*?)"', data, re.S)
+			if bild:
+				print bild[0]
+				#thingTwo = downloadPage(makeURL("secret/borealean.ogg", "borealean.ogg"), cookies=cookies)
+				downloadPage(bild[0], "/tmp/captcha.jpg", cookies=ck).addCallback(self.dowloadCatpchaDone)
+		else:
+			codes = re.findall("<span style='position:absolute;padding-left:(.*?)px;padding-top:.*?px;'>(.*?)</span>", data, re.S)
+			code = []
+			for pos,html in codes:
+				print html_parser.unescape(html)
+				code.append((pos, html_parser.unescape(html)))
 				
-		form_values = urllib.urlencode(form_values)
-		getPage(url, agent=std_headers, method='POST', cookies=ck, postdata=form_values, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData).addErrback(self.dataError)
+			print code
+			code.sort(key=lambda x: int(x[0]))
+			finalcode= ""
+			for html,fcode in code:
+				finalcode += fcode
+
+			print "CODE:", finalcode
+
+			self.form_values["code"] = str(finalcode)
+			print self.form_values
+			print ck
+			self.form_values = urllib.urlencode(self.form_values)
+			getPage(self.url, method='POST', cookies=ck, postdata=self.form_values, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData).addErrback(self.dataError)
 
 	def postData(self, data):
-		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
+		print data
+		get_packedjava = re.findall("eval.function(.*?)</script>", data, re.S)
 		print get_packedjava
 		if get_packedjava:
 			sUnpacked = cJsUnpacker().unpackByString(get_packedjava[1])
