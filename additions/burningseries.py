@@ -488,15 +488,18 @@ class bsStreams(Screen, ConfigListScreen):
 		getPage(self.serienUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 		
 	def parseData(self, data):
-		streams = re.findall('<li><a href="(serie/.*?)"><span\n            class="icon.(.*?)"></span>', data)
+		raw =  re.findall('<h3>Hoster dieser Episode</h3>(.*?)</ul>', data, re.S)
+		if raw:
+			streams = re.findall('<li><a.*?href="(serie/.*?)"><span.*?class="icon.(.*?)"></span>',raw[0],re.S)
+			if streams:
+				for (bsUrl,bsStream) in streams:
+					bsUrl = "http://www.burning-seri.es/" + bsUrl
+					if re.match('.*?(Ecostream|Sockshare|Streamcloud|Putlocker|Filenuke|MovShare|Novamov|DivxStage|UploadC|NowVideo|VideoWeed|Flashx|FileNuke|BitShare)',bsStream,re.I):
+						self.streamList.append((bsStream,bsUrl))
+				self.streamMenuList.setList(map(bsListEntry, self.streamList))
+				self.keyLocked = False
+				
 		details = re.findall('id="desc_spoiler">\s{0,10}(.*?)</div>.*?<img\ssrc="(.*?)"\salt="Cover"\s{0,2}/>', data, re.S)
-		if streams:
-			for (bsUrl,bsStream) in streams:
-				bsUrl = "http://www.burning-seri.es/" + bsUrl
-				if re.match('.*?(Ecostream|Sockshare|Streamcloud|Putlocker|Filenuke|MovShare|Novamov|DivxStage|UploadC|NowVideo|VideoWeed|Flashx|FileNuke|BitShare)',bsStream,re.I):
-					self.streamList.append((bsStream,bsUrl))
-			self.streamMenuList.setList(map(bsListEntry, self.streamList))
-			self.keyLocked = False
 		if details:
 			(handlung,cover) = details[0]
 			self['handlung'].setText(decodeHtml(handlung))
