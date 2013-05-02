@@ -82,6 +82,7 @@ from additions.porn.amateurporn import *
 from additions.porn.beeg import *
 from additions.porn.dreiin import *
 from additions.porn.drtuber import *
+from additions.porn.elladies import *
 from additions.porn.eporner import *
 from additions.porn.eroprofile import *
 from additions.porn.extremetube import *
@@ -201,6 +202,7 @@ config.mediaportal.showamateurporn = ConfigYesNo(default = False)
 config.mediaportal.showbeeg = ConfigYesNo(default = False)
 config.mediaportal.showdreiin = ConfigYesNo(default = False)
 config.mediaportal.showdrtuber = ConfigYesNo(default = False)
+config.mediaportal.showelladies = ConfigYesNo(default = False)
 config.mediaportal.showeporner = ConfigYesNo(default = False)
 config.mediaportal.showeroprofile = ConfigYesNo(default = False)
 config.mediaportal.showextremetube = ConfigYesNo(default = False)
@@ -357,6 +359,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige beeg:", config.mediaportal.showbeeg))
 		self.configlist.append(getConfigListEntry("Zeige Drei.in:", config.mediaportal.showdreiin))
 		self.configlist.append(getConfigListEntry("Zeige DrTuber:", config.mediaportal.showdrtuber))
+		self.configlist.append(getConfigListEntry("Zeige El-Ladies:", config.mediaportal.showelladies))
 		self.configlist.append(getConfigListEntry("Zeige Eporner:", config.mediaportal.showeporner))
 		self.configlist.append(getConfigListEntry("Zeige EroProfile:", config.mediaportal.showeroprofile))
 		self.configlist.append(getConfigListEntry("Zeige ExtremeTube:", config.mediaportal.showextremetube))
@@ -673,6 +676,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.porn.append(self.hauptListEntry("Drei.in", "dreiin"))
 		if config.mediaportal.showdrtuber.value:
 			self.porn.append(self.hauptListEntry("DrTuber", "drtuber"))
+		if config.mediaportal.showelladies.value:
+			self.porn.append(self.hauptListEntry("El-Ladies", "elladies"))
 		if config.mediaportal.showeporner.value:
 			self.porn.append(self.hauptListEntry("Eporner", "eporner"))
 		if config.mediaportal.showeroprofile.value:
@@ -1128,6 +1133,11 @@ class haupt_Screen(Screen, ConfigListScreen):
 				self.session.openWithCallback(self.pindrtuber, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
 				self.session.open(drtuberGenreScreen)
+		elif auswahl == "El-Ladies":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pinelladies, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.session.open(elladiesGenreScreen)
 		elif auswahl == "Eporner":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pineporner, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -1262,6 +1272,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 	def pindrtuber(self, pincode):
 		if pincode:
 			self.session.open(drtuberGenreScreen)
+
+	def pinelladies(self, pincode):
+		if pincode:
+			self.session.open(elladiesGenreScreen)
 
 	def pineporner(self, pincode):
 		if pincode:
@@ -1620,6 +1634,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Drei.in", "dreiin", "Porn"))
 		if config.mediaportal.showdrtuber.value:
 			self.plugin_liste.append(("DrTuber", "drtuber", "Porn"))
+		if config.mediaportal.showelladies.value:
+			self.plugin_liste.append(("El-Ladies", "elladies", "Porn"))
 		if config.mediaportal.showeporner.value:
 			self.plugin_liste.append(("Eporner", "eporner", "Porn"))
 		if config.mediaportal.showeroprofile.value:
@@ -2211,6 +2227,12 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			else:
 				self.hit_plugin("DrTuber")
 				self.session.open(drtuberGenreScreen)
+		elif auswahl == "El-Ladies":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pinelladies, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.hit_plugin("El-Ladies")
+				self.session.open(elladiesGenreScreen)
 		elif auswahl == "Eporner":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pineporner, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -2373,6 +2395,11 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		if pincode:
 			self.hit_plugin("DrTuber")
 			self.session.open(drtuberGenreScreen)
+
+	def pinelladies(self, pincode):
+		if pincode:
+			self.hit_plugin("El-Ladies")
+			self.session.open(elladiesGenreScreen)
 
 	def pineporner(self, pincode):
 		if pincode:
