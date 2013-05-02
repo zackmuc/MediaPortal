@@ -622,6 +622,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("Konzert Oase", "koase"))
 		if config.mediaportal.show1channel.value:
 			self.grauzone.append(self.hauptListEntry("1channel", "1channel"))
+		if config.mediaportal.showM2kWatchlist.value:
+			self.grauzone.append(self.hauptListEntry("Movie2k Watchlist", "movie2kwatchlist"))
+		if config.mediaportal.showKinoxWatchlist.value:
+			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
 
 		# Fun / Sport
 		if config.mediaportal.showAllMusicHouse.value:
@@ -1010,6 +1014,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(baskino)
 		elif auswahl == "Kinox":
 			self.session.open(kxMain) 
+		elif auswahl == "Kinox Watchlist":
+			self.session.open(kxWatchlist)
 		elif auswahl == "Vutechtalk":
 			self.session.open(vutechtalk)
 		elif auswahl == "Dreamscreencast":
@@ -1040,6 +1046,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(showSongstoGenre)
 		elif auswahl == "Movie2k":
 			self.session.open(m2kGenreScreen, "default")
+		elif auswahl == "Movie2k Watchlist":
+			self.session.open(m2kWatchlist)
 		elif auswahl == "IStream":
 			self.session.open(showIStreamGenre, "default")
 		elif auswahl == "mahlzeit.tv":
