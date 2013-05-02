@@ -267,7 +267,7 @@ class show_USER_ListScreen(Screen):
 		if len(self.filmliste) == 0:
 			print "No audio drama found!"
 			self.pages = 0
-			self.filmliste.append(('Keine Hörspiele gefunden !','','','',''))
+			self.filmliste.append(('Keine Videos gefunden !','','','',''))
 		else:
 			#self.filmliste.sort(key=lambda t : t[0].lower())
 			menu_len = len(self.filmliste)

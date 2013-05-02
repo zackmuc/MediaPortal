@@ -4,7 +4,7 @@ import Queue
 import threading
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
-CF_Version = "Clipfish.de v0.93 (experimental)"
+CF_Version = "Clipfish.de v0.94 (experimental)"
 
 CF_siteEncoding = 'utf-8'
 
@@ -73,7 +73,7 @@ class show_CF_Genre(Screen):
 		self.genreSelected = False
 		self.menuListe = []
 		self.baseUrl = "http://www.clipfish.de"
-		self.genreBase = ["/kategorien", "/musikvideos/genre", "/special/spielfilme/genre"]
+		self.genreBase = ["/kategorien", "/musikvideos/charts", "/musikvideos/genre", "/special/spielfilme/genre"]
 		self.genreName = ["","","",""]
 		self.genreUrl = ["","","",""]
 		self.genreTitle = ""
@@ -85,7 +85,8 @@ class show_CF_Genre(Screen):
 		self.genreMenu = [
 			[
 			("Videos", ""),
-			("Musik", ""),
+			("Musikvideo-Charts", ""),
+			("Musikvideos", ""),
 			("Spielfilme", "")
 			],
 			[[
@@ -105,7 +106,8 @@ class show_CF_Genre(Screen):
 			("Stars & Lifestyle", "/11/%s"),
 			("Tiere & Natur", "/15/%s"),
 			("Urlaub & Reisen", "/16/%s")
-			],[
+			],None,
+			[
 			("Country / Folk", "/207/country-folk"),
 			("Dance / Elektro", "/109/dance-electro"),
 			("HipHop / Rap", "/211/hip-hop-rap"),
@@ -135,6 +137,7 @@ class show_CF_Genre(Screen):
 			]
 			],
 			[
+			[None],
 			[None],
 			[None],
 			[None]
@@ -362,6 +365,7 @@ class CF_FilmListeScreen(Screen):
 		self.genreSpecials = False
 		self.genreVideos = re.match('.*?Videos', self.genreName)
 		self.genreSpielfilme = re.match('.*?Spielfilm', self.genreName)
+		self.genreMusicCharts = re.match('.*?-Charts', self.genreName)
 
 		self.setGenreStrTitle()
 		
@@ -384,6 +388,8 @@ class CF_FilmListeScreen(Screen):
 			url = "%s/%d/" % (link, self.page)
 		elif self.genreSpielfilme:
 			url = "%s/%d/" % (self.genreLink, self.page)
+		elif self.genreMusicCharts:
+			url = self.genreLink
 		else:
 			url = "%s/beste/%d/#" % (self.genreLink, self.page)
 			
@@ -418,14 +424,27 @@ class CF_FilmListeScreen(Screen):
 		l = len(data)
 		self.musicListe = []
 		while a < l:
-			mg = re.search('<li id="cf-video-item_(.*?)</li>', data[a:], re.S)
+			if self.genreMusicCharts:
+				mg = re.search('intern cf-left-col50-left">(.*?)"cf-charts-text">', data[a:], re.S)
+			else:
+				mg = re.search('<li id="cf-video-item_(.*?)</li>', data[a:], re.S)
+			
 			if mg:
 				a += mg.end()
-				m1 = re.search('href="(.*?)".*?title="(.*?)">.*?<img.*?src="(.*?)"', mg.group(1), re.S)
+				if self.genreMusicCharts:
+					m1 = re.search('href="(.*?)".*?<img.*?src="(.*?)".*?alt="(.*?)"', mg.group(1), re.S)
+				else:
+					m1 = re.search('href="(.*?)".*?title="(.*?)">.*?<img.*?src="(.*?)"', mg.group(1), re.S)
+				
 				if m1:
-					title = decodeHtml(m1.group(2))
-					url = m1.group(1)
-					img = m1.group(3)
+					if self.genreMusicCharts:
+						title = decodeHtml(m1.group(3))
+						url = m1.group(1)
+						img = m1.group(2)
+					else:
+						title = decodeHtml(m1.group(2))
+						url = m1.group(1)
+						img = m1.group(3)
 					
 					self.musicListe.append((title, "%s%s" % (self.baseUrl, url), img))
 			else:
