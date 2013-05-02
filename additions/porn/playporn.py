@@ -1,4 +1,5 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.playhttpmovie import PlayHttpMovie
 
 def playpornGenreListEntry(entry):
 	return [entry,
@@ -410,9 +411,17 @@ class playpornStreamListeScreen(Screen):
 		if stream_url == None:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=3)
 		else:
-			sref = eServiceReference(0x1001, 0, stream_url)
-			sref.setName(self.streamName)
-			self.session.open(MoviePlayer, sref)
+			fx = re.match('.*?flashx', stream_url)
+			if config.mediaportal.useHttpDump.value or fx:
+				if fx:
+					movieinfo = [stream_url,self.streamName,"http://play.flashx.tv/"]
+				else:
+					movieinfo = [stream_url,self.streamName,""]
+				self.session.open(PlayHttpMovie, movieinfo, self.streamName)
+			else:
+				sref = eServiceReference(0x1001, 0, stream_url)
+				sref.setName(self.streamName)
+				self.session.open(MoviePlayer, sref)
 
 	def keyCancel(self):
 		self.close()
