@@ -59,6 +59,7 @@ from additions.cinestream import *
 from additions.moovizon import *
 from additions.youtube import *
 from additions.clipfish import *
+from additions.mlehd import *
 
 # kids
 from additions.kinderkino import *
@@ -181,6 +182,7 @@ config.mediaportal.showCinestream = ConfigYesNo(default = True)
 config.mediaportal.showMoovizon = ConfigYesNo(default = True)
 config.mediaportal.showYoutube = ConfigYesNo(default = True)
 config.mediaportal.showClipfish = ConfigYesNo(default = True)
+config.mediaportal.mlehd = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -273,6 +275,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Kinox:", config.mediaportal.showKinox))
 		self.configlist.append(getConfigListEntry("Zeige Movie2k:", config.mediaportal.showM2k))
 		self.configlist.append(getConfigListEntry("Zeige Cinestream:", config.mediaportal.showCinestream))
+		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.mlehd))
 		self.configlist.append(getConfigListEntry("Zeige Konzert Oase:", config.mediaportal.showKoase))
 		self.configlist.append(getConfigListEntry("Zeige 1channel:", config.mediaportal.show1channel))
 		
@@ -1494,6 +1497,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("IStream", "istream", "Grauzone"))
 		if config.mediaportal.showSzeneStreams.value:
 			self.plugin_liste.append(("SzeneStreams", "szenestreams", "Grauzone"))
+		if config.mediaportal.mlehd.value:
+			self.plugin_liste.append(("MLE-HD", "mlehd", "Grauzone"))
 			
 		# Watchlisten - Grauzone
 		if config.mediaportal.showM2kWatchlist.value:
@@ -2166,6 +2171,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "KIKA+":
 			self.hit_plugin("KIKA+")
 			self.session.open(kikaGenreScreen)
+		elif auswahl == "MLE-HD":
+			self.hit_plugin("MLE-HD")
+			self.session.open(mlehdGenreScreen)
 		# porn
 		elif auswahl == "4Tube":
 			if config.mediaportal.pornpin.value:

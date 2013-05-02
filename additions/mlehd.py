@@ -1,0 +1,335 @@
+from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.yt_url import *
+
+def mlehdGenreListEntry(entry):
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 850, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
+		]
+		
+def mlehdListEntry(entry):
+	#TYPE_TEXT, x, y, width, height, fnt, flags, string [, color, backColor, backColorSelected, borderWidth, borderColor])
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 800, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+		]		
+
+class mlehdGenreScreen(Screen):
+	
+	def __init__(self, session):
+		self.session = session
+		
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/defaultGenreScreen.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel
+		}, -1)
+		
+		self.keyLocked = True
+		self.language = "de"
+		self['title'] = Label("mle-hd.se")
+		self['ContentTitle'] = Label("Genre:")
+		self['name'] = Label("")
+		self['F1'] = Label("Exit")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
+		self['F3'].hide()
+		self['F4'].hide()
+
+		self.genreliste = []
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['genreList'] = self.chooseMenuList
+
+		self.onLayoutFinish.append(self.loadPage)
+
+	def loadPage(self):	
+		self.genreliste = [("Neusten", "http://www.mle-hd.se/page/"),
+							("Abenteuer", "http://www.mle-hd.se/category/abenteuer/page/"),
+							("Action", "http://www.mle-hd.se/category/action/page/"),
+							("Animation-Zeichentrick", "http://www.mle-hd.se/category/animation-zeichentrick/page/"),
+							("Biografie-History", "http://www.mle-hd.se/category/biografiehistory/page/"),
+							("Doku", "http://www.mle-hd.se/category/doku/page/page/"),
+							("Drama", "http://www.mle-hd.se/category/dramathriller/page/"),
+							("Kinderfilme", "http://www.mle-hd.se/category/kinderfilme/page/"),
+							("Fantasy", "http://www.mle-hd.se/category/fantasy/page/"),
+							("Horror", "http://www.mle-hd.se/category/horror/page/"),
+							("Comedy", "http://www.mle-hd.se/category/komodien/page/"),
+							("Krieg", "http://www.mle-hd.se/category/krieg/page/"),
+							("Musik", "http://www.mle-hd.se/category/musik/page/"),
+							("Romantik", "http://www.mle-hd.se/category/romantik/page/"),
+							("Scifi", "http://www.mle-hd.se/category/scifi/page/"),
+							("Sport", "http://www.mle-hd.se/category/sport/page/"),
+							("Thriller", "http://www.mle-hd.se/category/thriller/page/"),
+							("Western", "http://www.mle-hd.se/category/western/page/")]
+
+		self.chooseMenuList.setList(map(mlehdGenreListEntry, self.genreliste))
+		self.keyLocked = False
+
+	def dataError(self, error):
+		print error
+
+			
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		mlehdGenre = self['genreList'].getCurrent()[0][0]
+		mlehdUrl = self['genreList'].getCurrent()[0][1]
+		print mlehdGenre, mlehdUrl
+		self.session.open(mlehdFilmListeScreen, mlehdGenre, mlehdUrl)
+		
+	def keyCancel(self):
+		self.close()
+		
+class mlehdFilmListeScreen(Screen):
+	
+	def __init__(self, session, genreName, genreLink):
+		self.session = session
+		self.genreLink = genreLink
+		self.genreName = genreName
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/defaultListScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/defaultListScreen.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel,
+			"up" : self.keyUp,
+			"down" : self.keyDown,
+			"right" : self.keyRight,
+			"left" : self.keyLeft,
+			"nextBouquet" : self.keyPageUp,
+			"prevBouquet" : self.keyPageDown
+		}, -1)
+		
+		self.keyLocked = True
+		self.page = 1
+		self['title'] = Label("mle-hd.se")
+		self['ContentTitle'] = Label("%s:" % self.genreName)
+		self['name'] = Label("")
+		self['F1'] = Label("Exit")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
+		self['F1'].hide()
+		self['F2'].hide()
+		self['F3'].hide()
+		self['F4'].hide()
+		self['coverArt'] = Pixmap()
+		self['Page'] = Label("1")
+		self['page'] = Label("")
+		self['handlung'] = Label("")
+		
+		self.filmliste = []
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['liste'] = self.chooseMenuList
+
+		self.onLayoutFinish.append(self.loadPage)
+			
+	def loadPage(self):
+		self.keyLocked = True
+		url = "%s%s" % (self.genreLink,str(self.page))
+		print url
+		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
+		
+	def loadPageData(self, data):
+		print "drin"
+		#countp = re.findall('totalPages: (.*?),', data, re.S)
+		#if countp:
+		#	self['page'].setText(countp[0])
+
+		movies = re.findall('<div class="chipsetl1data">.*?<a href="(http://www.mle-hd.se/.*?)" rel="bookmark" title="Permanent Link to (.*?)" class="img1">.*?<img.*?src="(http://www.mle-hd.se/wp-content/uploads/.*?)"', data, re.S)
+		if movies:
+			self.filmliste = []
+			for (url,title,image) in movies:
+				print title, url
+				self.filmliste.append((decodeHtml(title),url,image))
+			self.chooseMenuList.setList(map(mlehdListEntry, self.filmliste))
+			self.loadPic()
+			self['Page'].setText(str(self.page)+" von")
+			self.keyLocked = False
+
+	def dataError(self, error):
+		print error
+
+	def loadPic(self):
+		streamPic = self['liste'].getCurrent()[0][2]
+		print streamPic
+		downloadPage(streamPic, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+			
+	def ShowCover(self, picData):
+		if fileExists("/tmp/Icon.jpg"):
+			self['coverArt'].instance.setPixmap(None)
+			self.scale = AVSwitch().getFramebufferScale()
+			self.picload = ePicLoad()
+			size = self['coverArt'].instance.size()
+			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
+				ptr = self.picload.getData()
+				if ptr != None:
+					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].show()
+					del self.picload
+
+	def keyPageDown(self):
+		print "PageDown"
+		if self.keyLocked:
+			return
+		if not self.page < 1:
+			self.page -= 1
+			self.loadPage()
+
+	def keyPageUp(self):
+		print "PageUP"
+		if self.keyLocked:
+			return
+		self.page += 1
+		self.loadPage()
+
+	def keyLeft(self):
+		if self.keyLocked:
+			return
+		self['liste'].pageUp()
+		self.loadPic()
+		
+	def keyRight(self):
+		if self.keyLocked:
+			return
+		self['liste'].pageDown()
+		self.loadPic()
+		
+	def keyUp(self):
+		if self.keyLocked:
+			return
+		self['liste'].up()
+		self.loadPic()
+
+	def keyDown(self):
+		if self.keyLocked:
+			return
+		self['liste'].down()
+		self.loadPic()
+		
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		self.mlehdName = self['liste'].getCurrent()[0][0]
+		mlehdurl = self['liste'].getCurrent()[0][1]
+		print self.mlehdName, mlehdurl
+		self.session.open(mlehdFilmAuswahlScreen, self.mlehdName, mlehdurl)
+		
+	def keyCancel(self):
+		self.close()
+		
+class mlehdFilmAuswahlScreen(Screen):
+	
+	def __init__(self, session, genreName, genreLink):
+		self.session = session
+		self.genreLink = genreLink
+		self.genreName = genreName
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/defaultListScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/defaultListScreen.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel
+		}, -1)
+		
+		self.keyLocked = True
+		self['title'] = Label("mle-hd.se")
+		self['ContentTitle'] = Label("Part Auswahl - %s" % self.genreName)
+		self['name'] = Label("")
+		self['F1'] = Label("Exit")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
+		self['F1'].hide()
+		self['F2'].hide()
+		self['F3'].hide()
+		self['F4'].hide()
+		self['coverArt'] = Pixmap()
+		self['Page'] = Label("")
+		self['page'] = Label("")
+		self['handlung'] = Label("")
+		
+		self.filmliste = []
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['liste'] = self.chooseMenuList
+		self.onLayoutFinish.append(self.loadPage)
+			
+	def loadPage(self):
+		self.keyLocked = True
+		print self.genreLink
+		getPage(self.genreLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
+		
+	def loadPageData(self, data):
+		print "drin"
+		movies = re.findall("file: '(.*?)\&sid", data, re.S)
+		if movies:
+			print movies
+			self.filmliste = []
+			count = 0
+			for url in movies:
+				count += 1
+				print url
+				part = "Film %s" % count
+				self.filmliste.append((part,url))
+			self.chooseMenuList.setList(map(mlehdGenreListEntry, self.filmliste))
+			self.keyLocked = False
+			
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		self.part = self['liste'].getCurrent()[0][0]
+		link = self['liste'].getCurrent()[0][1]
+		getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStream).addErrback(self.dataError)
+		
+	def getStream(self, data):
+		stream_url = re.findall('<location>(http://.*?)</location>', data, re.S)
+		if stream_url:
+			print stream_url
+			sref = eServiceReference(0x1001, 0, stream_url[0])
+			sref.setName(self.genreName+" "+self.part)
+			self.session.open(MoviePlayer, sref)
+			
+	def dataError(self, error):
+		print error
+		
+	def keyCancel(self):
+		self.close()
