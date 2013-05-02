@@ -183,7 +183,7 @@ config.mediaportal.showCinestream = ConfigYesNo(default = True)
 config.mediaportal.showMoovizon = ConfigYesNo(default = True)
 config.mediaportal.showYoutube = ConfigYesNo(default = True)
 config.mediaportal.showClipfish = ConfigYesNo(default = True)
-config.mediaportal.mlehd = ConfigYesNo(default = True)
+config.mediaportal.showmlehd = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -277,7 +277,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Kinox:", config.mediaportal.showKinox))
 		self.configlist.append(getConfigListEntry("Zeige Movie2k:", config.mediaportal.showM2k))
 		self.configlist.append(getConfigListEntry("Zeige Cinestream:", config.mediaportal.showCinestream))
-		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.mlehd))
+		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.showmlehd))
 		self.configlist.append(getConfigListEntry("Zeige Konzert Oase:", config.mediaportal.showKoase))
 		self.configlist.append(getConfigListEntry("Zeige 1channel:", config.mediaportal.show1channel))
 		
@@ -598,6 +598,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 		# Grauzone
 		if config.mediaportal.showSzeneStreams.value:
 			self.grauzone.append(self.hauptListEntry("SzeneStreams", "szenestreams"))
+		if config.mediaportal.showmlehd.value:
+			self.grauzone.append(self.hauptListEntry("MLE-HD", "mlehd"))
 		if config.mediaportal.showStreamOase.value:
 			self.grauzone.append(self.hauptListEntry("StreamOase", "streamoase"))
 		if config.mediaportal.showMEHD.value:
@@ -1062,6 +1064,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(scienceTvGenreScreen)
 		elif auswahl == "SzeneStreams":
 			self.session.open(SzeneStreamsGenreScreen)
+		elif auswahl == "MLE-HD":
+			self.session.open(mlehdGenreScreen)
 		elif auswahl == "HörspielHouse":
 			self.session.open(show_HSH_Genre)
 		elif auswahl == "KIKA+":
@@ -1511,7 +1515,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("IStream", "istream", "Grauzone"))
 		if config.mediaportal.showSzeneStreams.value:
 			self.plugin_liste.append(("SzeneStreams", "szenestreams", "Grauzone"))
-		if config.mediaportal.mlehd.value:
+		if config.mediaportal.showmlehd.value:
 			self.plugin_liste.append(("MLE-HD", "mlehd", "Grauzone"))
 			
 		# Watchlisten - Grauzone
