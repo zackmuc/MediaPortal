@@ -102,6 +102,7 @@ from additions.porn.thenewporn import *
 from additions.porn.updatetube import *
 from additions.porn.wetplace import *
 from additions.porn.xhamster import *
+from additions.porn.xxxsave import *
 from additions.porn.x4tube import *
 from additions.porn.youporn import *
 
@@ -224,6 +225,7 @@ config.mediaportal.showthenewporn = ConfigYesNo(default = False)
 config.mediaportal.showupdatetube = ConfigYesNo(default = False)
 config.mediaportal.showwetplace = ConfigYesNo(default = False)
 config.mediaportal.showXhamster = ConfigYesNo(default = False)
+config.mediaportal.showxxxsave = ConfigYesNo(default = False)
 config.mediaportal.showyouporn = ConfigYesNo(default = False)
 
 #fake entry fuer die kategorien
@@ -381,6 +383,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige UpdateTube:", config.mediaportal.showupdatetube))
 		self.configlist.append(getConfigListEntry("Zeige WetPlace:", config.mediaportal.showwetplace))
 		self.configlist.append(getConfigListEntry("Zeige xHamster:", config.mediaportal.showXhamster))
+		self.configlist.append(getConfigListEntry("Zeige XXXSaVe:", config.mediaportal.showxxxsave))
 		self.configlist.append(getConfigListEntry("Zeige YouPorn:", config.mediaportal.showyouporn))
 		
 		self["config"].setList(self.configlist)
@@ -726,6 +729,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.porn.append(self.hauptListEntry("WetPlace", "wetplace"))
 		if config.mediaportal.showXhamster.value:
 			self.porn.append(self.hauptListEntry("xHamster", "xhamster"))
+		if config.mediaportal.showxxxsave.value:
+			self.porn.append(self.hauptListEntry("XXXSaVe", "xxxsave"))
 		if config.mediaportal.showyouporn.value:
 			self.porn.append(self.hauptListEntry("YouPorn", "youporn"))
 		
@@ -1255,6 +1260,11 @@ class haupt_Screen(Screen, ConfigListScreen):
 				self.session.openWithCallback(self.pinxhamster, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
 				self.session.open(xhamsterGenreScreen)
+		elif auswahl == "XXXSaVe":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pinxxxsave, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.session.open(xxxsaveFilmScreen)
 		elif auswahl == "YouPorn":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinyouporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -1372,6 +1382,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 	def pinxhamster(self, pincode):
 		if pincode:
 			self.session.open(xhamsterGenreScreen)
+
+	def pinxxxsave(self, pincode):
+		if pincode:
+			self.session.open(xxxsaveFilmScreen)
 
 	def pinyouporn(self, pincode):
 		if pincode:
@@ -1690,6 +1704,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("WetPlace", "wetplace", "Porn"))
 		if config.mediaportal.showXhamster.value:
 			self.plugin_liste.append(("xHamster", "xhamster", "Porn"))
+		if config.mediaportal.showxxxsave.value:
+			self.plugin_liste.append(("XXXSaVe", "xxxsave", "Porn"))
 		if config.mediaportal.showyouporn.value:
 			self.plugin_liste.append(("YouPorn", "youporn", "Porn"))
 
@@ -2371,6 +2387,12 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			else:
 				self.hit_plugin("xHamster")
 				self.session.open(xhamsterGenreScreen)
+		elif auswahl == "XXXSaVe":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pinxxxsave, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.hit_plugin("XXXSaVe")
+				self.session.open(xxxsaveFilmScreen)
 		elif auswahl == "YouPorn":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinyouporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -2517,6 +2539,11 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		if pincode:
 			self.hit_plugin("xHamster")
 			self.session.open(xhamsterGenreScreen)
+
+	def pinxxxsave(self, pincode):
+		if pincode:
+			self.hit_plugin("XXXSaVe")
+			self.session.open(xxxsaveFilmScreen)
 
 	def pinyouporn(self, pincode):
 		if pincode:

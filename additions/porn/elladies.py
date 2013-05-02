@@ -214,7 +214,7 @@ class elladiesFilmScreen(Screen):
 		self.filmliste = []
 		url = 'http://search.el-ladies.com/?search=%s&fun=0&niche=%s&pnum=%s&hd=%s' % (self.SearchString, self.phCatID, str(self.page), self.HD)
 		print url
-		getPage(url, headers={'Cookie': 'hideNiches=9%2C2%2C3%2C1%2C29%2C31%2C4%2C21%2C22%2C25', 'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
+		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
 		lastp = re.findall('.*pnum=(.*?)"', data, re.S)
