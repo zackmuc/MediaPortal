@@ -82,6 +82,7 @@ from additions.porn.beeg import *
 from additions.porn.dreiin import *
 from additions.porn.drtuber import *
 from additions.porn.eporner import *
+from additions.porn.eroprofile import *
 from additions.porn.extremetube import *
 from additions.porn.gstreaminxxx import *
 from additions.porn.hdporn import *
@@ -199,6 +200,7 @@ config.mediaportal.showbeeg = ConfigYesNo(default = False)
 config.mediaportal.showdreiin = ConfigYesNo(default = False)
 config.mediaportal.showdrtuber = ConfigYesNo(default = False)
 config.mediaportal.showeporner = ConfigYesNo(default = False)
+config.mediaportal.showeroprofile = ConfigYesNo(default = False)
 config.mediaportal.showextremetube = ConfigYesNo(default = False)
 config.mediaportal.showgstreaminxxx = ConfigYesNo(default = False)
 config.mediaportal.showhdporn = ConfigYesNo(default = False)
@@ -353,6 +355,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Drei.in:", config.mediaportal.showdreiin))
 		self.configlist.append(getConfigListEntry("Zeige DrTuber:", config.mediaportal.showdrtuber))
 		self.configlist.append(getConfigListEntry("Zeige Eporner:", config.mediaportal.showeporner))
+		self.configlist.append(getConfigListEntry("Zeige EroProfile:", config.mediaportal.showeroprofile))
 		self.configlist.append(getConfigListEntry("Zeige ExtremeTube:", config.mediaportal.showextremetube))
 		self.configlist.append(getConfigListEntry("Zeige G-Stream-XXX:", config.mediaportal.showgstreaminxxx))
 		self.configlist.append(getConfigListEntry("Zeige HDPorn:", config.mediaportal.showhdporn))
@@ -669,6 +672,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.porn.append(self.hauptListEntry("DrTuber", "drtuber"))
 		if config.mediaportal.showeporner.value:
 			self.porn.append(self.hauptListEntry("Eporner", "eporner"))
+		if config.mediaportal.showeroprofile.value:
+			self.porn.append(self.hauptListEntry("EroProfile", "eroprofile"))
 		if config.mediaportal.showextremetube.value:
 			self.porn.append(self.hauptListEntry("ExtremeTube", "extremetube"))
 		if config.mediaportal.showgstreaminxxx.value:
@@ -1125,6 +1130,11 @@ class haupt_Screen(Screen, ConfigListScreen):
 				self.session.openWithCallback(self.pineporner, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
 				self.session.open(epornerGenreScreen)
+		elif auswahl == "EroProfile":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pineroprofile, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.session.open(eroprofileGenreScreen)
 		elif auswahl == "ExtremeTube":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinextremetube, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -1253,6 +1263,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 	def pineporner(self, pincode):
 		if pincode:
 			self.session.open(epornerGenreScreen)
+
+	def pineroprofile(self, pincode):
+		if pincode:
+			self.session.open(eroprofileGenreScreen)
 
 	def pinextremetube(self, pincode):
 		if pincode:
@@ -1603,6 +1617,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("DrTuber", "drtuber", "Porn"))
 		if config.mediaportal.showeporner.value:
 			self.plugin_liste.append(("Eporner", "eporner", "Porn"))
+		if config.mediaportal.showeroprofile.value:
+			self.plugin_liste.append(("EroProfile", "eroprofile", "Porn"))
 		if config.mediaportal.showextremetube.value:
 			self.plugin_liste.append(("ExtremeTube", "extremetube", "Porn"))
 		if config.mediaportal.showgstreaminxxx.value:
@@ -2193,6 +2209,12 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			else:
 				self.hit_plugin("Eporner")
 				self.session.open(epornerGenreScreen)
+		elif auswahl == "EroProfile":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pineroprofile, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.hit_plugin("EroProfile")
+				self.session.open(eroprofileGenreScreen)
 		elif auswahl == "ExtremeTube":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinextremetube, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -2348,6 +2370,11 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		if pincode:
 			self.hit_plugin("Eporner")
 			self.session.open(epornerGenreScreen)
+
+	def pineroprofile(self, pincode):
+		if pincode:
+			self.hit_plugin("EroProfile")
+			self.session.open(eroprofileGenreScreen)
 
 	def pinextremetube(self, pincode):
 		if pincode:
