@@ -203,7 +203,7 @@ class xxxsaveStreamListeScreen(Screen):
 			"cancel": self.keyCancel
 		}, -1)
 
-		self['title'] = Label("Porno-Streams.com")
+		self['title'] = Label("XXXSaVe.com")
 		self['name'] = Label(self.streamName)
 		self['coverArt'] = Pixmap()
 		
