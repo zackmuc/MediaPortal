@@ -231,7 +231,7 @@ class xxxsaveStreamListeScreen(Screen):
 					print hostername, stream
 					hostername = hostername.replace('.eu','')
 					hostername = hostername.title()
-					disc = re.search('.*?(Scene_1|Scene_2|Scene_3|Scene_4|Scene_5|Scene_6|Scene_7|Scene_8|Scene_9|Scene_10|Scene_11|Scene_12|Scene_13|Scene_14|Scene_15).*?', stream, re.S|re.I)
+					disc = re.search('.*?(Scene_10|Scene_11|Scene_12|Scene_13|Scene_14|Scene_15|Scene_1|Scene_2|Scene_3|Scene_4|Scene_5|Scene_6|Scene_7|Scene_8|Scene_9).*?', stream, re.S|re.I)
 					if disc:
 						discno = disc.group(1)
 						hostername = hostername + ' (' + discno + ')'
