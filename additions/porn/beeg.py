@@ -176,9 +176,9 @@ class beegFilmScreen(Screen):
 	def loadData(self, data):
 		pagerbox = re.search('class="pager-box">(.*)</div>', data, re.S)
 		if pagerbox:
-			lastp = re.findall('<a\s.*target="_self".*>(.?[0-9])</a>\s{0,2}<a\s.*id="paging_prev">', pagerbox.group(1), re.S)
+			lastp = re.search('<a\s.*target="_self".*>(.?[0-9])</a>\s{0,2}<a\s.*id="paging_prev">', pagerbox.group(1), re.S)
 			if lastp:
-				self.lastpage = int(lastp[0])
+				self.lastpage = int(lastp.group(1))
 		else:
 			self.lastpage = 1
 		self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))

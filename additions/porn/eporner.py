@@ -205,9 +205,9 @@ class epornerFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class="numlist2">.*?of\s(.*?[0-9])\s', data, re.S)
+		lastp = re.search('class="numlist2">.*?of\s(.*?[0-9])\s', data, re.S)
 		if lastp:
-			lastp = round((float(lastp[0]) / 32) + 0.5)
+			lastp = round((float(lastp.group(1)) / 32) + 0.5)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

@@ -63,9 +63,9 @@ class xxxsaveFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('.*?Page\s.*?of\s(.*?)<', data, re.S)
+		lastp = re.search('.*?Page\s.*?of\s(.*?)<', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

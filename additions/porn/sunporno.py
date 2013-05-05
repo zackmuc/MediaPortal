@@ -203,9 +203,9 @@ class sunpornoFilmScreen(Screen):
 	
 	def loadData(self, data):
 		lastparse = re.search('class="block88"(.*?)class="thumbs"', data, re.S)
-		lastp = re.findall('href=.*>([0-9]+)<', lastparse.group(1), re.S)
+		lastp = re.search('href=.*>([0-9]+)<', lastparse.group(1), re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

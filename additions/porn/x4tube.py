@@ -187,9 +187,9 @@ class fourtubePornstarsScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class="last"\shref=".*page=(.*?)"\stitle="Last\spage">', data, re.S)
+		lastp = re.search('class="last"\shref=".*page=(.*?)"\stitle="Last\spage">', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:
@@ -345,9 +345,9 @@ class fourtubeSitesScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class="last"\shref=".*page=(.*?)"\stitle="Last\spage">', data, re.S)
+		lastp = re.search('class="last"\shref=".*page=(.*?)"\stitle="Last\spage">', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:
@@ -502,9 +502,9 @@ class fourtubeFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class="last"\shref=".*page=(.*?)"\stitle="Last\spage">', data, re.S)
+		lastp = re.search('class="last"\shref=".*page=(.*?)"\stitle="Last\spage">', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

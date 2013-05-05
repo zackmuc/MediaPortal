@@ -209,9 +209,9 @@ class updatetubeFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('<div>Showing.*of\s(.*?[0-9])\sitems', data, re.S)
+		lastp = re.search('<div>Showing.*of\s(.*?[0-9])\sitems', data, re.S)
 		if lastp:
-			lastp = round((float(lastp[0]) / 40) + 0.5)
+			lastp = round((float(lastp.group(1)) / 40) + 0.5)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

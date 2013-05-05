@@ -172,9 +172,9 @@ class xhamsterFilmScreen(Screen):
 		
 	def pageData(self, data):
 		lastpparse = re.search('class=\'pager\'>(.*)</div>', data, re.S)
-		lastp = re.findall('href=.*>(.*[0-9])<.*?', lastpparse.group(1), re.S)
+		lastp = re.search('href=.*>(.*[0-9])<.*?', lastpparse.group(1), re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

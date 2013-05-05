@@ -169,9 +169,9 @@ class drtuberFilmScreen(Screen):
 	def loadData(self, data):
 		pagerbox = re.search('<div\sclass="number">(.*?)<div\sclass="clear">', data, re.S)
 		if pagerbox:
-			lastp = re.findall('.*>([0-9]+)', pagerbox.group(1), re.S)
+			lastp = re.search('.*>([0-9]+)', pagerbox.group(1), re.S)
 			if lastp:
-				self.lastpage = int(lastp[0])
+				self.lastpage = int(lastp.group(1))
 		else:
 			self.lastpage = 1
 		self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))

@@ -197,9 +197,9 @@ class gigatvFilmScreen(Screen):
 	def loadData(self, data):
 		lastparse = re.search('<ul\sclass="sequences\shlist">(.*?)</ul>', data, re.S)
 		if lastparse:
-			lastp = re.findall('<a\shref=".*>.*?([0-9]+)', lastparse.group(1), re.S)
+			lastp = re.search('<a\shref=".*>.*?([0-9]+)', lastparse.group(1), re.S)
 			if lastp:
-				self.lastpage = int(lastp[0])
+				self.lastpage = int(lastp.group(1))
 			else:
 				self.lastpage = 1
 		else:

@@ -205,9 +205,9 @@ class youpornFilmScreen(Screen):
 	
 	def loadData(self, data):
 		lastpparse = re.search('id="pagination">(.*)</nav>', data, re.S)
-		lastp = re.findall('<li>.*">(.*?[0-9])<.*/li>', lastpparse.group(1), re.S)
+		lastp = re.search('<li>.*">(.*?[0-9])<.*/li>', lastpparse.group(1), re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

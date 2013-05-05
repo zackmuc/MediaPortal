@@ -209,9 +209,9 @@ class pornerbrosFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.pageData).addErrback(self.dataError)
 
 	def pageData(self, data):
-		lastp = re.findall('<title>Page.*?of\s(.*?[0-9])\s', data, re.S)
+		lastp = re.search('<title>Page.*?of\s(.*?[0-9])\s', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

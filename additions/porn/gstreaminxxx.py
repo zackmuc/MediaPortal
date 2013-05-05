@@ -191,9 +191,9 @@ class gstreaminxxxFilmScreen(Screen):
 		getPage(url, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('normal">Seite.*?von\s(.*?)</td>', data, re.S)
+		lastp = re.search('normal">Seite.*?von\s(.*?)</td>', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

@@ -186,9 +186,9 @@ class eroprofileFilmScreen(Screen):
 		getPage(url, headers={'Cookie': 'hideNiches=9%2C2%2C3%2C1%2C29%2C31%2C4%2C21%2C22%2C25', 'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class="maxW"><tr><td><b>(.*?)</b>\sresults</td>', data, re.S)
+		lastp = re.search('class="maxW"><tr><td><b>(.*?)</b>\sresults</td>', data, re.S)
 		if lastp:
-			lastp = round((float(lastp[0]) / 12) + 0.5)
+			lastp = round((float(lastp.group(1)) / 12) + 0.5)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

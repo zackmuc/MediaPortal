@@ -202,9 +202,9 @@ class redtubeFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class="categoryHeading">.*\((.*?)\)</h1>', data, re.S)
+		lastp = re.search('class="categoryHeading">.*\((.*?)\)</h1>', data, re.S)
 		if lastp:
-			lastp = lastp[0].replace(',','')
+			lastp = lastp.group(1).replace(',','')
 			cat = self.phCatLink
 			search = re.search('/?search=(.*)', cat, re.S)
 			if search:

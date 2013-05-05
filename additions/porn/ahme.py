@@ -204,9 +204,9 @@ class ahmeFilmScreen(Screen):
 	
 	def loadData(self, data):
 		lastpparse = re.search('class="top_pages">(.*)</div><!--/top pages', data, re.S)
-		lastp = re.findall('href=.*html.*>(.*[0-9])<.*?', lastpparse.group(1), re.S)
+		lastp = re.search('href=.*html.*>(.*[0-9])<.*?', lastpparse.group(1), re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:

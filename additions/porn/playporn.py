@@ -210,9 +210,9 @@ class playpornFilmScreen(Screen):
 		getPage(url, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.findall('class=\'pages\'>.*?of (.*?)</span>', data, re.S)
+		lastp = re.search('class=\'pages\'>.*?of (.*?)</span>', data, re.S)
 		if lastp:
-			lastp = lastp[0]
+			lastp = lastp.group(1)
 			print lastp
 			self.lastpage = int(lastp)
 		else:
