@@ -4,7 +4,7 @@ import Queue
 import threading
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
-CF_Version = "Clipfish.de v0.94 (experimental)"
+CF_Version = "Clipfish.de v0.95 (experimental)"
 
 CF_siteEncoding = 'utf-8'
 
@@ -66,6 +66,7 @@ class show_CF_Genre(Screen):
 		self['F3'] = Label("")
 		self['F4'] = Label("")
 		
+		self.param_qr = ''
 		self.menuLevel = 0
 		self.menuMaxLevel = 1
 		self.menuIdx = [0,0,0]
@@ -73,7 +74,7 @@ class show_CF_Genre(Screen):
 		self.genreSelected = False
 		self.menuListe = []
 		self.baseUrl = "http://www.clipfish.de"
-		self.genreBase = ["/kategorien", "/musikvideos/charts", "/musikvideos/genre", "/special/spielfilme/genre"]
+		self.genreBase = ["/suche", "/kategorien", "/musikvideos/charts", "/musikvideos/genre", "/special/spielfilme/genre"]
 		self.genreName = ["","","",""]
 		self.genreUrl = ["","","",""]
 		self.genreTitle = ""
@@ -84,12 +85,14 @@ class show_CF_Genre(Screen):
 		
 		self.genreMenu = [
 			[
+			("Suche...", ""),
 			("Videos", ""),
 			("Musikvideo-Charts", ""),
 			("Musikvideos", ""),
 			("Spielfilme", "")
 			],
-			[[
+			[None,
+			[
 			#("Eure Empfehlungen", "/28/%s"),
 			("Anime & Cartoons", "/2/%s"),
 			("Auto", "/3/%s"),
@@ -137,6 +140,7 @@ class show_CF_Genre(Screen):
 			]
 			],
 			[
+			[None],
 			[None],
 			[None],
 			[None],
@@ -206,8 +210,23 @@ class show_CF_Genre(Screen):
 			print "Genre selected"
 			genreurl = self.baseUrl+self.genreBase[self.menuIdx[0]]+self.genreUrl[0]+self.genreUrl[1]
 			print genreurl
-			self.session.open(CF_FilmListeScreen, genreurl, self.genreTitle)
+			if re.match('.*?Suche...', self.genreTitle):
+				self.paraQuery()
+			else:
+				self.session.open(CF_FilmListeScreen, genreurl, self.genreTitle)
 
+	def paraQuery(self):
+		self.param_qr = ''
+		self.session.openWithCallback(self.cb_paraQuery, VirtualKeyBoard, title = (_("Suchanfrage")), text = self.param_qr)
+		
+	def cb_paraQuery(self, callback = None, entry = None):
+		if callback != None:
+			self.param_qr = callback.strip()
+			if len(self.param_qr) > 0:
+				qr = urllib.quote(self.param_qr)
+				genreurl = self.baseUrl+self.genreBase[self.menuIdx[0]]+'/'+qr
+				self.session.open(CF_FilmListeScreen, genreurl, self.genreTitle)
+	
 	def setMenu(self, levelIncr, menuInit=False):
 		print "setMenu: ",levelIncr
 		self.genreSelected = False
@@ -366,6 +385,7 @@ class CF_FilmListeScreen(Screen):
 		self.genreVideos = re.match('.*?Videos', self.genreName)
 		self.genreSpielfilme = re.match('.*?Spielfilm', self.genreName)
 		self.genreMusicCharts = re.match('.*?-Charts', self.genreName)
+		self.genreSearch = re.match('.*?Suche...', self.genreName)
 
 		self.setGenreStrTitle()
 		
@@ -388,7 +408,7 @@ class CF_FilmListeScreen(Screen):
 			url = "%s/%d/" % (link, self.page)
 		elif self.genreSpielfilme:
 			url = "%s/%d/" % (self.genreLink, self.page)
-		elif self.genreMusicCharts:
+		elif self.genreMusicCharts or self.genreSearch:
 			url = self.genreLink
 		else:
 			url = "%s/beste/%d/#" % (self.genreLink, self.page)
@@ -426,18 +446,20 @@ class CF_FilmListeScreen(Screen):
 		while a < l:
 			if self.genreMusicCharts:
 				mg = re.search('intern cf-left-col50-left">(.*?)"cf-charts-text">', data[a:], re.S)
+			elif self.genreSearch:
+				mg = re.search('"cf-search-list-item-image">(.*?)</li>', data[a:], re.S)
 			else:
 				mg = re.search('<li id="cf-video-item_(.*?)</li>', data[a:], re.S)
 			
 			if mg:
 				a += mg.end()
-				if self.genreMusicCharts:
+				if self.genreMusicCharts or self.genreSearch:
 					m1 = re.search('href="(.*?)".*?<img.*?src="(.*?)".*?alt="(.*?)"', mg.group(1), re.S)
 				else:
 					m1 = re.search('href="(.*?)".*?title="(.*?)">.*?<img.*?src="(.*?)"', mg.group(1), re.S)
 				
 				if m1:
-					if self.genreMusicCharts:
+					if self.genreMusicCharts or self.genreSearch:
 						title = decodeHtml(m1.group(3))
 						url = m1.group(1)
 						img = m1.group(2)
