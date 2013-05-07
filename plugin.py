@@ -88,6 +88,7 @@ from additions.porn.extremetube import *
 from additions.porn.gstreaminxxx import *
 from additions.porn.hdporn import *
 from additions.porn.hotshame import *
+from additions.porn.megaskanks import *
 from additions.porn.pinkrod import *
 from additions.porn.playporn import *
 from additions.porn.pornerbros import *
@@ -208,6 +209,7 @@ config.mediaportal.showextremetube = ConfigYesNo(default = False)
 config.mediaportal.showgstreaminxxx = ConfigYesNo(default = False)
 config.mediaportal.showhdporn = ConfigYesNo(default = False)
 config.mediaportal.showhotshame = ConfigYesNo(default = False)
+config.mediaportal.showmegaskanks = ConfigYesNo(default = False)
 config.mediaportal.showIStreamPorn = ConfigYesNo(default = False)
 config.mediaportal.showM2kPorn = ConfigYesNo(default = False)
 config.mediaportal.showpinkrod = ConfigYesNo(default = False)
@@ -365,6 +367,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige G-Stream-XXX:", config.mediaportal.showgstreaminxxx))
 		self.configlist.append(getConfigListEntry("Zeige HDPorn:", config.mediaportal.showhdporn))
 		self.configlist.append(getConfigListEntry("Zeige hotshame:", config.mediaportal.showhotshame))
+		self.configlist.append(getConfigListEntry("Zeige MegaSkanks:", config.mediaportal.showmegaskanks))
 		self.configlist.append(getConfigListEntry("Zeige IStream-XXX:", config.mediaportal.showIStreamPorn))
 		self.configlist.append(getConfigListEntry("Zeige Movie2k-XXX:", config.mediaportal.showM2kPorn))
 		self.configlist.append(getConfigListEntry("Zeige Pinkrod:", config.mediaportal.showpinkrod))
@@ -694,6 +697,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.porn.append(self.hauptListEntry("HDPorn", "hdporn"))
 		if config.mediaportal.showhotshame.value:
 			self.porn.append(self.hauptListEntry("hotshame", "hotshame"))
+		if config.mediaportal.showmegaskanks.value:
+			self.porn.append(self.hauptListEntry("MegaSkanks", "megaskanks"))
 		if config.mediaportal.showIStreamPorn.value:
 			self.porn.append(self.hauptListEntry("IStream-XXX", "istreamporn"))
 		if config.mediaportal.showM2kPorn.value:
@@ -1175,6 +1180,11 @@ class haupt_Screen(Screen, ConfigListScreen):
 				self.session.openWithCallback(self.pinhotshame, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
 				self.session.open(hotshameGenreScreen)
+		elif auswahl == "MegaSkanks":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pinmegaskanks, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.session.open(megaskanksGenreScreen)
 		elif auswahl == "IStream-XXX":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinistreamporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -1308,6 +1318,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 	def pinhotshame(self, pincode):
 		if pincode:
 			self.session.open(hotshameGenreScreen)
+
+	def pinmegaskanks(self, pincode):
+		if pincode:
+			self.session.open(megaskanksGenreScreen)
 
 	def pinmovie2kporn(self, pincode):
 		if pincode:
@@ -1658,6 +1672,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("HDPorn", "hdporn", "Porn"))
 		if config.mediaportal.showhotshame.value:
 			self.plugin_liste.append(("hotshame", "hotshame", "Porn"))
+		if config.mediaportal.showmegaskanks.value:
+			self.plugin_liste.append(("MegaSkanks", "megaskanks", "Porn"))
 		if config.mediaportal.showIStreamPorn.value:
 			self.plugin_liste.append(("IStream-XXX", "istreamporn", "Porn"))
 		if config.mediaportal.showM2kPorn.value:
@@ -2275,6 +2291,12 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			else:
 				self.hit_plugin("hotshame")
 				self.session.open(hotshameGenreScreen)
+		elif auswahl == "MegaSkanks":
+			if config.mediaportal.pornpin.value:
+				self.session.openWithCallback(self.pinmegaskanks, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+			else:
+				self.hit_plugin("MegaSkanks")
+				self.session.open(megaskanksGenreScreen)
 		elif auswahl == "IStream-XXX":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinistreamporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -2437,6 +2459,11 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		if pincode:
 			self.hit_plugin("hotshame")
 			self.session.open(hotshameGenreScreen)
+
+	def pinmegaskanks(self, pincode):
+		if pincode:
+			self.hit_plugin("MegaSkanks")
+			self.session.open(megaskanksGenreScreen)
 
 	def pinistreamporn(self, pincode):
 		if pincode:
