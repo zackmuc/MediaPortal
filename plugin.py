@@ -3,6 +3,7 @@
 # General imports
 from resources.imports import *
 from resources.decrypt import *
+from resources.update import *
 	
 # Stream-Sites import
 from additions.forplayers import *
@@ -483,53 +484,17 @@ class haupt_Screen(Screen, ConfigListScreen):
 
 		self.currentlist = "porn"
 
-		if config.mediaportal.autoupdate.value:
-			self.onLayoutFinish.append(self.checkforupdate)
-		else:
-			self.onLayoutFinish.append(self.layoutFinished)
+		self.onLayoutFinish.append(self.layoutFinished)
 		
-	def checkforupdate(self):
-		self.keyLocked = True
-		try:
-			getPage("http://master.dl.sourceforge.net/project/e2-mediaportal/version.txt").addCallback(self.gotUpdateInfo).addErrback(self.gotError)
-		except Exception, error:
-			print str(error)
-
-	def gotError(self, error=""):
-		self.layoutFinished()
-
-	def gotUpdateInfo(self, html):
-		tmp_infolines = html.splitlines()
-		remoteversion = tmp_infolines[0]
-		self.updateurl = tmp_infolines[1]
-		if config.mediaportal.version.value < remoteversion:
-			self.session.openWithCallback(self.startPluginUpdate,MessageBox,_("An update is available for the MediaPortal Plugin!\nDo you want to download and install it now?"), MessageBox.TYPE_YESNO)
-		else:
-			self.layoutFinished()
-
-	def startPluginUpdate(self, answer):
-		if answer is True:
-			self.container=eConsoleAppContainer()
-			self.container.appClosed.append(self.finishedPluginUpdate)
-			self.container.execute("opkg install --force-overwrite --force-depends " + str(self.updateurl))
-		else:
-			self.layoutFinished()
-
-	def finishedPluginUpdate(self,retval):
-		self.session.openWithCallback(self.restartGUI, MessageBox, _("MediaPortal successfully updated!\nDo you want to restart the Enigma2 GUI now?"), MessageBox.TYPE_YESNO)
-
-	def restartGUI(self, answer):
-		if answer is True:
-			self.session.open(TryQuitMainloop, 3)
-		else:
-			self.layoutFinished()
-
 	def layoutFinished(self):
+		if config.mediaportal.autoupdate.value:
+			checkupdate(self.session).checkforupdate()
+
 		self.mediatheken = []
 		self.grauzone = []
 		self.funsport = []	
 		self.porn = []	
-		
+
 		# Mediatheken
 		if config.mediaportal.showMyvideo.value:
 			self.mediatheken.append(self.hauptListEntry("MyVideo", "myvideo"))
@@ -752,7 +717,6 @@ class haupt_Screen(Screen, ConfigListScreen):
 		self["funsport"].l.setItemHeight(44)
 		self["porn"].setList(self.porn)
 		self["porn"].l.setItemHeight(44)
-		self.keyLocked = False
 		self.keyRight()
 
 	def hauptListEntry(self, name, jpg):
@@ -765,13 +729,9 @@ class haupt_Screen(Screen, ConfigListScreen):
 		return res
 	
 	def keySetup(self):
-		if self.keyLocked:
-			return
 		self.session.openWithCallback(self.pinok, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 	
 	def keyHelp(self):
-		if self.keyLocked:
-			return
 		self.session.open(HelpScreen)
 
 	def getTriesEntry(self):
@@ -1851,49 +1811,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		self.selektor_index = 1
 		self.select_list = 0
 
-		if config.mediaportal.autoupdate.value:
-			self.onFirstExecBegin.append(self.checkforupdate)
-		else:
-			self.onFirstExecBegin.append(self._onFirstExecBegin)
-		
-	def checkforupdate(self):
-		self.keyLocked = True
-		try:
-			getPage("http://master.dl.sourceforge.net/project/e2-mediaportal/version.txt").addCallback(self.gotUpdateInfo).addErrback(self.gotError)
-		except Exception, error:
-			print str(error)
-
-	def gotError(self, error=""):
-		self._onFirstExecBegin()
-
-	def gotUpdateInfo(self, html):
-		tmp_infolines = html.splitlines()
-		remoteversion = tmp_infolines[0]
-		self.updateurl = tmp_infolines[1]
-		if config.mediaportal.version.value < remoteversion:
-			self.session.openWithCallback(self.startPluginUpdate,MessageBox,_("An update is available for the MediaPortal Plugin!\nDo you want to download and install it now?"), MessageBox.TYPE_YESNO)
-		else:
-			self._onFirstExecBegin()
-
-	def startPluginUpdate(self, answer):
-		if answer is True:
-			self.container=eConsoleAppContainer()
-			self.container.appClosed.append(self.finishedPluginUpdate)
-			self.container.execute("opkg install --force-overwrite --force-depends " + str(self.updateurl))
-		else:
-			self._onFirstExecBegin()
-
-	def finishedPluginUpdate(self,retval):
-		self.session.openWithCallback(self.restartGUI, MessageBox, _("MediaPortal successfully updated!\nDo you want to restart the Enigma2 GUI now?"), MessageBox.TYPE_YESNO)
-
-	def restartGUI(self, answer):
-		if answer is True:
-			self.session.open(TryQuitMainloop, 3)
-		else:
-			self._onFirstExecBegin()
-		
 		self.onFirstExecBegin.append(self._onFirstExecBegin)
-
+		
 	def manuelleSortierung(self):
 		self.session.openWithCallback(self.restart, pluginSort)
 
@@ -1915,6 +1834,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			shutil.move(self.sort_plugins_file+".tmp", self.sort_plugins_file)
 
 	def _onFirstExecBegin(self):
+		if config.mediaportal.autoupdate.value:
+			checkupdate(self.session).checkforupdate()
+			
 		# load plugin icons
 		print "Set Filter:", config.mediaportal.filter.value
 		self['blue'].setText(config.mediaportal.filter.value)
@@ -1960,7 +1882,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 					
 		# erstelle mainlist
 		self.widget_list()
-		self.keyLocked = False
 				
 	def widget_list(self):
 		count = 1
@@ -2004,8 +1925,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		self["frame"].startMoving()
 		
 	def keyOK(self):
-		if self.keyLocked:
-			return
 		if self.check_empty_list():
 			return
 		
@@ -2551,8 +2470,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.session.open(youpornGenreScreen)
 	
 	def	keyLeft(self):
-		if self.keyLocked:
-			return
 		if self.check_empty_list():
 			return
 		if self.selektor_index > 1: 
@@ -2562,8 +2479,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.page_back()
 
 	def	keyRight(self):
-		if self.keyLocked:
-			return
 		if self.check_empty_list():
 			return
 		if self.selektor_index < 40 and self.selektor_index != len(self.mainlist[int(self.select_list)]):
@@ -2573,8 +2488,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.page_next()
 			
 	def keyUp(self):
-		if self.keyLocked:
-			return
 		if self.check_empty_list():
 			return
 		if self.selektor_index-8 > 1:
@@ -2585,8 +2498,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.move_selector()
 
 	def keyDown(self):
-		if self.keyLocked:
-			return
 		if self.check_empty_list():
 			return
 		if self.selektor_index+8 <= len(self.mainlist[int(self.select_list)]):
@@ -2643,14 +2554,10 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self["zeile"+str(x)].show()
 	
 	def keySetup(self):
-		if self.keyLocked:
-			return
 		print config.mediaportal.pincode.value
 		self.session.openWithCallback(self.pinok, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 	
 	def keyHelp(self):
-		if self.keyLocked:
-			return
 		self.session.open(HelpScreen)
 
 	def getTriesEntry(self):
