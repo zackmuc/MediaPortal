@@ -3,7 +3,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
 
-YT_Version = "Youtube Search v0.95 (experimental)"
+YT_Version = "Youtube Search v0.96 (experimental)"
 
 YT_siteEncoding = 'utf-8'
 
@@ -587,10 +587,7 @@ class YT_ListScreen(Screen):
 		self['page'] = Label("")
 		if not self.favoGenre:
 			self['F1'] = Label("Text-")
-			if not (self.playlistGenre or self.channelGenre):
-				self['F2'] = Label("Favorit")
-			else:
-				self['F2'] = Label("")
+			self['F2'] = Label("Favorit")
 			self['F3'] = Label("VidPrio")
 			self['F4'] = Label("Text+")
 		else:
@@ -634,7 +631,7 @@ class YT_ListScreen(Screen):
 		print "getPage: ",self.stvLink
 		
 		self.filmliste = []
-		self.filmliste.append(('Bitte warten...','','','',''))
+		self.filmliste.append(('Bitte warten...','','','','',''))
 		self.chooseMenuList.setList(map(YT_ListEntry, self.filmliste))
 		
 		if self.favoGenre:
@@ -676,14 +673,14 @@ class YT_ListScreen(Screen):
 						url = m2.group(2)
 						img = m2.group(3)
 						
-						self.filmliste.append(('', title, url, img, desc))
+						self.filmliste.append(('', title, url, img, desc, 'P'))
 				else:
 					a = l
 					
 			if len(self.filmliste) == 0:
 				print "No playlist found!"
 				self.pages = 0
-				self.filmliste.append(('Keine Playlists gefunden !','','','',''))
+				self.filmliste.append(('Keine Playlists gefunden !','','','','',''))
 				self.keyLocked = True
 			else:
 				#self.filmliste.sort(key=lambda t : t[0].lower())
@@ -708,14 +705,14 @@ class YT_ListScreen(Screen):
 						url = m2.group(2)
 						img = m2.group(3)
 						
-						self.filmliste.append(('', title, url, img, desc))
+						self.filmliste.append(('', title, url, img, desc, 'C'))
 				else:
 					a = l
 					
 			if len(self.filmliste) == 0:
 				print "No channel found!"
 				self.pages = 0
-				self.filmliste.append(('Keine Channels gefunden !','','','',''))
+				self.filmliste.append(('Keine Channels gefunden !','','','','',''))
 				self.keyLocked = True
 			else:
 				#self.filmliste.sort(key=lambda t : t[0].lower())
@@ -743,14 +740,14 @@ class YT_ListScreen(Screen):
 						dura = int(m2.group(4))
 						vtim = str(datetime.timedelta(seconds=dura))
 						title = decodeHtml(m2.group(3))
-						self.filmliste.append((vtim+' ', title, vid, img, desc))
+						self.filmliste.append((vtim+' ', title, vid, img, desc, ''))
 				else:
 					a = l
 					
 			if len(self.filmliste) == 0:
 				print "No video found!"
 				self.pages = 0
-				self.filmliste.append(('Keine Videos gefunden !','','','',''))
+				self.filmliste.append(('Keine Videos gefunden !','','','','',''))
 				self.keyLocked = True
 			else:
 				#self.filmliste.sort(key=lambda t : t[0].lower())
@@ -835,10 +832,13 @@ class YT_ListScreen(Screen):
 			while j < l:
 				if j != i:
 					c += 1
+					dura = self.filmliste[j][0]
 					dhTitle = self.filmliste[j][1]
 					dhVideoId = self.filmliste[j][2]
 					dhImg = self.filmliste[j][3]
-					wdat = '<i>%d</i><n>%s</n><v>%s</v><im>%s</im>\n' % (c, dhTitle, dhVideoId, dhImg)
+					desc = urllib.quote(self.filmliste[j][4])
+					gid = self.filmliste[j][5]
+					wdat = '<i>%d</i><n>%s</n><v>%s</v><im>%s</im><d>%s</d><g>%s</g><desc>%s</desc>\n' % (c, dhTitle, dhVideoId, dhImg, dura, gid, desc)
 					f1.write(wdat)
 				
 				j += 1
@@ -855,9 +855,12 @@ class YT_ListScreen(Screen):
 	def addFavo(self):
 		print "addFavo:"
 		
+		dura = self['liste'].getCurrent()[0][0]
 		dhTitle = self['liste'].getCurrent()[0][1]
 		dhVideoId = self['liste'].getCurrent()[0][2]
 		dhImg = self['liste'].getCurrent()[0][3]
+		gid = self['liste'].getCurrent()[0][5]
+		desc = urllib.quote(self['liste'].getCurrent()[0][4])
 			
 		try:
 			if not fileExists(self.favo_path):
@@ -885,8 +888,8 @@ class YT_ListScreen(Screen):
 						f1.close()
 						self.session.open(MessageBox, _("Favorit schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)					
 						return
-						
-			wdat = '<i>%d</i><n>%s</n><v>%s</v><im>%s</im>\n' % (max_i + 1, dhTitle, dhVideoId, dhImg)
+			
+			wdat = '<i>%d</i><n>%s</n><v>%s</v><im>%s</im><d>%s</d><g>%s</g><desc>%s</desc>\n' % (max_i + 1, dhTitle, dhVideoId, dhImg, dura, gid, desc)
 			f1.write(wdat)
 			f1.close()
 			self.session.open(MessageBox, _("Favorit hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)					
@@ -911,16 +914,19 @@ class YT_ListScreen(Screen):
 			if not f_new:
 				data = f1.read()
 				f1.close()
-				m = re.findall('<n>(.*?)</n><v>(.*?)</v><im>(.*?)</im>', data)
+				m = re.findall('<n>(.*?)</n><v>(.*?)</v><im>(.*?)</im><d>(.*?)</d><g>(.*?)</g><desc>(.*?)</desc>', data)
 				if m:
-					for (n, v, img) in m:
-						self.filmliste.append(('', n, v, img, ''))
+					for (n, v, img, dura, gid, desc) in m:
+						self.filmliste.append((dura, n, v, img, urllib.unquote(desc), gid))
 				
 			if len(self.filmliste) == 0:
 				print "No video found!"
 				self.pages = self.page = 0
-				self.filmliste.append(('Keine Videos gefunden !','','','',''))
+				self.filmliste.append(('Keine Videos gefunden !','','','','',''))
 				self.keyLocked = True
+				if not f_new and len(data) > 0:
+					os.remove(self.favo_path)
+					
 			else:
 				self.pages = self.page = 1
 				self.keyLocked = False
@@ -1024,8 +1030,8 @@ class YT_ListScreen(Screen):
 		if self.favoGenre:
 			return
 			
-		if not (self.playlistGenre or self.channelGenre):
-			self.addFavo()
+		#if not (self.playlistGenre or self.channelGenre):
+		self.addFavo()
 	
 	def key_4(self):
 		#print "keyPageDownFast(5)"
@@ -1051,7 +1057,8 @@ class YT_ListScreen(Screen):
 		if self.keyLocked:
 			return
 
-		if self.playlistGenre or self.channelGenre:
+		gid = self['liste'].getCurrent()[0][5]
+		if gid == 'P' or gid == 'C':
 			dhTitle = 'Videos: ' + self['liste'].getCurrent()[0][1]
 			genreurl = re.sub('v=2', '', self['liste'].getCurrent()[0][2])
 			self.session.open(YT_ListScreen, genreurl, dhTitle)
