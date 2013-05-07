@@ -1061,7 +1061,10 @@ class YT_ListScreen(Screen):
 		if gid == 'P' or gid == 'C':
 			dhTitle = 'Videos: ' + self['liste'].getCurrent()[0][1]
 			genreurl = re.sub('v=2', '', self['liste'].getCurrent()[0][2])
-			self.session.open(YT_ListScreen, genreurl, dhTitle)
+			if self.favoGenre:
+				self.session.openWithCallback(self.getFavos, YT_ListScreen, genreurl, dhTitle)
+			else:
+				self.session.open(YT_ListScreen, genreurl, dhTitle)
 		else:
 			dhTitle = self['liste'].getCurrent()[0][1]
 			dhVideoId = self['liste'].getCurrent()[0][2]
