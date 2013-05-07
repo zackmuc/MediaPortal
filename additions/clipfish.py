@@ -4,7 +4,7 @@ import Queue
 import threading
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
-CF_Version = "Clipfish.de v0.95 (experimental)"
+CF_Version = "Clipfish.de v0.96 (experimental)"
 
 CF_siteEncoding = 'utf-8'
 
@@ -125,18 +125,18 @@ class show_CF_Genre(Screen):
 			("Rock / Alternative", "/119/rock-alternative"),
 			("Schlager", "/38/schlager")
 			],[
-			("Action", "/1"),
-			("SciFi", "/43"),
-			("Drama", "/37"),
-			("Abenteuer", "/31"),
-			("Dokumentation", "/23"),
-			("Kinder", "/17"),
-			("Western", "/11"),
-			("Klassiker", "/9"),
-			("Horror", "/27"),
-			("Asian", "/71"),
-			("Erotik", "/25"),
-			("Komödie", "/29")
+			("Action", "/1/action/neu/%d/#1"),
+			("SciFi", "/43/science-fiction/neu/%d/#43"),
+			("Drama", "/37/drama/neu/%d/#37"),
+			("Abenteuer", "/31/abenteuer/neu/%d/#31"),
+			("Dokumentation", "/23/dokumentation/neu/%d/#23"),
+			("Kinder", "/17/kinder/neu/%d/#17"),
+			("Western", "/11/western/neu/%d/#11"),
+			("Klassiker", "/9/klassiker/neu/%d/#9"),
+			("Horror", "/27/horror/neu/%d/#27"),
+			("Asian", "/71/asian/neu/%d/#71"),
+			("Erotik", "/25/erotik/neu/%d/#25"),
+			("Komödie", "/29/komoedie/neu/%d/#29")
 			]
 			],
 			[
@@ -407,7 +407,7 @@ class CF_FilmListeScreen(Screen):
 			link = self.genreLink % 'neu'
 			url = "%s/%d/" % (link, self.page)
 		elif self.genreSpielfilme:
-			url = "%s/%d/" % (self.genreLink, self.page)
+			url = self.genreLink % self.page
 		elif self.genreMusicCharts or self.genreSearch:
 			url = self.genreLink
 		else:
