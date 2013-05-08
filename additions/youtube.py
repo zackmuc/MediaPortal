@@ -3,7 +3,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
 
-YT_Version = "Youtube Search v0.96 (experimental)"
+YT_Version = "Youtube Search v0.97 (experimental)"
 
 YT_siteEncoding = 'utf-8'
 
@@ -576,7 +576,7 @@ class YT_ListScreen(Screen):
 			"9" 		: self.key_9
 		}, -1)
 
-		self.favoGenre = re.match('.*?Favoriten', self.genreName)
+		self.favoGenre = re.match('Favoriten', self.genreName)
 		self.playlistGenre = re.match('.*?Playlist', self.genreName)
 		self.channelGenre = re.match('.*?Channel', self.genreName)
 
@@ -796,7 +796,8 @@ class YT_ListScreen(Screen):
 		print "showCoverFile:"
 		if fileExists(picPath):
 			print "picpath: ",picPath
-			self['coverArt'].instance.setPixmap(None)
+			#self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -804,7 +805,8 @@ class YT_ListScreen(Screen):
 			if self.picload.startDecode(picPath, 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					#self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
