@@ -115,7 +115,7 @@ class dokuScreen(Screen):
 		
 	def ShowCover(self, picData):
 		if fileExists("/tmp/nkIcon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -123,7 +123,7 @@ class dokuScreen(Screen):
 			if self.picload.startDecode("/tmp/nkIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 	

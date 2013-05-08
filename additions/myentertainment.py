@@ -168,7 +168,7 @@ class MEHDFilmListeScreen(Screen):
 
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -176,7 +176,7 @@ class MEHDFilmListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -340,7 +340,7 @@ class enterColListScreen(Screen):
 		
 	def ShowCover(self, picData):
 		if fileExists("/tmp/spIcon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -348,7 +348,7 @@ class enterColListScreen(Screen):
 			if self.picload.startDecode("/tmp/spIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 					

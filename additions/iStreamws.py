@@ -449,7 +449,7 @@ class IStreamFilmListeScreen(Screen):
 	
 	def ShowCoverFile(self, picPath):
 		if fileExists(picPath):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -457,7 +457,7 @@ class IStreamFilmListeScreen(Screen):
 			if self.picload.startDecode(picPath, 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 				
@@ -734,7 +734,7 @@ class IStreamStreams(Screen, ConfigListScreen):
 	def ShowCover(self, picData):
 		print "ShowCover:"
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -742,7 +742,7 @@ class IStreamStreams(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 

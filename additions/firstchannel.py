@@ -133,7 +133,7 @@ class chFeatured(Screen, ConfigListScreen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/chIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -141,7 +141,7 @@ class chFeatured(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/chIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -261,7 +261,7 @@ class chTVshows(Screen, ConfigListScreen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/chIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -269,7 +269,7 @@ class chTVshows(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/chIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -389,7 +389,7 @@ class chTVshowsEpisode(Screen, ConfigListScreen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/chIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -397,7 +397,7 @@ class chTVshowsEpisode(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/chIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -478,7 +478,7 @@ class chStreams(Screen, ConfigListScreen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/chIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -486,7 +486,7 @@ class chStreams(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/chIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					

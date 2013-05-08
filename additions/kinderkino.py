@@ -83,7 +83,7 @@ class kinderKinoScreen(Screen):
 		
 	def roflCoverShow(self, data):
 		if fileExists("/tmp/kkPic.jpg"):
-			self['roflPic'].instance.setPixmap(None)
+			self['roflPic'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['roflPic'].instance.size()
@@ -91,7 +91,7 @@ class kinderKinoScreen(Screen):
 			if self.picload.startDecode("/tmp/kkPic.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['roflPic'].instance.setPixmap(ptr.__deref__())
+					self['roflPic'].instance.setPixmap(ptr)
 					self['roflPic'].show()
 					del self.picload
 

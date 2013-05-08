@@ -303,7 +303,7 @@ class bsStaffeln(Screen, ConfigListScreen):
 		
 	def ShowCover(self, picData):
 		if fileExists("/tmp/bsIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -311,7 +311,7 @@ class bsStaffeln(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/bsIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 
@@ -421,7 +421,7 @@ class bsEpisoden(Screen, ConfigListScreen):
 
 	def ShowCover(self, picData):
 		if fileExists("/tmp/bsIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -429,7 +429,7 @@ class bsEpisoden(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/bsIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -509,7 +509,7 @@ class bsStreams(Screen, ConfigListScreen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/bsIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -517,7 +517,7 @@ class bsStreams(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/bsIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 

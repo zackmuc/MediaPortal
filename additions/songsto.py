@@ -144,7 +144,7 @@ class showSongstoAll(Screen, InfoBarBase, InfoBarSeek):
 		
 	def scCoverShow(self, picData):
 		if fileExists("/tmp/scIcon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -152,7 +152,7 @@ class showSongstoAll(Screen, InfoBarBase, InfoBarSeek):
 			if self.picload.startDecode("/tmp/scIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 	
@@ -284,7 +284,7 @@ class showSongstoTop(Screen, InfoBarBase, InfoBarSeek):
 		
 	def scCoverShow(self, picData):
 		if fileExists("/tmp/scIcon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -292,7 +292,7 @@ class showSongstoTop(Screen, InfoBarBase, InfoBarSeek):
 			if self.picload.startDecode("/tmp/scIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 	

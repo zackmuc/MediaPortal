@@ -74,7 +74,7 @@ class baskino(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/baIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -82,7 +82,7 @@ class baskino(Screen):
 			if self.picload.startDecode("/tmp/baIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					

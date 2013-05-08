@@ -75,7 +75,7 @@ class trailer(Screen, ConfigListScreen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/trIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -83,7 +83,7 @@ class trailer(Screen, ConfigListScreen):
 			if self.picload.startDecode("/tmp/trIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					

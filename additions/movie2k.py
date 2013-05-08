@@ -436,7 +436,7 @@ class m2kSucheAlleFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -444,7 +444,7 @@ class m2kSucheAlleFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -612,7 +612,7 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -620,7 +620,7 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -770,7 +770,7 @@ class m2kKinoFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -778,7 +778,7 @@ class m2kKinoFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -896,7 +896,7 @@ class m2kVideoFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -904,7 +904,7 @@ class m2kVideoFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -1024,7 +1024,7 @@ class m2kupdateFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -1032,7 +1032,7 @@ class m2kupdateFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -1158,7 +1158,7 @@ class m2kTopSerienFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -1166,7 +1166,7 @@ class m2kTopSerienFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -1314,7 +1314,7 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -1322,7 +1322,7 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -1492,7 +1492,7 @@ class m2kStreamListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -1500,7 +1500,7 @@ class m2kStreamListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -1818,7 +1818,7 @@ class m2kEpisodenListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -1826,7 +1826,7 @@ class m2kEpisodenListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -1940,7 +1940,7 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -1948,7 +1948,7 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -2142,7 +2142,7 @@ class m2kSerienABCListe(Screen):
 
 	def ShowCoverFlag(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -2150,7 +2150,7 @@ class m2kSerienABCListe(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 

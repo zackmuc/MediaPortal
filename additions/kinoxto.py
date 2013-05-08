@@ -211,7 +211,7 @@ class kxKino(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -219,7 +219,7 @@ class kxKino(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -338,7 +338,7 @@ class kxNeuesteKino(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -346,7 +346,7 @@ class kxNeuesteKino(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -466,7 +466,7 @@ class kxNeuesteOnline(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -474,7 +474,7 @@ class kxNeuesteOnline(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -644,7 +644,7 @@ class kxABCpage(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -652,7 +652,7 @@ class kxABCpage(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -788,7 +788,7 @@ class kxNeuesteSerien(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -796,7 +796,7 @@ class kxNeuesteSerien(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -986,7 +986,7 @@ class kxSerienABCpage(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -994,7 +994,7 @@ class kxSerienABCpage(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					
@@ -1194,7 +1194,7 @@ class kxEpisoden(Screen):
 		
 	def showCover(self, picData):
 		if fileExists("/tmp/kxIcon.jpg"):
-			self['stationIcon'].instance.setPixmap(None)
+			self['stationIcon'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['stationIcon'].instance.size()
@@ -1202,7 +1202,7 @@ class kxEpisoden(Screen):
 			if self.picload.startDecode("/tmp/kxIcon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['stationIcon'].instance.setPixmap(ptr.__deref__())
+					self['stationIcon'].instance.setPixmap(ptr)
 					self['stationIcon'].show()
 					del self.picload
 					

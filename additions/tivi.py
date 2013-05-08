@@ -71,7 +71,7 @@ class tiviGenreListeScreen(Screen):
 	
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -79,7 +79,7 @@ class tiviGenreListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 
@@ -195,7 +195,7 @@ class tiviFilmListeScreen(Screen):
 	
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['coverArt'].instance.setPixmap(None)
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -203,7 +203,7 @@ class tiviFilmListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['coverArt'].instance.setPixmap(ptr.__deref__())
+					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
 

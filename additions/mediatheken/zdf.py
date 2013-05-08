@@ -146,7 +146,7 @@ class ZDFSubGenreScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['Pic'].instance.setPixmap(None)
+			self['Pic'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['Pic'].instance.size()
@@ -154,7 +154,7 @@ class ZDFSubGenreScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['Pic'].instance.setPixmap(ptr.__deref__())
+					self['Pic'].instance.setPixmap(ptr)
 					self['Pic'].show()
 					del self.picload
 
@@ -263,7 +263,7 @@ class ZDFFilmeListeScreen(Screen):
 			
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['Pic'].instance.setPixmap(None)
+			self['Pic'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['Pic'].instance.size()
@@ -271,7 +271,7 @@ class ZDFFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['Pic'].instance.setPixmap(ptr.__deref__())
+					self['Pic'].instance.setPixmap(ptr)
 					self['Pic'].show()
 					del self.picload
 
