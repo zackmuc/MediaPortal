@@ -1,5 +1,6 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.playrtmpmovie import PlayRtmpMovie
+from Components.config import config
 import json
 
 def kinderKinoListEntry(entry):
@@ -141,9 +142,15 @@ class kinderKinoScreen(Screen):
 			return
 		kkTitle = str(self['roflList'].getCurrent()[0][0])
 		kkUrlPart = str(self['roflList'].getCurrent()[0][1])
-		kkRtmpLink = "rtmp://fms.edge.newmedia.nacamar.net/loadtv_vod/' --playpath=mp4:kinderkino-kostenlos/%s --app=loadtv_vod/ --pageUrl=http://kostenlos.kinderkino.de/ --swfUrl=http://kinderkinokostenlos-www.azurewebsites.net/asset --pageUrl=http://kostenlos.kinderkino.de/'" % (kkUrlPart)
-		movieinfo = [kkRtmpLink,kkTitle]
-		self.session.open(PlayRtmpMovie, movieinfo, kkTitle)
+		if config.mediaportal.useRtmpDump.value:
+			kkRtmpLink = "rtmp://fms.edge.newmedia.nacamar.net/loadtv_vod/' --playpath=mp4:kinderkino-kostenlos/%s --app=loadtv_vod/ --pageUrl=http://kostenlos.kinderkino.de/ --swfUrl=http://kinderkinokostenlos-www.azurewebsites.net/asset'" % (kkUrlPart)
+			movieinfo = [kkRtmpLink,kkTitle]
+			self.session.open(PlayRtmpMovie, movieinfo, kkTitle)
+		else:
+			kkRtmpLink = "rtmp://fms.edge.newmedia.nacamar.net/loadtv_vod/' playpath=mp4:kinderkino-kostenlos/%s pageUrl=http://kostenlos.kinderkino.de/ swfUrl=http://kinderkinokostenlos-www.azurewebsites.net/asset'" % (kkUrlPart)
+			sref = eServiceReference(0x1001, 0, kkRtmpLink)
+			sref.setName(kkTitle)
+			self.session.open(MoviePlayer, sref)
 
 	def keyCancel(self):
 		self.close()
