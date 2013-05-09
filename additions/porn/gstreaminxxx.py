@@ -66,7 +66,7 @@ class gstreaminxxxGenreScreen(Screen):
 	def get_site_cookie1(self):
 		self.keyLocked = True
 		url = "http://g-stream.in"
-		getPage(url, headers=special_headers).addCallback(self.get_site_cookie2).addErrback(self.dataError)
+		getPage(url, agent=special_headers, headers={'Cookie': 'overkill_in='+str(time())}).addCallback(self.get_site_cookie2).addErrback(self.dataError)
 		
 	def get_site_cookie2(self, data):
 		x = re.search('searchfrm', data, re.S)
@@ -76,7 +76,7 @@ class gstreaminxxxGenreScreen(Screen):
 		self.keyLocked = True
 		raw = re.findall('javascript"\ssrc="(.*?)">.*?scf\(\'(.*?)\'\+\'(.*?)\'.*?', data, re.S)
 		url = "http://g-stream.in" + str(raw[0][0])
-		getPage(url, headers=special_headers).addCallback(self.get_site_cookie3, raw[0][1], raw[0][2]).addErrback(self.dataError)
+		getPage(url, agent=special_headers, headers={'Cookie': 'overkill_in='+str(time())}).addCallback(self.get_site_cookie3, raw[0][1], raw[0][2]).addErrback(self.dataError)
 		
 	def get_site_cookie3(self, data, cookie1, cookie2):
 		raw = re.findall('escape\(hsh.*?"(.*?)"\)', data, re.S)
@@ -188,7 +188,7 @@ class gstreaminxxxFilmScreen(Screen):
 		self.filmliste = []
 		url = "%s%s" % (self.phCatLink, str(self.page))
 		print url
-		getPage(url, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx}).addCallback(self.loadData).addErrback(self.dataError)
+		getPage(url, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx+'; overkill_in='+str(time())}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
 		lastp = re.search('normal">Seite.*?von\s(.*?)</td>', data, re.S)
@@ -349,7 +349,7 @@ class gstreaminxxxStreamListeScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		getPage(self.streamFilmLink, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx}).addCallback(self.loadPageData).addErrback(self.dataError)
+		getPage(self.streamFilmLink, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx+'; overkill_in='+str(time())}).addCallback(self.loadPageData).addErrback(self.dataError)
 		
 	def dataError(self, error):
 		print error
@@ -398,7 +398,7 @@ class gstreaminxxxStreamListeScreen(Screen):
 			self.get_stream(url)
 		else:
 			print 'Secured Play'
-			getPage(streamLink, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx}).addCallback(self.getVideoPage).addErrback(self.dataError)
+			getPage(streamLink, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx+'; overkill_in='+str(time())}).addCallback(self.getVideoPage).addErrback(self.dataError)
 
 	def getVideoPage(self, data):
 		# secured streamcloud url
