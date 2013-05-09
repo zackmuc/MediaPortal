@@ -3,7 +3,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
 
-YT_Version = "Youtube Search v0.97 (experimental)"
+YT_Version = "Youtube Search v0.98 (experimental)"
 
 YT_siteEncoding = 'utf-8'
 
@@ -650,8 +650,8 @@ class YT_ListScreen(Screen):
 				self.pages = a // self.max_res
 				if a % self.max_res:
 					self.pages += 1
-				if self.pages > 999:
-					self.pages = 999
+				if self.pages > 83:
+					self.pages = 83
 				self.page = 1
 		
 		a = 0
