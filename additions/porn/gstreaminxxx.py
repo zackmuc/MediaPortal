@@ -356,7 +356,7 @@ class gstreaminxxxStreamListeScreen(Screen):
 		
 	def loadPageData(self, data):
 		print "daten bekommen"
-		raw = re.findall('<table\sid="post[0-9]+"(.*?)</table>', data, re.S)
+		raw = re.findall('<table\sid="post[0-9]+"(.*?)id="post_thanks_box', data, re.S)
 		streams = re.findall('"(http://.*?(g-stream.in\/secure\/.*?\/|flashx|[w]+.putlocker|.).*?)"', raw[0], re.S)
 		if streams:
 			for (stream, hostername) in streams:
