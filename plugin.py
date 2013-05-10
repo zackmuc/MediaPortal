@@ -27,7 +27,6 @@ from additions.baskino import *
 from additions.kinoxto import *
 from additions.vutechtalk import *
 from additions.dreamscreencast import *
-from additions.konzertoase import *
 from additions.streamoase import *
 from additions.autobild import *
 from additions.nhl import *
@@ -151,7 +150,6 @@ config.mediaportal.showBaskino = ConfigYesNo(default = True)
 config.mediaportal.showKinox = ConfigYesNo(default = True)
 config.mediaportal.showVutec = ConfigYesNo(default = True)
 config.mediaportal.showDsc = ConfigYesNo(default = True)
-config.mediaportal.showKoase = ConfigYesNo(default = True)
 config.mediaportal.showAutoBild = ConfigYesNo(default = True)
 config.mediaportal.showNhl = ConfigYesNo(default = True)
 config.mediaportal.showSongsto = ConfigYesNo(default = True)
@@ -281,7 +279,6 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Movie2k:", config.mediaportal.showM2k))
 		self.configlist.append(getConfigListEntry("Zeige Cinestream:", config.mediaportal.showCinestream))
 		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.showmlehd))
-		self.configlist.append(getConfigListEntry("Zeige Konzert Oase:", config.mediaportal.showKoase))
 		self.configlist.append(getConfigListEntry("Zeige 1channel:", config.mediaportal.show1channel))
 		
 		self.configlist.append(getConfigListEntry("----- Watchlist -----", config.mediaportal.fake_entry))
@@ -586,8 +583,6 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("Burning-Series", "burningseries"))
 		if config.mediaportal.showBaskino.value:
 			self.grauzone.append(self.hauptListEntry("Baskino", "baskino"))
-		if config.mediaportal.showKoase.value:
-			self.grauzone.append(self.hauptListEntry("Konzert Oase", "koase"))
 		if config.mediaportal.show1channel.value:
 			self.grauzone.append(self.hauptListEntry("1channel", "1channel"))
 		if config.mediaportal.showM2kWatchlist.value:
@@ -987,8 +982,6 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(dreamscreencast)
 		elif auswahl == "TV-Kino":
 			self.session.open(tvkino)
-		elif auswahl == "Konzert Oase":
-			self.session.open(oaseGenreScreen)
 		elif auswahl == "StreamOase":
 			self.session.open(oasetvGenreScreen)
 		elif auswahl == "AutoBild":
@@ -1526,8 +1519,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Vutechtalk", "vutechtalk", "Mediathek"))
 		if config.mediaportal.showDsc.value:
 			self.plugin_liste.append(("Dreamscreencast", "dreamscreencast", "Mediathek"))
-		if config.mediaportal.showKoase.value:
-			self.plugin_liste.append(("Konzert Oase", "koase", "Grauzone"))
 		if config.mediaportal.showNhl.value:
 			self.plugin_liste.append(("NHL", "nhl", "Sport"))
 		if config.mediaportal.show4Players.value:
@@ -2001,9 +1992,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "TV-Kino":
 			self.hit_plugin("TV-Kino")
 			self.session.open(tvkino)
-		elif auswahl == "Konzert Oase":
-			self.hit_plugin("Konzert Oase")
-			self.session.open(oaseGenreScreen)
 		elif auswahl == "StreamOase":
 			self.hit_plugin("StreamOase")
 			self.session.open(oasetvGenreScreen)
