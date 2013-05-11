@@ -5,7 +5,7 @@ from Plugins.Extensions.MediaPortal.resources.yt_url import *
 import Queue
 import threading
 
-DOKUH_Version = "DOKUh.de v0.97"
+DOKUH_Version = "DOKUh.de v0.98"
 
 DOKUH_siteEncoding = 'utf-8'
 
@@ -928,8 +928,13 @@ class DOKUHStreams(Screen, ConfigListScreen):
 			for (videoTag,imgUrl,duration,title,desc) in streams:
 				self.streamListe.append((title.lstrip().rstrip(),videoTag,imgUrl," ["+duration+"]",desc))
 		else:
-			print "No dokus found !"
-			self.streamListe.append(("No streams found !","","","",""))
+			m = re.search('www.youtube.com/embed/(.*?)\?', data)
+			if m:
+				v = m.group(1)
+				self.streamListe.append((self.dokuName,v,None,"",None))
+			else:
+				print "No dokus found !"
+				self.streamListe.append(("No streams found !","","","",""))
 			
 		self.streamMenuList.setList(map(DOKUHStreamListEntry, self.streamListe))
 		self.loadPic()
