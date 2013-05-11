@@ -16,7 +16,7 @@ def chMainListEntry(entry):
 		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_CENTER, entry[0])
 		]
 		
-class chMain(Screen, ConfigListScreen):
+class chMain(Screen):
 	
 	def __init__(self, session):
 		self.session = session
@@ -70,7 +70,7 @@ class chMain(Screen, ConfigListScreen):
 	def keyCancel(self):
 		self.close()
 
-class chFeatured(Screen, ConfigListScreen):
+class chFeatured(Screen):
 	
 	def __init__(self, session, chGotLink):
 		self.chGotLink = chGotLink
@@ -112,15 +112,13 @@ class chFeatured(Screen, ConfigListScreen):
 		
 	def loadPage(self):
 		self.streamList = []
-		#url = "http://www.1channel.ch/index.php?sort=featured&page=%s" % self.page
 		url = "%s%s" % (self.chGotLink, str(self.page)) 
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 		
 	def parseData(self, data):
-		chMovies = re.findall('<div class="index_item index_item_ie"><a href="(.*?)" title="Watch.(.*?)"><img src="(.*?)"', data, re.S)
+		chMovies = re.findall('<div\sclass="index_item\sindex_item_ie">.*?<a\shref="(.*?)"\stitle="Watch.(.*?)"><img\ssrc="(.*?)"', data, re.S)
 		if chMovies:
 			for (chUrl,chTitle,chImage) in chMovies:
-				chUrl = "http://www.1channel.ch" + chUrl
 				self.streamList.append((decodeHtml(chTitle),chUrl,chImage))
 				self.streamMenuList.setList(map(chListEntry, self.streamList))
 			self.keyLocked = False
@@ -152,9 +150,10 @@ class chFeatured(Screen, ConfigListScreen):
 		exist = self['streamlist'].getCurrent()
 		if self.keyLocked or exist == None:
 			return
+		titel = self['streamlist'].getCurrent()[0][0]
 		auswahl = self['streamlist'].getCurrent()[0][1]
 		print auswahl
-		self.session.open(chStreams, auswahl)
+		self.session.open(chStreams, auswahl, titel)
 
 	def keyPageDown(self):
 		print "PageDown"
@@ -198,7 +197,7 @@ class chFeatured(Screen, ConfigListScreen):
 	def keyCancel(self):
 		self.close()
 
-class chTVshows(Screen, ConfigListScreen):
+class chTVshows(Screen):
 	
 	def __init__(self, session, chGotLink):
 		self.chGotLink = chGotLink
@@ -240,15 +239,13 @@ class chTVshows(Screen, ConfigListScreen):
 		
 	def loadPage(self):
 		self.streamList = []
-		#url = "http://www.1channel.ch/index.php?sort=featured&page=%s" % self.page
 		url = "%s%s" % (self.chGotLink, str(self.page)) 
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 		
 	def parseData(self, data):
-		chMovies = re.findall('<div class="index_item index_item_ie"><a href="(.*?)" title="Watch.(.*?)"><img src="(.*?)"', data, re.S)
+		chMovies = re.findall('<div\sclass="index_item\sindex_item_ie">.*?<a\shref="(.*?)"\stitle="Watch.(.*?)"><img\ssrc="(.*?)"', data, re.S)
 		if chMovies:
 			for (chUrl,chTitle,chImage) in chMovies:
-				chUrl = "http://www.1channel.ch" + chUrl
 				self.streamList.append((decodeHtml(chTitle),chUrl,chImage))
 				self.streamMenuList.setList(map(chListEntry, self.streamList))
 			self.keyLocked = False
@@ -326,7 +323,7 @@ class chTVshows(Screen, ConfigListScreen):
 	def keyCancel(self):
 		self.close()
 		
-class chTVshowsEpisode(Screen, ConfigListScreen):
+class chTVshowsEpisode(Screen):
 		
 	def __init__(self, session, chGotLink):
 		self.chGotLink = chGotLink
@@ -363,22 +360,19 @@ class chTVshowsEpisode(Screen, ConfigListScreen):
 		
 	def loadPage(self):
 		self.streamList = []
-		#url = "http://www.1channel.ch/index.php?sort=featured&page=%s" % self.page
 		url = "%s%s" % (self.chGotLink, str(self.page)) 
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 		
 	def parseData(self, data):
-		episoden = re.findall('<div class="tv_episode_ite.*?"> <a href="(.*?)">.*?<span class="tv_episode_name">(.*?)</span>', data, re.S)
+		episoden = re.findall('class="tv_episode_item.*?">.*?<a\shref="(.*?)"\stitle="Watch.*?Episode\s[0-9]+(.*?)"', data, re.S|re.I)
 		if episoden:
 			for (url,title) in episoden:
-				episode = re.findall('season-(.*?)-episode-(.*?)$',url, re.S)
+				episode = re.findall('season-(.*?)-episode-(.*?)$', url, re.S)
 				season_episode_label = "Season %s Episode %s %s" % (episode[0][0], episode[0][1], title)
-				url = "http://www.1channel.ch" + url
 				self.streamList.append((decodeHtml(season_episode_label),url))
-				self.streamMenuList.setList(map(chListEntry, self.streamList))
+			self.streamMenuList.setList(map(chListEntry, self.streamList))
 			self.keyLocked = False
-			
-		details = re.findall('<meta name="description" content="Watch.(.*?)">.*?<meta property="og:image" content="(.*?)"/>', data, re.S)
+		details = re.findall('<meta\sname="description"\scontent="Watch.(.*?)">.*?<meta\sproperty="og:image"\scontent="(.*?)"/>', data, re.S)
 		if details:
 			(handlung,image) = details[0]
 			self['handlung'].setText(decodeHtml(handlung))
@@ -408,18 +402,20 @@ class chTVshowsEpisode(Screen, ConfigListScreen):
 		exist = self['streamlist'].getCurrent()
 		if self.keyLocked or exist == None:
 			return
+		titel = self['streamlist'].getCurrent()[0][0]
 		auswahl = self['streamlist'].getCurrent()[0][1]
 		print auswahl
-		self.session.open(chStreams, auswahl)
+		self.session.open(chStreams, auswahl, titel)
 
 	def keyCancel(self):
 		self.close()
 		
-class chStreams(Screen, ConfigListScreen):
+class chStreams(Screen):
 	
-	def __init__(self, session, movielink):
+	def __init__(self, session, movielink, name):
 		self.session = session
 		self.movielink = movielink
+		self.titel = name
 		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/chStreams.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
 			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/chStreams.xml"
@@ -454,16 +450,16 @@ class chStreams(Screen, ConfigListScreen):
 		getPage(self.movielink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 	
 	def parseData(self, data):
-		streams = re.findall('<a href="/external.php.*?url=(.*?)&.*?document.writeln\(\'(.*?)\'\)',data, re.S)
+		streams = re.findall('<a\shref="/external.php\?vid=(.*?)&.*?document.writeln\(\'(.*?)\'\)',data, re.S)
 		if streams:
 			for (chCode, chStreamHoster) in streams:
-				chUrl = base64.urlsafe_b64decode(chCode + '=' * (4 - len(chCode) % 4))
+				chUrl = 'http://www.1channel.ch/external.php?vid=%s&%s' % (chCode, chStreamHoster)
 				print chStreamHoster, chUrl
 				if re.match('.*?(putlocker|sockshare|filenuke|videoweed|movshare|novamov|divxstage|uploadc|sharesix)', chStreamHoster, re.S):
 					self.streamList.append((chStreamHoster, chUrl))
 			self.streamMenuList.setList(map(chStreamListEntry, self.streamList))
 			self.keyLocked = False
-		details = re.findall('<meta name="description" content="Watch.(.*?)">.*?<meta property="og:image" content="(.*?)"/>', data, re.S)
+		details = re.findall('<meta\sname="description"\scontent="Watch.(.*?)">.*?<meta\sproperty="og:image"\scontent="(.*?)"/>', data, re.S)
 		if details:
 			(handlung,image) = details[0]
 			self['handlung'].setText(decodeHtml(handlung))
@@ -496,11 +492,15 @@ class chStreams(Screen, ConfigListScreen):
 			return
 		auswahl = self['streamlist'].getCurrent()[0][1]
 		print auswahl
-		get_stream_link(self.session).check_link(auswahl, self.got_link)
+		req = urllib2.Request(auswahl)
+		res = urllib2.urlopen(req)
+		url = res.geturl()
+		get_stream_link(self.session).check_link(url, self.got_link)
 		
 	def got_link(self, stream_url):
 		print stream_url
 		sref = eServiceReference(0x1001, 0, stream_url)
+		sref.setName(self.titel)
 		self.session.open(MoviePlayer, sref)
 		
 	def keyCancel(self):
