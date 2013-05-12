@@ -60,6 +60,7 @@ from additions.moovizon import *
 from additions.youtube import *
 from additions.clipfish import *
 from additions.mlehd import *
+from additions.ddl_me import *
 
 # kids
 from additions.kinderkino import *
@@ -184,6 +185,7 @@ config.mediaportal.showMoovizon = ConfigYesNo(default = True)
 config.mediaportal.showYoutube = ConfigYesNo(default = True)
 config.mediaportal.showClipfish = ConfigYesNo(default = True)
 config.mediaportal.showmlehd = ConfigYesNo(default = True)
+config.mediaportal.showDdlme = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -280,6 +282,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Cinestream:", config.mediaportal.showCinestream))
 		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.showmlehd))
 		self.configlist.append(getConfigListEntry("Zeige 1channel:", config.mediaportal.show1channel))
+		self.configlist.append(getConfigListEntry("Zeige ddl.me:", config.mediaportal.showDdlme))
 		
 		self.configlist.append(getConfigListEntry("----- Watchlist -----", config.mediaportal.fake_entry))
 		self.configlist.append(getConfigListEntry("Zeige Kinox Watchlist:", config.mediaportal.showKinoxWatchlist))
@@ -589,6 +592,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("Movie2k Watchlist", "movie2kwatchlist"))
 		if config.mediaportal.showKinoxWatchlist.value:
 			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
+		if config.mediaportal.showKinoxWatchlist.value:
+			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
+		if config.mediaportal.showDdlme.value:
+			self.grauzone.append(self.hauptListEntry("ddl.me", "ddl_me"))
 
 		# Fun / Sport
 		if config.mediaportal.showAllMusicHouse.value:
@@ -1050,6 +1057,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(youtubeGenreScreen)
 		elif auswahl == "Clipfish":
 			self.session.open(show_CF_Genre)
+		elif auswahl == "ddl.me":
+			self.session.open(show_DDLME_Genre)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1492,6 +1501,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("SzeneStreams", "szenestreams", "Grauzone"))
 		if config.mediaportal.showmlehd.value:
 			self.plugin_liste.append(("MLE-HD", "mlehd", "Grauzone"))
+		if config.mediaportal.showDdlme.value:
+			self.plugin_liste.append(("ddl.me", "ddl_me", "Grauzone"))
 			
 		# Watchlisten - Grauzone
 		if config.mediaportal.showM2kWatchlist.value:
@@ -2094,6 +2105,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Clipfish":
 			self.hit_plugin("Clipfish")
 			self.session.open(show_CF_Genre)
+		elif auswahl == "ddl.me":
+			self.hit_plugin("ddl.me")
+			self.session.open(show_DDLME_Genre)
 		# mediatheken
 		elif auswahl == "VOXNOW":
 			self.hit_plugin("VOXNOW")
