@@ -46,7 +46,7 @@ class get_stream_link:
 			elif re.match('.*?http://xvidstage.com', data, re.S):
 				link = data
 				#print "xvidstage"
-				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.xvidstage).addErrback(self.errorload)
+				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.xvidstage_post, link).addErrback(self.errorload)
 
 			elif re.match('.*?http://filenuke.com', data, re.S):
 				link = data
@@ -184,8 +184,8 @@ class get_stream_link:
 
 			elif re.match('.*?http://wupfile.com', data, re.S):
 				link = data
-				#print link
-				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.zooupload).addErrback(self.errorload)
+				print link
+				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.wupfile_post, link).addErrback(self.errorload)
 
 			elif re.match('.*?http://bitshare.com', data, re.S):
 				link = data
@@ -209,7 +209,7 @@ class get_stream_link:
 				message = self.session.open(MessageBox, _("Invalid Stream link, try another Stream Hoster !"), MessageBox.TYPE_INFO, timeout=5)
 				
 	def stream_not_found(self):
-		#self._callback(None)
+		self._callback(None)
 		print "stream_not_found!"
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
@@ -284,7 +284,62 @@ class get_stream_link:
 						print stream_url[0]
 						self._callback(stream_url[0])
 					else:
-						self.stream_not_found()	
+						self.stream_not_found()
+			else:
+				self.stream_not_found()
+		else:
+			self.stream_not_found()
+						
+	def wupfile_post(self, data, url):
+		print "hole daten"
+		op = re.findall('type="hidden" name="op".*?value="(.*?)"', data, re.S)
+		id = re.findall('type="hidden" name="id".*?value="(.*?)"', data, re.S)
+		fname = re.findall('type="hidden" name="fname".*?value="(.*?)"', data, re.S)
+		referer = re.findall('type="hidden" name="referer".*?value="(.*?)"', data, re.S)
+		if op and id and fname and referer:
+			info = urlencode({
+				'fname': fname[0],
+				'id': id[0],
+				'method_free': "Kostenloser Download",
+				'op': "download1",
+				'referer': "",
+				'usr_login': ""})
+				
+			print info	
+			getPage(url, method='POST', postdata=info, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.wupfile_data).addErrback(self.errorload)
+		else:
+			self.stream_not_found()
+	
+	def wupfile_data(self, data):
+		print "hole streamlink"
+		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
+		if get_packedjava:
+			print get_packedjava
+			sJavascript = get_packedjava[1]
+			sUnpacked = cJsUnpacker().unpackByString(sJavascript)
+			if sUnpacked:
+				print "unpacked"
+				print sUnpacked
+				if re.match('.*?type="video/divx', sUnpacked):
+					print "DDIIIIIIIIIVVVXXX"
+					stream_url = re.findall('type="video/divx"src="(.*?)"', sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
+					else:
+						self.stream_not_found()
+				elif re.match(".*?file", sUnpacked):
+					print "FFFFFFFFLLLLLLLLLLLVVVVVVVV"
+					stream_url = re.findall("file','(.*?)'", sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
+					else:
+						self.stream_not_found()
+			else:
+				self.stream_not_found()
+		else:
+			self.stream_not_found()
 	
 	def sharesix(self, data):
 		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
@@ -948,17 +1003,25 @@ class get_stream_link:
 		else:
 			self.stream_not_found()
 
-#	def xvidstage(self, data, url):
-#		id = re.findall('<input type="hidden" name="id" value="(.*?)">', data, re.S)
-#		fname = re.findall('<input type="hidden" name="fname" value="(.*?)">', data, re.S)
-#		if id and fname:
-#			post_data = urllib.urlencode({'op': 'download1', 'usr_login': '', 'id': id[0], 'fname': fname[0], 'referer': '', 'method_free': 'Kostenloser Download'})
-#			print post_data
-#			getPage(url, method='POST', postdata = post_data, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.xvidstage_data).addErrback(self.errorload)
-#		else:
-#			self.stream_not_found()
+	def xvidstage_post(self, data, url):
+		print "hole daten"
+		op = re.findall('type="hidden" name="op".*?value="(.*?)"', data, re.S)
+		id = re.findall('type="hidden" name="id".*?value="(.*?)"', data, re.S)
+		fname = re.findall('type="hidden" name="fname".*?value="(.*?)"', data, re.S)
+		referer = re.findall('type="hidden" name="referer".*?value="(.*?)"', data, re.S)
+		if op and id and fname and referer:
+			info = urlencode({
+				'fname': fname[0],
+				'id': id[0],
+				'method_free': "Weiter zu Video / Stream Video",
+				'op': "download1",
+				'referer': "",
+				'usr_login': ""})
+			getPage(url, method='POST', postdata=info, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.xvidstage_data).addErrback(self.errorload)
+		else:
+			self.stream_not_found()
 
-	def xvidstage(self, data):
+	def xvidstage_data(self, data):
 		print "drin"
 		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
 		if get_packedjava:
