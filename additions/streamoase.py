@@ -192,19 +192,19 @@ class oasetvFilmListeScreen(Screen):
 	def findStream(self, data):
 		stream_list = []
 		stream_name = self['filmList'].getCurrent()[0][0]
-		get_embed = re.findall('http://180upload.com/embed-(.*?)-', data, re.S)
-		if get_embed:
-			url = "http://180upload.com/" + get_embed[0]
-			print url
-			stream_list.append(("180upload", url))
-		get_wupfile = re.findall('(http://wupfile.com.*?)"', data, re.S)
-		if get_wupfile:
-			print get_wupfile[0]
-			stream_list.append(("Wupfile", get_wupfile[0]))
 		mighty = re.findall('(http://www.mightyupload.com/embed.*?)"', data, re.S)
 		if mighty:
 			print mighty[0]
 			stream_list.append(("MightyUpload", mighty[0]))
+		get_embed = re.findall('http://180upload.com/embed-(.*?)-', data, re.S)
+		if get_embed:
+			url = "http://180upload.com/" + get_embed[0]
+			print url
+			stream_list.append(("180upload *NOT SUPPORTED*", url))
+		get_wupfile = re.findall('(http://wupfile.com.*?)"', data, re.S)
+		if get_wupfile:
+			print get_wupfile[0]
+			stream_list.append(("Wupfile", get_wupfile[0]))
 
 		self.keyLocked = False
 		self.session.open(oasetvCDListeScreen, stream_list, stream_name)
@@ -309,7 +309,10 @@ class oasetvCDListeScreen(Screen):
 			getPage(streamLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData).addErrback(self.dataError)
 		elif name == "MightyUpload":
 			getPage(streamLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.postData2).addErrback(self.dataError)
-
+		else:
+			message = self.session.open(MessageBox, _("No Supported Streamhoster."), MessageBox.TYPE_INFO, timeout=3)
+			self.keyLocked = False
+			
 	def dowloadCatpchaDone(self, data):
 		if fileExists("/tmp/captcha.jpg"):
 			print "Captcha.jpg gefunden.."
@@ -377,6 +380,8 @@ class oasetvCDListeScreen(Screen):
 				sref = eServiceReference(0x1001, 0, stream_url[0])
 				sref.setName(self.stream_name)
 				self.session.open(MoviePlayer, sref)
+			else:
+				message = self.session.open(MessageBox, _("Stream not found."), MessageBox.TYPE_INFO, timeout=3)
 		else:
 			message = self.session.open(MessageBox, _("Stream not found."), MessageBox.TYPE_INFO, timeout=3)
 			
@@ -392,6 +397,8 @@ class oasetvCDListeScreen(Screen):
 				sref = eServiceReference(0x1001, 0, stream_url[0])
 				sref.setName(self.stream_name)
 				self.session.open(MoviePlayer, sref)
+			else:
+				message = self.session.open(MessageBox, _("Stream not found."), MessageBox.TYPE_INFO, timeout=3)
 		else:
 			message = self.session.open(MessageBox, _("Stream not found."), MessageBox.TYPE_INFO, timeout=3)
 
