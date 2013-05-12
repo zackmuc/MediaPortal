@@ -248,15 +248,14 @@ class SzeneStreamsStreamListeScreen(Screen):
 			streams = []
 			for each in raw:
 				if re.match('.*?iframe.*?src', each, re.S|re.I):
-					streams += re.findall('<font color="#ff0000">.*?src="http://szene-streams.com/player/(.*?).gif".*?<iframe.*?src="(.*?)"', each, re.S|re.I)
+					streams += re.findall('<font color="#ff0000">.*?src="http://szene-streams.com/player/(.*?).[gif|jpg|png]".*?<iframe.*?src=["|\'](.*?)["|\']', each, re.S|re.I)
 				else:
-					streams += re.findall('<font color="#ff0000">.*?src="http://szene-streams.com/player/(.*?).gif".*?</font>.*?target="_blank" href="(.*?)"', each, re.S|re.I)
-
+					streams += re.findall('<font color="#ff0000">.*?src="http://szene-streams.com/player/(.*?).[gif|jpg|png]".*?</font>.*?target="_blank" href=["|\'](.*?)["|\']', each, re.S|re.I)
 		if streams:
 			for (hostername,stream) in streams:
 				if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|flash x|Divxmov|Putme|Zooupload|Wupfile)', hostername.strip(' '), re.S|re.I):
 					print hostername.strip(' '), stream.strip('\n')
-					hostername = hostername.replace('_logo','')
+					hostername = hostername.replace('_logo','').replace('.j','').replace('.g','').replace('.p','')
 					self.filmliste.append((hostername.strip(' '), stream.strip('\n')))
 			self.chooseMenuList.setList(map(SzeneStreamsHosterListEntry, self.filmliste))
 			self.keyLocked = False
