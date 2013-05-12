@@ -201,6 +201,10 @@ class get_stream_link:
 				link = data
 				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.eco_read).addErrback(self.errorload)
 
+			elif re.match('.*?http://played.to', data, re.S):
+				link = data
+				getPage(link, cookies=cj, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.played, link).addErrback(self.errorload)
+				
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
 		else:
@@ -214,6 +218,42 @@ class get_stream_link:
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
 
+	def played(self, data, url):
+		print "hole daten"
+		op = re.findall('type="hidden" name="op".*?value="(.*?)"', data, re.S)
+		id = re.findall('type="hidden" name="id".*?value="(.*?)"', data, re.S)
+		fname = re.findall('type="hidden" name="fname".*?value="(.*?)"', data, re.S)
+		referer = re.findall('type="hidden" name="referer".*?value="(.*?)"', data, re.S)
+		hash = re.findall('type="hidden" name="hash".*?value="(.*?)"', data, re.S)
+		if op and id and fname and referer:
+			info = urlencode({
+				'fname': fname[0],
+				'id': id[0],
+				'imhuman': "Continue to Video",
+				'op': "download1",
+				'referer': "",
+				'hash': hash[0],
+				'usr_login': ""})
+				
+			print info	
+			getPage(url, method='POST', cookies=cj, postdata=info, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.played_data2).addErrback(self.errorload)
+			#reactor.callLater(5, self.played_data, url, method='POST', cookies=cj, postdata=info, headers={'Content-Type':'application/x-www-form-urlencoded'})
+		else:
+			self.stream_not_found()		
+
+	def played_data(self, *args, **kwargs):
+		print "drin"
+		getPage(*args, **kwargs).addCallback(self.played_data2).addErrback(self.errorload)
+		
+	def played_data2(self, data):
+		print data
+		stream_url = re.findall('file: "(.*?)"', data, re.S)
+		if stream_url:
+			print stream_url[0]
+			self._callback(stream_url[0])
+		else:
+			self.stream_not_found()
+	
 	def eco_read(self, data):
 		post_url = re.findall('<form name="setss" method="post" action="(.*?)">', data, re.S)
 		if post_url:
