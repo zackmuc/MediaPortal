@@ -1040,6 +1040,8 @@ class get_stream_link:
 		if stream_url:
 			print stream_url
 			self._callback(stream_url[0])
+		elif re.match('.*?This video is encoding now', data, re.S):
+			self.session.open(MessageBox, _("This video is encoding now. Please check back later."), MessageBox.TYPE_INFO, timeout=10)
 		else:
 			self.stream_not_found()
 
