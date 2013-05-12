@@ -1872,7 +1872,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			if not fileExists(poster_path):
 				poster_path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/icons_wall/no_icon.png"
 
-			self["zeile"+str(x)].instance.setPixmap(None)
+			self["zeile"+str(x)].instance.setPixmap(gPixmapPtr())
 			self["zeile"+str(x)].hide()
 			pic = LoadPixmap(cached=True, path=poster_path)
 			if pic != None:
