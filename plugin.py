@@ -592,8 +592,6 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("Movie2k Watchlist", "movie2kwatchlist"))
 		if config.mediaportal.showKinoxWatchlist.value:
 			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
-		if config.mediaportal.showKinoxWatchlist.value:
-			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
 		if config.mediaportal.showDdlme.value:
 			self.grauzone.append(self.hauptListEntry("ddl.me", "ddl_me"))
 
