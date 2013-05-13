@@ -5,7 +5,7 @@ from Plugins.Extensions.MediaPortal.resources.yt_url import *
 import Queue
 import threading
 
-DS_Version = "Doku-Stream.org v0.98"
+DS_Version = "Doku-Stream.org v0.99"
 
 DS_siteEncoding = 'utf-8'
 
@@ -89,7 +89,7 @@ class show_DS_Genre(Screen):
 		
 		self.genreMenu = [
 			[
-			("Neueste Dokus", "/neuste-dokus"),
+			("Neueste Dokus", ""),
 			("Doku Empfehlungen", "/tag/empfehlung"),
 			("Geschichte", "/zeitgeschichte"),
 			("Gesellschaft", "/gesellschaft"),
@@ -136,7 +136,7 @@ class show_DS_Genre(Screen):
 			[
 			("Alpha Centauri", "/alpha-centauri"),
 			#("Das Römer Experiment", "/das-romer-experiment"),
-			#("Die Geschichte der Indianer", "/die-geschichte-der-indianer"),
+			("Der Kalte Krieg", "/der-kalte-krieg"),
 			("Geheimnisse des Universums / Unser Universum", "/serie-geheimnisse-des-universums"),
 			("Geist & Gehirn", "/geist-gehirn"),
 			("Leschs Kosmos", "/leschs-kosmos"),
@@ -412,8 +412,8 @@ class DS_FilmListeScreen(Screen):
 		self.keckse = {}
 		self.page = 0
 		self.pages = 0;
-		#self.genreNEUESTE = re.match(".*?Neueste Dokus",self.genreName)
-		self.genreNEUESTE = False
+		self.genreNEUESTE = re.match(".*?Neueste Dokus",self.genreName)
+		#self.genreNEUESTE = False
 		self.genreEMPFEHLUNG = re.match(".*?Doku Empfehlung",self.genreName)
 		self.genreSpecials = self.genreNEUESTE or self.genreEMPFEHLUNG
 
@@ -465,19 +465,24 @@ class DS_FilmListeScreen(Screen):
 		
 	def loadPageData(self, data):
 		print "loadPageData:"
-		
+		"""
 		if self.genreNEUESTE:
 			print "Specials Dokus suche..."
 			m=re.search('class="lcp_catlist"(.*?)</ul>',data,re.S)
 		else:
 			print "Normal search.."
 			m=re.search('id="content"(.*?)"navigation">',data,re.S)
-			
+		"""
+		m=re.search('id="content"(.*?)"navigation">',data,re.S)
+		
 		if m:
+			"""
 			if self.genreNEUESTE:
 				dokus = re.findall('href="(.*?)".*?title="(.*?)">', m.group(1))
 			else:
 				dokus = re.findall('"border-bottom:none.*?href="(.*?)".*?title="(.*?)">.*?<img.*?src="(.*?)"', m.group(1), re.S)
+			"""
+			dokus = re.findall('"border-bottom:none.*?href="(.*?)".*?title="(.*?)">.*?<img.*?src="(.*?)"', m.group(1), re.S)
 		else:
 			dokus = None
 		
@@ -485,7 +490,10 @@ class DS_FilmListeScreen(Screen):
 			print "Dokus found !"
 			if not self.pages:
 				#m = re.findall('class=\'pages\'>Seite.*?von (.*?)</', data)
-				m = re.findall('class=\'page larger\'>(.*?)</', data)
+				if self.genreNEUESTE:
+					m = re.findall('class=\'larger page\'>(.*?)</', data)
+				else:
+					m = re.findall('class=\'page larger\'>(.*?)</', data)
 				if m:
 					pages = 0
 					for i in m:
@@ -501,6 +509,7 @@ class DS_FilmListeScreen(Screen):
 				self['page'].setText("%d / %d" % (self.page,self.pages))
 			
 			self.dokusListe = []
+			"""
 			if self.genreNEUESTE:
 				for	(url,name) in dokus:
 					#print	"Url: ", url, "Name: ", name
@@ -509,6 +518,11 @@ class DS_FilmListeScreen(Screen):
 				for	(url,name,img) in dokus:
 					#print	"Url: ", url, "Name: ", name
 					self.dokusListe.append((decodeHtml(name), url, img))
+			"""
+			
+			for	(url,name,img) in dokus:
+				#print	"Url: ", url, "Name: ", name
+				self.dokusListe.append((decodeHtml(name), url, img))
 			
 			self.dokusListe.sort()
 			self.chooseMenuList.setList(map(DS_FilmListEntry, self.dokusListe))
