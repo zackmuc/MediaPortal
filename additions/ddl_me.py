@@ -881,7 +881,7 @@ class DDLMEStreams(Screen, ConfigListScreen):
 									if streams:
 										#print "Streams found"
 										s = mg.group(1)
-										if re.match('.*?(putlocker|sockshare|flash strea|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Click.*?Play|BitShare)', s, re.I):
+										if re.match('.*?(played|putlocker|sockshare|flash strea|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Click.*?Play|BitShare)', s, re.I):
 											#print s
 											
 											for h in streams:
@@ -926,7 +926,7 @@ class DDLMEStreams(Screen, ConfigListScreen):
 					if streams:
 						print "Streams found"
 						s = mg.group(1)
-						if re.match('.*?(putlocker|sockshare|flash strea|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Click.*?Play|BitShare)', s, re.I):
+						if re.match('.*?(played|putlocker|sockshare|flash strea|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Click.*?Play|BitShare)', s, re.I):
 							#print s
 							
 							part = ''
