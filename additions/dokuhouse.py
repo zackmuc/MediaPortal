@@ -5,7 +5,7 @@ from Plugins.Extensions.MediaPortal.resources.yt_url import *
 import Queue
 import threading
 
-DH_Version = "DokuHouse.de v0.95"
+DH_Version = "DokuHouse.de v0.96"
 
 DH_siteEncoding = 'utf-8'
 
@@ -104,21 +104,29 @@ class show_DH_Genre(Screen):
 			[
 			("Aktenzeichen XY", "/aktenzeichen-xy-spezial"),
 			("Ancient Aliens", "/ancient-aliens-spezial"),
+			("Born To Kill", "/born-to-kill"),
+			("Crime 360", "/crime-360"),
 			("Da wird mir übel", "/da-wird-mir-ubel-spezial"),
+			("Damals in/nach der DDR", "/damals-in-der-ddr"),
 			("Die Deutschen", "/die-deutschen-spezial"),
 			("Die großen Kriminalfälle", "/die-grosen-kriminalfalle-spezial"),
 			("Die Stone-Skala", "/die-stone-skala-spezial"),
 			("Drogen im Visier", "/drogen-im-visier-special"),
+			("Forensic Factor", "/forensic-factor"),
 			("Hotdokus", "/hotdokus"),
 			("Junior Docs", "/junior-docs-special"),
+			("Jurassic Fight Club", "/jurassic-fight-club"),
+			("Mayday Alarm im Cockpit", "/mayday-alarm-im-cockpit"),
 			("Medical Detectives", "/medical-detectives"),
+			("Megafabriken", "/megafabriken"),
 			("Mysteriöse Todesfälle", "/mysteriose-todesfalle-spezial"),
+			("NCIS", "/ncis"),
 			("Nicht nachmachen!", "/nicht-nachmachen-spezial"),
-			("Österreich II", "/osterreich-ii"),
+			("Spuren der Vergangenheit", "/spuren-der-vergangenheit"),
 			("UFO Jäger", "/ufo-jager"),
 			("Unser Universum", "/unser-universum-spezial"),
-			("Wunder des Weltalls", "/wunder-des-weltalls-spezial"),
-			("Zukunft ohne Menschen", "/zukunft-ohne-menschen")
+			("Wild Germany", "/wild-germany"),
+			("Wunder des Weltalls", "/wunder-des-weltalls-spezial")
 			],
 			#subGenre_1 = 
 			[
@@ -491,7 +499,9 @@ class DH_FilmListeScreen(Screen):
 			m=re.search('<div id="content">(.*?)<!-- #content -->',data,re.S)
 			
 		if m:
-			dokus = re.findall('<div class="featured-.*?<a href="(.*?)"><img.*?src="(.*?)".*?title='\
+			#dokus = re.findall('<div class="featured-.*?<a href="(.*?)"><img.*?src="(.*?)".*?title='\
+			#					'"(.*?)" />.*?<p>(.*?)</p>', m.group(1), re.S)
+			dokus = re.findall('<div class="featured-.*?<a href="(.*?)"><img.*?src="(.*?)".*?alt='\
 								'"(.*?)" />.*?<p>(.*?)</p>', m.group(1), re.S)
 		else:
 			dokus = None
