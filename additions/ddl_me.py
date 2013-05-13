@@ -16,7 +16,7 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 	
-DDLME_Version = "ddl.me v0.90 (experimental)"
+DDLME_Version = "ddl.me v0.91 (experimental)"
 
 DDLME_siteEncoding = 'utf-8'
 
@@ -32,6 +32,7 @@ Tastenfunktionen in der Filmliste:
 	'1', '4', '7',
 	'3', 6', '9'			: blättern in 2er, 5er, 10er Schritten Down/Up
 	INFO					: anzeige der IMDB-Bewertung
+	KeyYellow				: Sortierung
 
 Stream Auswahl:
 	Rot/Blau				: Die Beschreibung Seitenweise scrollen
@@ -103,67 +104,67 @@ class show_DDLME_Genre(Screen):
 			[None,
 			[
 			("Neue Filme", "/update_0_1"),
-			("Alle", "00_0_1_%d"),
-			("Kinofilme", "23_0_1_%d"),
-			("Abenteuer", "01_0_1_%d"),
-			("Action", "02_0_1_%d"),
-			("Animation", "03_0_1_%d"),
-			("Biografie", "04_0_1_%d"),
-			("Blockbuster", "25_0_1_%d"),
-			("Doku", "06_0_1_%d"),
-			("Drama", "07_0_1_%d"),
-			("Familie", "08_0_1_%d"),
-			("Fantasie", "09_0_1_%d"),
-			("Geschichte", "10_0_1_%d"),
-			("Horror", "11_0_1_%d"),
-			("Klassiker", "12_0_1_%d"),
-			("Komödie", "13_0_1_%d"),
-			("Kriegsfilm", "14_0_1_%d"),
-			("Musik", "15_0_1_%d"),
-			("Mystery", "16_0_1_%d"),
-			("Romantisch", "17_0_1_%d"),
-			("SciFi", "18_0_1_%d"),
-			("Sport", "20_0_1_%d"),
-			("Thriller", "21_0_1_%d"),
-			("Western", "22_0_1_%d")
+			("Alle", "00_%d_1_%d"),
+			("Kinofilme", "23_%d_1_%d"),
+			("Abenteuer", "01_%d_1_%d"),
+			("Action", "02_%d_1_%d"),
+			("Animation", "03_%d_1_%d"),
+			("Biografie", "04_%d_1_%d"),
+			("Blockbuster", "25_%d_1_%d"),
+			("Doku", "06_%d_1_%d"),
+			("Drama", "07_%d_1_%d"),
+			("Familie", "08_%d_1_%d"),
+			("Fantasie", "09_%d_1_%d"),
+			("Geschichte", "10_%d_1_%d"),
+			("Horror", "11_%d_1_%d"),
+			("Klassiker", "12_%d_1_%d"),
+			("Komödie", "13_%d_1_%d"),
+			("Kriegsfilm", "14_%d_1_%d"),
+			("Musik", "15_%d_1_%d"),
+			("Mystery", "16_%d_1_%d"),
+			("Romantisch", "17_%d_1_%d"),
+			("SciFi", "18_%d_1_%d"),
+			("Sport", "20_%d_1_%d"),
+			("Thriller", "21_%d_1_%d"),
+			("Western", "22_%d_1_%d")
 			],
 			[
 			("Neue Serien", "/update_0_1"),
-			("Alle", "00_0_1_%d"),
-			("Abenteuer", "01_0_1_%d"),
-			("Action", "02_0_1_%d"),
-			("Animation", "03_0_1_%d"),
-			("Doku", "06_0_1_%d"),
-			("Drama", "07_0_1_%d"),
-			("Familie", "08_0_1_%d"),
-			("Fantasie", "09_0_1_%d"),
-			("Geschichte", "10_0_1_%d"),
-			("Horror", "11_0_1_%d"),
-			("Komödie", "13_0_1_%d"),
-			("Mystery", "16_0_1_%d"),
-			("Romantisch", "17_0_1_%d"),
-			("SciFi", "18_0_1_%d"),
-			("Sport", "20_0_1_%d"),
-			("Thriller", "21_0_1_%d"),
-			("Western", "22_0_1_%d")
+			("Alle", "00_%d_1_%d"),
+			("Abenteuer", "01_%d_1_%d"),
+			("Action", "02_%d_1_%d"),
+			("Animation", "03_%d_1_%d"),
+			("Doku", "06_%d_1_%d"),
+			("Drama", "07_%d_1_%d"),
+			("Familie", "08_%d_1_%d"),
+			("Fantasie", "09_%d_1_%d"),
+			("Geschichte", "10_%d_1_%d"),
+			("Horror", "11_%d_1_%d"),
+			("Komödie", "13_%d_1_%d"),
+			("Mystery", "16_%d_1_%d"),
+			("Romantisch", "17_%d_1_%d"),
+			("SciFi", "18_%d_1_%d"),
+			("Sport", "20_%d_1_%d"),
+			("Thriller", "21_%d_1_%d"),
+			("Western", "22_%d_1_%d")
 			],
 			[
-			("Alle", "00_0_1_%d"),
-			("Thriller", "01_0_1_%d"),
-			("Krimi", "02_0_1_%d"),
-			("Fantasy", "03_0_1_%d"),
-			("Horror", "04_0_1_%d"),
-			("SciFi", "05_0_1_%d"),
-			("Romane", "06_0_1_%d"),
-			("Historisch", "07_0_1_%d"),
-			("Klassiker", "08_0_1_%d"),
-			("Humor", "09_0_1_%d"),
-			("Bildung & Wissen", "10_0_1_%d"),
-			("Freizeit & Leben", "11_0_1_%d"),
-			("Karriere", "12_0_1_%d"),
-			("Kinder", "13_0_1_%d"),
-			("Jugendliche", "14_0_1_%d"),
-			("Erotik", "15_0_1_%d")
+			("Alle", "00_%d_1_%d"),
+			("Thriller", "01_%d_1_%d"),
+			("Krimi", "02_%d_1_%d"),
+			("Fantasy", "03_%d_1_%d"),
+			("Horror", "04_%d_1_%d"),
+			("SciFi", "05_%d_1_%d"),
+			("Romane", "06_%d_1_%d"),
+			("Historisch", "07_%d_1_%d"),
+			("Klassiker", "08_%d_1_%d"),
+			("Humor", "09_%d_1_%d"),
+			("Bildung & Wissen", "10_%d_1_%d"),
+			("Freizeit & Leben", "11_%d_1_%d"),
+			("Karriere", "12_%d_1_%d"),
+			("Kinder", "13_%d_1_%d"),
+			("Jugendliche", "14_%d_1_%d"),
+			("Erotik", "15_%d_1_%d")
 			]
 			],
 			[
@@ -375,17 +376,13 @@ class DDLME_FilmListeScreen(Screen):
 			"9" : self.key_9,
 			"blue" :  self.keyTxtPageDown,
 			"red" :  self.keyTxtPageUp,
+			"yellow" :  self.keyYellow,
 			"info"	: self.keyTMDbInfo
 		}, -1)
 
-		self.sortOrder = 0
+		self.sortOrderTxt = ['Letztem Update', 'Blockbuster', 'IMDb Rating', 'Jahr']
 		self.baseUrl = "http://de.ddl.me"
 		self.genreTitle = "Auswahl "
-		self.sortParIMDB = ""
-		self.sortParAZ = ""
-		self.sortOrderStrAZ = ""
-		self.sortOrderStrIMDB = ""
-		self.sortOrderStrGenre = ""
 		self['title'] = Label(DDLME_Version)
 		self['ContentTitle'] = Label("")
 		self['name'] = Label("")
@@ -393,7 +390,7 @@ class DDLME_FilmListeScreen(Screen):
 		self['page'] = Label("")
 		self['F1'] = Label("Text-")
 		self['F2'] = Label("")
-		self['F3'] = Label("")
+		self['F3'] = Label("Sortierung")
 		self['F4'] = Label("Text+")
 		self['Page'] = Label("Page")
 		self['coverArt'] = Pixmap()
@@ -425,7 +422,13 @@ class DDLME_FilmListeScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def setGenreStrTitle(self):
-		genreName = "%s%s" % (self.genreTitle,self.genreName)
+		if self.genreSpecials:
+			genreName = "%s%s" % (self.genreTitle,self.genreName)
+			self['F3'].hide()
+		else:
+			self['F3'].show()
+			genreName = "%s%s - Sortierung: %s" % (self.genreTitle,self.genreName,self.sortOrderTxt[mp_globals.ddlme_sortOrder])
+			
 		#print genreName
 		self['ContentTitle'].setText(genreName)
 
@@ -437,7 +440,7 @@ class DDLME_FilmListeScreen(Screen):
 			page = self.page
 			if page < 1:
 				page = 1
-			url = self.genreLink % page
+			url = self.genreLink % (mp_globals.ddlme_sortOrder, page)
 			
 		if self.page:
 			self['page'].setText("%d / %d" % (self.page,self.pages))
@@ -770,6 +773,15 @@ class DDLME_FilmListeScreen(Screen):
 			title = self['liste'].getCurrent()[0][0]
 			self.session.open(IMDB, title)
 
+	def keyYellow(self):
+		if not (self.keyLocked or self.genreSpecials):
+			self.keyLocked = True
+			mp_globals.ddlme_sortOrder += 1
+			if mp_globals.ddlme_sortOrder > 3:
+				mp_globals.ddlme_sortOrder = 0
+			self.setGenreStrTitle()
+			self.loadPage()
+			
 	def keyCancel(self):
 		self.close()
 
