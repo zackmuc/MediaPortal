@@ -16,7 +16,7 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 	
-DDLME_Version = "ddl.me v0.92 (experimental)"
+DDLME_Version = "ddl.me v0.93 (experimental)"
 
 DDLME_siteEncoding = 'utf-8'
 
@@ -785,10 +785,18 @@ class DDLME_FilmListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
+def DDLMEStreamListEntry2(entry):
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 200, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0]),
+		(eListboxPythonMultiContent.TYPE_TEXT, 220, 0, 200, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[2]),
+		(eListboxPythonMultiContent.TYPE_TEXT, 440, 0, 440, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[3])
+		]
+
 def DDLMEStreamListEntry(entry):
 	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0]+entry[2])
+		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0] + entry[2])
 		] 
+
 class DDLMEStreams(Screen, ConfigListScreen):
 	
 	def __init__(self, session, filmUrl, filmName, imageLink):
@@ -899,7 +907,7 @@ class DDLMEStreams(Screen, ConfigListScreen):
 											for h in streams:
 												url = h.replace('\\', '')
 												print url
-												self.streamListe.append((s,url,''))
+												self.streamListe.append((s,url,'',''))
 										else:
 											print "No supported hoster:"
 											print s
@@ -908,63 +916,86 @@ class DDLMEStreams(Screen, ConfigListScreen):
 							a = l
 					else:
 						a = l
+						
+			if len(self.streamListe) == 0:
+				self.streamListe.append(("No streams found !","","",""))
+			
+			self.streamMenuList.setList(map(DDLMEStreamListEntry, self.streamListe))
 		else:
 			print "norm. streams"
-			np = re.search('var subcats =.*?"1":"(\d)"', data)
+			np = re.search('var subcats =', data)
 			if np:
-				print "np found"
-				n = int(np.group(1))
+				k = np.end()
+				kl = len(data)
 			else:
-				n = 1
+				k = kl = 0
 			
-			ls = re.search('"links":{(.*?)}}', data)
-			if ls:
-				print "links found"
-				links = ls.group(1)
-				l=len(links)
-			else:
-				links = None
-				l = 0
-			
-			a=0
-			while a<l:
-				mg = re.search('"(.*?)":\[(\[.*?\])\]', links[a:])
-				if mg:
-					print "hoster found"
-					a += mg.end()
-				
-					streams = re.findall('\["(.*?)".*?"(http:.*?)".*?"stream"\]', mg.group(2))
-							
-					if streams:
-						print "Streams found"
-						s = mg.group(1)
-						if re.match('.*?(played|putlocker|sockshare|flash strea|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Click.*?Play|BitShare)', s, re.I):
-							#print s
-							
-							part = ''
-							for (p,h) in streams:
-								url = h.replace('\\', '')
-								if n > 1:
-									part = " - Part " + p + ' / ' + str(n)
-								print url
-								print part
-								self.streamListe.append((s,url,part))
-						else:
-							print "No supported hoster:"
-							print s
+			while k < kl:
+				np = re.search('{"0":"(.*?)","1":"(\d)"', data[k:])
+				if np:
+					k += np.end()
+					print "np found"
+					kap = np.group(1)
+					n = int(np.group(2))
 				else:
-					a = l
+					k = kl
+					continue
+					
+				ls = re.search('"links":{(.*?)}}', data)
+				if ls:
+					print "links found"
+					links = ls.group(1)
+					l=len(links)
+				else:
+					continue
+					
+				a=0
+				while a<l:
+					mg = re.search('"(.*?)":\[(\[.*?\])\]', links[a:])
+					if mg:
+						print "hoster found"
+						a += mg.end()
+					
+						streams = re.findall('\["(.*?)".*?"(http:.*?)".*?"stream"\]', mg.group(2))
+								
+						if streams:
+							print "Streams found"
+							s = mg.group(1)
+							if re.match('.*?(played|putlocker|sockshare|flash strea|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Click.*?Play|BitShare)', s, re.I):
+								#print s
+								part = ''
+								for (p,h) in streams:
+									url = h.replace('\\', '')
+									if n > 1:
+										part = "Part " + p
+									else:
+										part = "One Part"
+										
+									if re.match('apitel (\d)',kap):
+										kap = self._insert(kap, 'K', 0)
+									print url
+									print part
+									self.streamListe.append((s,url,part,kap))
+							else:
+								print "No supported hoster:"
+								print s
+					else:
+						a = l
 
-		if len(self.streamListe) == 0:
-			self.streamListe.append(("No streams found !","",""))
+			if len(self.streamListe) == 0:
+				self.streamListe.append(("No streams found !","","",""))
 			
-		self.streamMenuList.setList(map(DDLMEStreamListEntry, self.streamListe))
+			self.streamMenuList.setList(map(DDLMEStreamListEntry2, self.streamListe))
+			
 		self['handlung'].setText(decodeHtml(desc))
 		self.keyLocked = False			
 		print "imageUrl: ",self.imageUrl
 		if self.imageUrl:
 			downloadPage(self.imageUrl, "/tmp/Icon.jpg").addCallback(self.ShowCover)			
 	
+	def _insert(self, ori, ins, pos):
+		return ori[:pos] + ins + ori[pos:] 
+
 	def ShowCover(self, picData):
 		print "ShowCover:"
 		if fileExists("/tmp/Icon.jpg"):
@@ -983,7 +1014,7 @@ class DDLMEStreams(Screen, ConfigListScreen):
 	def dataError(self, error):
 		print "dataError:"
 		print error
-		self.streamListe.append(("Read error !",""))			
+		self.streamListe.append(("Read error !","","",""))			
 		self.streamMenuList.setList(map(DDLMEStreamListEntry, self.streamListe))
 			
 	def got_link(self, stream_url):
