@@ -971,8 +971,9 @@ class DDLMEStreams(Screen, ConfigListScreen):
 									else:
 										part = "One Part"
 										
-									if re.match('apitel (\d)',kap):
-										kap = self._insert(kap, 'K', 0)
+									#if re.match('apitel (\d)',kap):
+									#	kap = self._insert(kap, 'K', 0)
+									
 									print url
 									print part
 									self.streamListe.append((s,url,part,kap))
