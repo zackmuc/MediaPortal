@@ -1023,8 +1023,12 @@ class DDLMEStreams(Screen, ConfigListScreen):
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=3)
 		else:
 			fx = re.match('.*?flashx', stream_url)
+			if not re.match('One', self['liste'].getCurrent()[0][2]):
+				title = self.filmName + ' - ' + self['liste'].getCurrent()[0][2]
+			else:
+				title = self.filmName
+				
 			if config.mediaportal.useHttpDump.value or fx:
-				title = self.filmName + self['liste'].getCurrent()[0][2]
 				if fx:
 					movieinfo = [stream_url,self.filmName,"http://play.flashx.tv/"]
 				else:
@@ -1033,7 +1037,7 @@ class DDLMEStreams(Screen, ConfigListScreen):
 				self.session.open(PlayHttpMovie, movieinfo, title)
 			else:
 				sref = eServiceReference(0x1001, 0, stream_url)
-				sref.setName("%s%s" % (self.filmName,self['liste'].getCurrent()[0][2]))
+				sref.setName(title)
 				self.session.open(MoviePlayer, sref)
 	
 	def keyOK(self):
