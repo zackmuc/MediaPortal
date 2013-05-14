@@ -16,7 +16,7 @@ else:
 	IMDbPresent = False
 	TMDbPresent = False
 	
-DDLME_Version = "ddl.me v0.91 (experimental)"
+DDLME_Version = "ddl.me v0.92 (experimental)"
 
 DDLME_siteEncoding = 'utf-8'
 
@@ -514,7 +514,7 @@ class DDLME_FilmListeScreen(Screen):
 						
 			if m:
 				print "m found"
-				m = re.findall('title=\'(.*?)\'.*?href=\'(.*?)\'.*?<img.*?=\'(.*?)\'', m.group(1))
+				m = re.findall('title=\'(.*?)\'.*?href=\'(.*?)\'.*?<img.*?(http://.*?jpg)', m.group(1))
 				if m:
 					self.page = 1
 					self.pages = 1
@@ -917,7 +917,7 @@ class DDLMEStreams(Screen, ConfigListScreen):
 			else:
 				n = 1
 			
-			ls = re.search('"links":\{(.*?)\}\}\};', data)
+			ls = re.search('"links":{(.*?)}}', data)
 			if ls:
 				print "links found"
 				links = ls.group(1)
