@@ -179,11 +179,15 @@ class VuBox4PlayersApi(object):
 
     @staticmethod
     def __format_duration(duration_str):
+        return 0
+    # TODO: Clean fix
+    """
         if ':' in duration_str:
             m, s = duration_str.split(' ')[0].split(':', 1)
             return int(int(m) * 60 + int(s))
         else:
             return 0
+    """
 
     @staticmethod
     def __api_call(method, *params):
