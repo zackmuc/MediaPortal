@@ -18,6 +18,7 @@
 #
 
 import json
+import re
 from datetime import date
 from urllib import quote
 from urllib2 import urlopen, Request, HTTPError, URLError
