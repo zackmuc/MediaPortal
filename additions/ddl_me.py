@@ -488,18 +488,18 @@ class DDLME_FilmListeScreen(Screen):
 						if i>0:
 							nm = nm[:i]
 							
-						if int(info.group(3)) < 10:
-							staffel = "S0"+str(info.group(3))
-						else:
-							staffel = "S"+str(info.group(3))
-
-						if int(info.group(2)) < 10:
-							episode = "E0"+str(info.group(2))
-						else:
-							episode = "E"+str(info.group(2))
+						#if int(info.group(3)) < 10:
+						#	staffel = "S0"+str(info.group(3))
+						#else:
+						#	staffel = "S"+str(info.group(3))
 						
-						t = "%s%s - %s" % (staffel, episode, nm)
-						#t = 'S%02dE%03d - %s' % (int(info.group(3)), int(info.group(2)), nm)
+						#if int(info.group(2)) < 10:
+						#	episode = "E0"+str(info.group(2))
+						#else:
+						#	episode = "E"+str(info.group(2))
+						
+						#t = "%s%s - %s" % (staffel, episode, nm)
+						t = 'S%02dE%03d - %s' % (int(info.group(3)), int(info.group(2)), nm)
 						self.filmListe.append((t, h, self.imgLink, ''))
 					else:
 						a = l
