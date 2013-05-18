@@ -1,4 +1,4 @@
-##Thanks to Tristan Fischer for XBMC-API (sphere@dersphere.de)
+###Thanks to Tristan Fischer for XBMC-API (sphere@dersphere.de)
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.decrypt import *
 
