@@ -204,7 +204,11 @@ class get_stream_link:
 			elif re.match('.*?http://played.to', data, re.S):
 				link = data
 				getPage(link, cookies=cj, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.played, link).addErrback(self.errorload)
-				
+
+			elif re.match('.*?stream2k.com', data, re.S):
+				link = data
+				getPage(link, headers={'referer':link}).addCallback(self.stream2k).addErrback(self.errorload)
+			
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
 		else:
@@ -218,6 +222,13 @@ class get_stream_link:
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
 
+	def stream2k(self, data):
+		file = re.findall("file: '(.*?)'", data, re.S)
+		if file:
+			self._callback(file[0])
+		else:
+			self.stream_not_found()
+			
 	def played(self, data, url):
 		print "hole daten"
 		op = re.findall('type="hidden" name="op".*?value="(.*?)"', data, re.S)
