@@ -108,8 +108,8 @@ from additions.porn.x4tube import *
 from additions.porn.youporn import *
 
 config.mediaportal = ConfigSubsection()
-config.mediaportal.version = NoSave(ConfigText(default="425"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="4.2.5"))
+config.mediaportal.version = NoSave(ConfigText(default="426"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="4.2.6"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.skin = ConfigSelection(default = "tec", choices = [("tec", _("tec")),("liquidblue", _("liquidblue")), ("original", _("original"))])
