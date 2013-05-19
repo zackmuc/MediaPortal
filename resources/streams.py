@@ -208,6 +208,10 @@ class get_stream_link:
 			elif re.match('.*?stream2k.com', data, re.S):
 				link = data
 				getPage(link, headers={'referer':link}).addCallback(self.stream2k).addErrback(self.errorload)
+
+			elif re.match('.*?limevideo.net', data, re.S):
+				link = data
+				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.lmv, link).addErrback(self.errorload)
 			
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
@@ -221,6 +225,55 @@ class get_stream_link:
 		print "stream_not_found!"
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
+
+	def lmv(self, data, url):
+		dataPost = {}
+		r = re.findall('input type="hidden".*?name="(.*?)".*?value="(.*?)"', data, re.S)
+		for name, value in r:
+			dataPost[name] = value
+			dataPost.update({'method_free':'Continue to Video'})
+		print dataPost
+		getPage(url, method='POST', postdata=urlencode(dataPost), headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.lmv2, url).addErrback(self.errorload)
+
+	def lmv2(self, data, url):
+		dataPost = {}
+		r = re.findall('input type="hidden".*?name="(.*?)".*?value="(.*?)"', data, re.S)
+		for name, value in r:
+			dataPost[name] = value
+			dataPost.update({'method_free':'Continue to Video'})
+		print dataPost
+		getPage(url, method='POST', postdata=urlencode(dataPost), headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.lmvPlay).addErrback(self.errorload)
+	
+	def lmvPlay(self, data):
+		print data
+		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
+		if get_packedjava:
+			print get_packedjava
+			sJavascript = get_packedjava[0]
+			sUnpacked = cJsUnpacker().unpackByString(sJavascript)
+			if sUnpacked:
+				print "unpacked"
+				print sUnpacked
+				if re.match('.*?type="video/divx', sUnpacked):
+					print "DDIIIIIIIIIVVVXXX"
+					stream_url = re.findall('type="video/divx"src="(.*?)"', sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
+					else:
+						self.stream_not_found()
+				elif re.match(".*?file", sUnpacked):
+					print "FFFFFFFFLLLLLLLLLLLVVVVVVVV"
+					stream_url = re.findall("file','(.*?)'", sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
+					else:
+						self.stream_not_found()
+			else:
+				self.stream_not_found()
+		else:
+			self.stream_not_found()
 
 	def stream2k(self, data):
 		file = re.findall("file: '(.*?)'", data, re.S)
