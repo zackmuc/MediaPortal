@@ -77,6 +77,9 @@ from additions.mediatheken.superrtlnow import *
 from additions.mediatheken.zdf import *
 from additions.mediatheken.orf import *
 
+# music
+from additions.canna import *
+
 # porn
 from additions.porn.ahme import *
 from additions.porn.amateurporn import *
@@ -186,6 +189,7 @@ config.mediaportal.showYoutube = ConfigYesNo(default = True)
 config.mediaportal.showClipfish = ConfigYesNo(default = True)
 config.mediaportal.showmlehd = ConfigYesNo(default = True)
 config.mediaportal.showDdlme = ConfigYesNo(default = True)
+config.mediaportal.showCanna = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -314,6 +318,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige USER-Channels:", config.mediaportal.showUserChannels))
 		self.configlist.append(getConfigListEntry("Zeige YouTube:", config.mediaportal.showYoutube))
 		self.configlist.append(getConfigListEntry("Zeige Clipfish:", config.mediaportal.showClipfish))
+		self.configlist.append(getConfigListEntry("Zeige Canna:", config.mediaportal.showCanna))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -1588,6 +1593,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("YouTube", "youtube", "Fun"))
 		if config.mediaportal.showClipfish.value:
 			self.plugin_liste.append(("Clipfish", "clipfish", "Fun"))
+		if config.mediaportal.showCanna.value:
+			self.plugin_liste.append(("Canna", "canna", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2137,6 +2144,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "MLE-HD":
 			self.hit_plugin("MLE-HD")
 			self.session.open(mlehdGenreScreen)
+		elif auswahl == "Canna":
+			self.hit_plugin("Canna")
+			self.session.open(cannaGenreScreen)
 		# porn
 		elif auswahl == "4Tube":
 			if config.mediaportal.pornpin.value:
