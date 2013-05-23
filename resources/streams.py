@@ -213,6 +213,18 @@ class get_stream_link:
 				link = data
 				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.lmv, link).addErrback(self.errorload)
 			
+			elif re.match('.*?videomega.tv', data, re.S):
+				link = data
+				if re.match('.*?iframe.php', link):
+					getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.videomega).addErrback(self.errorload)
+				else:
+					id = link.split('ref=')
+					if id:
+						link = "http://videomega.tv/iframe.php?ref=%s" % id[1]
+						getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.videomega).addErrback(self.errorload)
+					else:
+						self.stream_not_found()
+
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
 		else:
@@ -226,6 +238,22 @@ class get_stream_link:
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
 
+	def videomega(self, data):		
+		unescape = re.findall('unescape."(.*?)"', data, re.S)
+		if unescape:
+			javadata = urllib2.unquote(unescape[0])
+			if javadata:
+				stream_url = re.findall('file: "(.*?)"', javadata, re.S)
+				if stream_url:
+					print stream_url[0]
+					self._callback(stream_url[0])
+				else:
+					self.stream_not_found()
+			else:
+				self.stream_not_found()
+		else:
+			self.stream_not_found()
+		
 	def lmv(self, data, url):
 		dataPost = {}
 		r = re.findall('input type="hidden".*?name="(.*?)".*?value="(.*?)"', data, re.S)
