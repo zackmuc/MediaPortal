@@ -224,7 +224,7 @@ class get_stream_link:
 						getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.videomega).addErrback(self.errorload)
 					else:
 						self.stream_not_found()
-
+					
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
 		else:
@@ -757,7 +757,7 @@ class get_stream_link:
 		ar = re.search('url=(.+?)&title', data)
 		if ar:
 			stream_url = ar.group(1)
-			print "novmov linkss:", stream_url
+			print stream_url
 			self._callback(stream_url)
 		else:
 			self.stream_not_found()			
