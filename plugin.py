@@ -1072,7 +1072,7 @@ class haupt_Screen(Screen, ConfigListScreen):
 		elif auswahl == "Canna-Power":
 			self.session.open(cannaGenreScreen)
 		elif auswahl == "Ran.de":
-			self.session.open(RanGenreScreen)
+			self.session.open(ranGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1950,7 +1950,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		
 		select_nr = self.mainlist[int(self.select_list)][int(self.selektor_index)-1]
 		auswahl = self.plugin_liste[int(select_nr)-1][0]
-		print auswahl
+		print "Plugin:", auswahl
 
 		if auswahl == "Doku.me":
 			self.hit_plugin("Doku.me")
