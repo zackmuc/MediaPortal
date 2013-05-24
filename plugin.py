@@ -299,7 +299,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige NHL:", config.mediaportal.showNhl))		
 		self.configlist.append(getConfigListEntry("Zeige Spobox:", config.mediaportal.showSpobox))
 		self.configlist.append(getConfigListEntry("Zeige Laola1:", config.mediaportal.showLaola1))
-		self.configlist.append(getConfigListEntry("Zeige Ran:", config.mediaportal.showRan))
+		self.configlist.append(getConfigListEntry("Zeige Ran.de:", config.mediaportal.showRan))
 		
 		### Fun
 		self.configlist.append(getConfigListEntry("----- Fun -----", config.mediaportal.fake_entry))
@@ -321,7 +321,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige USER-Channels:", config.mediaportal.showUserChannels))
 		self.configlist.append(getConfigListEntry("Zeige YouTube:", config.mediaportal.showYoutube))
 		self.configlist.append(getConfigListEntry("Zeige Clipfish:", config.mediaportal.showClipfish))
-		self.configlist.append(getConfigListEntry("Zeige Canna:", config.mediaportal.showCanna))
+		self.configlist.append(getConfigListEntry("Zeige Canna Power:", config.mediaportal.showCanna))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -645,7 +645,9 @@ class haupt_Screen(Screen, ConfigListScreen):
 		if config.mediaportal.showClipfish.value:
 			self.funsport.append(self.hauptListEntry("Clipfish", "clipfish"))
 		if config.mediaportal.showCanna.value:
-			self.funsport.append(self.hauptListEntry("Canna", "canna"))
+			self.funsport.append(self.hauptListEntry("Canna-Power", "canna"))
+		if config.mediaportal.showRan.value:
+			self.funsport.append(self.hauptListEntry("Ran.de", "ran"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1067,8 +1069,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(show_CF_Genre)
 		elif auswahl == "ddl.me":
 			self.session.open(show_DDLME_Genre)
-		elif auswahl == "Canna":
+		elif auswahl == "Canna-Power":
 			self.session.open(cannaGenreScreen)
+		elif auswahl == "Ran.de":
+			self.session.open(RanGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1601,9 +1605,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		if config.mediaportal.showClipfish.value:
 			self.plugin_liste.append(("Clipfish", "clipfish", "Fun"))
 		if config.mediaportal.showCanna.value:
-			self.plugin_liste.append(("Canna", "canna", "Fun"))
+			self.plugin_liste.append(("Canna-Power", "canna", "Fun"))
 		if config.mediaportal.showRan.value:
-			self.plugin_liste.append(("Ran", "ran", "Sport"))
+			self.plugin_liste.append(("Ran.de", "ran", "Sport"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2126,10 +2130,10 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.hit_plugin("MLE-HD")
 			self.session.open(mlehdGenreScreen)
 		elif auswahl == "Canna":
-			self.hit_plugin("Canna")
+			self.hit_plugin("Canna-Power")
 			self.session.open(cannaGenreScreen)
-		elif auswahl == "Ran":
-			self.hit_plugin("Ran")
+		elif auswahl == "Ran.de":
+			self.hit_plugin("Ran.de")
 			self.session.open(ranGenreScreen)
 
 		# mediatheken
