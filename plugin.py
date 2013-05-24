@@ -641,6 +641,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("YouTube", "youtube"))
 		if config.mediaportal.showClipfish.value:
 			self.funsport.append(self.hauptListEntry("Clipfish", "clipfish"))
+		if config.mediaportal.showCanna.value:
+			self.funsport.append(self.hauptListEntry("Canna", "canna"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1062,6 +1064,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(show_CF_Genre)
 		elif auswahl == "ddl.me":
 			self.session.open(show_DDLME_Genre)
+		elif auswahl == "Canna":
+			self.session.open(cannaGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -2113,6 +2117,13 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "ddl.me":
 			self.hit_plugin("ddl.me")
 			self.session.open(show_DDLME_Genre)
+		elif auswahl == "MLE-HD":
+			self.hit_plugin("MLE-HD")
+			self.session.open(mlehdGenreScreen)
+		elif auswahl == "Canna":
+			self.hit_plugin("Canna")
+			self.session.open(cannaGenreScreen)
+
 		# mediatheken
 		elif auswahl == "VOXNOW":
 			self.hit_plugin("VOXNOW")
@@ -2141,12 +2152,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "KIKA+":
 			self.hit_plugin("KIKA+")
 			self.session.open(kikaGenreScreen)
-		elif auswahl == "MLE-HD":
-			self.hit_plugin("MLE-HD")
-			self.session.open(mlehdGenreScreen)
-		elif auswahl == "Canna":
-			self.hit_plugin("Canna")
-			self.session.open(cannaGenreScreen)
+
 		# porn
 		elif auswahl == "4Tube":
 			if config.mediaportal.pornpin.value:
