@@ -61,6 +61,7 @@ from additions.youtube import *
 from additions.clipfish import *
 from additions.mlehd import *
 from additions.ddl_me import *
+from additions.ran import *
 
 # kids
 from additions.kinderkino import *
@@ -190,6 +191,7 @@ config.mediaportal.showClipfish = ConfigYesNo(default = True)
 config.mediaportal.showmlehd = ConfigYesNo(default = True)
 config.mediaportal.showDdlme = ConfigYesNo(default = True)
 config.mediaportal.showCanna = ConfigYesNo(default = True)
+config.mediaportal.showRan = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -297,6 +299,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige NHL:", config.mediaportal.showNhl))		
 		self.configlist.append(getConfigListEntry("Zeige Spobox:", config.mediaportal.showSpobox))
 		self.configlist.append(getConfigListEntry("Zeige Laola1:", config.mediaportal.showLaola1))
+		self.configlist.append(getConfigListEntry("Zeige Ran:", config.mediaportal.showRan))
 		
 		### Fun
 		self.configlist.append(getConfigListEntry("----- Fun -----", config.mediaportal.fake_entry))
@@ -1599,6 +1602,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Clipfish", "clipfish", "Fun"))
 		if config.mediaportal.showCanna.value:
 			self.plugin_liste.append(("Canna", "canna", "Fun"))
+		if config.mediaportal.showRan.value:
+			self.plugin_liste.append(("Ran", "ran", "Sport"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2123,6 +2128,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Canna":
 			self.hit_plugin("Canna")
 			self.session.open(cannaGenreScreen)
+		elif auswahl == "Ran":
+			self.hit_plugin("Ran")
+			self.session.open(ranGenreScreen)
 
 		# mediatheken
 		elif auswahl == "VOXNOW":
