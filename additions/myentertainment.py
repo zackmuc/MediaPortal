@@ -58,6 +58,7 @@ class showMEHDGenre(Screen):
 			("Mystery", "http://my-entertainment.biz/forum/list.php?r=category/62-HD-Mystery&page="),
 			("Romanze", "http://my-entertainment.biz/forum/list.php?r=category/40-HD-Romanze&page="),
 			("SciFi", "http://my-entertainment.biz/forum/list.php?r=category/41-HD-SciFi&page="),
+			("Serien", "http://my-entertainment.biz/forum/content.php?r=1072-Serien&page="),
 			("Thriller", "http://my-entertainment.biz/forum/list.php?r=category/42-HD-Thriller&page="),
 			("Zeichentrick", "http://my-entertainment.biz/forum/list.php?r=category/43-HD-Zeichentrick&page=")]
 					
@@ -187,17 +188,23 @@ class MEHDFilmListeScreen(Screen):
 		getPage(streamLink, cookies=kekse, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStream).addErrback(self.dataError)
 		
 	def getStream(self, data):
-		stream = re.findall('href="(http://my-entertainment.biz/.*?/Non-Membe.*?.php\?mov=.*?)"', data)
-		# Wenn nur ein Link, dann stream starten, ansonsten handelt es sich wohl um eine Collection
-		if len(stream) == 1:
-			print 'Ein Free Stream....',stream
-			getPage(stream[0], cookies=kekse, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStreamLink).addErrback(self.dataError)
+		if self.genreName == 'Serien':
+			print 'getStream__serien'
+			streamPic = self['filmList'].getCurrent()[0][2]
+			folgen = re.findall('<a href="(http://streamcloud.*?)".*?target="_blank">(.*?).avi',data,re.S)
+			self.session.open(enterSerienListScreen, folgen, streamPic)
 		else:
-			searchTitle = re.findall('<title>(.*?)</title>', data, re.S)
-			searchCol = re.findall('<img src="(http://my-entertainment.biz.*?)".*?href="(http://my-entertainment.biz/server/Non-Member.php\\?mov=.*?)"', data, re.S)
-			print 'Mehrere Free-Streams...',searchCol
-			# Jetzt muessen wir eine neue Screen oeffnen um die Filme der Collection anzuzeigen
-			self.session.open(enterColListScreen, searchCol, searchTitle)
+			stream = re.findall('href="(http://my-entertainment.biz/.*?/Non-Membe.*?.php\?mov=.*?)"', data)
+			# Wenn nur ein Link, dann stream starten, ansonsten handelt es sich wohl um eine Collection
+			if len(stream) == 1:
+				print 'Ein Free Stream....',stream
+				getPage(stream[0], cookies=kekse, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStreamLink).addErrback(self.dataError)
+			else:
+				searchTitle = re.findall('<title>(.*?)</title>', data, re.S)
+				searchCol = re.findall('<img src="(http://my-entertainment.biz.*?)".*?href="(http://my-entertainment.biz/server/Non-Member.php\\?mov=.*?)"', data, re.S)
+				print 'Mehrere Free-Streams...',searchCol
+				# Jetzt muessen wir eine neue Screen oeffnen um die Filme der Collection anzuzeigen
+				self.session.open(enterColListScreen, searchCol, searchTitle)
 
 	def getStreamLink(self, data):
 			#print 'streamdata...:', data
@@ -375,6 +382,134 @@ class enterColListScreen(Screen):
 		print 'RealStreamLink...', streamLink
 		getPage(streamLink, cookies=kekse, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getRealLink).addErrback(self.dataError)
 	
+	def dataError(self, error):
+		print error
+		
+	def keyLeft(self):
+		if self.keyLocked:
+			return
+		self['auswahlColList'].pageUp()
+		self.loadPic()
+		
+	def keyRight(self):
+		if self.keyLocked:
+			return
+		self['auswahlColList'].pageDown()
+		self.loadPic()
+		
+	def keyUp(self):
+		if self.keyLocked:
+			return
+		self['auswahlColList'].up()
+		self.loadPic()
+		
+	def keyDown(self):
+		if self.keyLocked:
+			return
+		self['auswahlColList'].down()
+		self.loadPic()
+		
+	def keyCancel(self):
+		self.close()
+		
+def enterSerienListEntry(entry):
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 900, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+		] 
+		
+class enterSerienListScreen(Screen):
+	
+	def __init__(self, session, folgenCol, folgenPic):
+		self.session = session
+		self.folgenCol = folgenCol
+		self.folgenPic = folgenPic
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/enterColListScreen.xml" % config.mediaportal.skin.value
+		if not fileExists(path):
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/enterColListScreen.xml"
+		print path
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel,
+			"up" : self.keyUp,
+			"down" : self.keyDown,
+			"right" : self.keyRight,
+			"left" : self.keyLeft,
+		}, -1)
+
+		self['title'] = Label("My-Entertainment.biz")
+		self['name'] = Label("Auswahl")
+		self['handlung'] = Label("")
+		self['coverArt'] = Pixmap()
+		
+		self.keyLocked = True
+		self.auswahlColListe = []
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['auswahlColList'] = self.chooseMenuList
+		self.onLayoutFinish.append(self.showColData)
+		
+		
+	def showColData(self):
+		i=1
+		if self.folgenCol:
+			self.filmliste = []
+			for (url,name) in self.folgenCol:
+				self.filmliste.append((decodeHtml(name), url, self.folgenPic))
+			self.chooseMenuList.setList(map(enterSerienListEntry, self.filmliste))
+			self.keyLocked = False
+			self.loadPic
+
+	def loadPic(self):
+		streamName = self['auswahlColList'].getCurrent()[0][0]
+		streamFilmLink = self['auswahlColList'].getCurrent()[0][1]
+		self['name'].setText(streamName)
+		streamPic = self['auswahlColList'].getCurrent()[0][2]
+		downloadPage(streamPic, "/tmp/spIcon.jpg").addCallback(self.ShowCover)
+
+		
+	def ShowCover(self, picData):
+		if fileExists("/tmp/spIcon.jpg"):
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
+			self.scale = AVSwitch().getFramebufferScale()
+			self.picload = ePicLoad()
+			size = self['coverArt'].instance.size()
+			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+			if self.picload.startDecode("/tmp/spIcon.jpg", 0, 0, False) == 0:
+				ptr = self.picload.getData()
+				if ptr != None:
+					self['coverArt'].instance.setPixmap(ptr)
+					self['coverArt'].show()
+					del self.picload
+					
+
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		link = self['auswahlColList'].getCurrent()[0][1]
+		self.streamName = self['auswahlColList'].getCurrent()[0][0]
+		link_found = False
+		if link:
+			link_found = True
+			print link
+			get_stream_link(self.session).check_link(link, self.got_link, False)
+		if not link_found:
+			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
+
+	def got_link(self, stream_url):
+		if stream_url == None:
+			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=3)
+		else:
+			sref = eServiceReference(0x1001, 0, stream_url)
+			sref.setName(self.streamName)
+			self.session.open(MoviePlayer, sref)
+		
 	def dataError(self, error):
 		print error
 		
