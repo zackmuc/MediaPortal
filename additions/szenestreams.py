@@ -48,6 +48,7 @@ class SzeneStreamsGenreScreen(Screen):
 		self.onLayoutFinish.append(self.layoutFinished)
 		
 	def layoutFinished(self):
+		#self.genreliste.append(("Last Updates", "http://szene-streams.com/"))
 		self.genreliste.append(("Kinofilme", "http://szene-streams.com/publ/aktuelle_kinofilme/1-"))
 		self.genreliste.append(("Alle Filme", "http://szene-streams.com/publ/0-"))
 		self.chooseMenuList.setList(map(SzeneStreamsGenreListEntry, self.genreliste))
@@ -103,7 +104,10 @@ class SzeneStreamsFilmeListeScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 		
 	def loadPage(self):
-		url = "%s%s" % (self.streamGenreLink, str(self.page))
+		if not self.streamGenreLink == "http://szene-streams.com/":
+			url = "%s%s" % (self.streamGenreLink, str(self.page))
+		else:
+			url = self.streamGenreLink
 		print url
 		getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
 

@@ -165,7 +165,7 @@ class get_stream_link:
 			elif re.match('.*?putme.org', data, re.S):
 				link = data
 				#print link
-				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.putme_org, link).addErrback(self.errorload)
+				getPage(link, cookies=cj, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.putme_org, link).addErrback(self.errorload)
 
 			elif re.match('.*?divxmov.net', data, re.S):
 				link = data
@@ -515,22 +515,32 @@ class get_stream_link:
 
 	def putme_org(self, data, url):
 		print "hole post infos"
-		id = re.findall('type="hidden" name="id".*?value="(.*?)"', data, re.S)
-		rand = re.findall('type="hidden" name="rand".*?value="(.*?)"', data, re.S)
-		referer = re.findall('type="hidden" name="referer".*?value="(.*?)"', data, re.S)
-		if id and rand:
-			print id, rand
-			post_data = urlencode({'down_direct': "1", 'id': id[0], 'method_free': "", 'method_premium': "", 'op': "download2", 'rand': rand[0], 'referer': ""})
-			print post_data
-			reactor.callLater(10, self.putme_org_post, url, method='POST', postdata=post_data, headers={'Content-Type':'application/x-www-form-urlencoded'})
-			message = self.session.open(MessageBox, _("Stream startet in 10 sec."), MessageBox.TYPE_INFO, timeout=10)
+		dataPost = {}
+		r = re.findall('input type="hidden".*?name="(.*?)".*?value="(.*?)"', data, re.S)
+		if r:
+			for name, value in r:
+				dataPost[name] = value
+				dataPost.update({'method_free':'Continue to Video'})
+				
+			print dataPost
+			getPage(url, method='POST', cookies=cj, postdata=urlencode(dataPost), headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.putme_org_post, url).addErrback(self.errorload)
 		else:
 			self.stream_not_found()
-
-	def putme_org_post(self, *args, **kwargs):
-		print "drin"
-		getPage(*args, **kwargs).addCallback(self.putme_org_data).addErrback(self.errorload)
-
+			
+	def putme_org_post(self, data, url):
+		print "hole post infos2"
+		dataPost = {}
+		r = re.findall('input type="hidden".*?name="(.*?)".*?value="(.*?)"', data, re.S)
+		if r:
+			for name, value in r:
+				dataPost[name] = value
+				dataPost.update({'method_free':'Continue to Video'})
+				
+			print dataPost
+			getPage(url, method='POST', postdata=urlencode(dataPost), headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.putme_org_data).addErrback(self.errorload)
+		else:
+			self.stream_not_found()
+		
 	def putme_org_data(self, data):
 		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
 		if get_packedjava:
@@ -548,12 +558,21 @@ class get_stream_link:
 						self._callback(stream_url[0].replace('0://','http://'))
 					else:
 						self.stream_not_found()
+						
 				elif re.match(".*?file:", sUnpacked):
 					print "FFFFFFFFLLLLLLLLLLLVVVVVVVV"
 					stream_url = re.findall("file:'(.*?)'", sUnpacked)
 					if stream_url:
 						print stream_url[0].replace('0://','http://')
 						self._callback(stream_url[0].replace('0://','http://'))
+					else:
+						self.stream_not_found()
+						
+				elif re.match('.*?value="src=', sUnpacked):
+					stream_url = re.findall('value="src=(.*?flv)&', sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
 					else:
 						self.stream_not_found()
 				else:
