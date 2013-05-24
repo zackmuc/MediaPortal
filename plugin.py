@@ -321,7 +321,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige USER-Channels:", config.mediaportal.showUserChannels))
 		self.configlist.append(getConfigListEntry("Zeige YouTube:", config.mediaportal.showYoutube))
 		self.configlist.append(getConfigListEntry("Zeige Clipfish:", config.mediaportal.showClipfish))
-		self.configlist.append(getConfigListEntry("Zeige Canna Power:", config.mediaportal.showCanna))
+		self.configlist.append(getConfigListEntry("Zeige Canna-Power:", config.mediaportal.showCanna))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -2129,7 +2129,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "MLE-HD":
 			self.hit_plugin("MLE-HD")
 			self.session.open(mlehdGenreScreen)
-		elif auswahl == "Canna":
+		elif auswahl == "Canna-Power":
 			self.hit_plugin("Canna-Power")
 			self.session.open(cannaGenreScreen)
 		elif auswahl == "Ran.de":
