@@ -3,7 +3,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
 
-YT_Version = "Youtube Search v0.98 (experimental)"
+YT_Version = "Youtube Search v0.99 (experimental)"
 
 YT_siteEncoding = 'utf-8'
 
@@ -401,7 +401,7 @@ class youtubeGenreScreen(Screen):
 				else:
 					c = ''
 					
-				if self.param_author != '':
+				if re.match('Video', self.genreTitle) and self.param_author != '':
 					at = '&author=' + urllib.quote(self.param_author)
 				else:
 					at = ''
@@ -577,8 +577,8 @@ class YT_ListScreen(Screen):
 		}, -1)
 
 		self.favoGenre = re.match('Favoriten', self.genreName)
-		self.playlistGenre = re.match('.*?Playlist', self.genreName)
-		self.channelGenre = re.match('.*?Channel', self.genreName)
+		self.playlistGenre = re.match('Playlist', self.genreName)
+		self.channelGenre = re.match('Channel', self.genreName)
 
 		self['title'] = Label(YT_Version)
 		self['ContentTitle'] = Label(self.genreName)
@@ -694,15 +694,15 @@ class YT_ListScreen(Screen):
 				if mg:
 					a += mg.end()
 					m1 = re.search('<summary>(.*?)</summary>', mg.group(1), re.S)
-					m2 = re.search('<title>(.*?)</title>.*?<gd:feedLink.*?href=\'(.*?)\''\
+					m2 = re.search('<author>.*?<name>(.*?)</name>.*?<uri>(.*?)</uri>'\
 						'.*?<media:thumbnail.*?url=\'(.*?)\'', mg.group(1), re.S)
 					if m2:
-						title = decodeHtml(m2.group(1))
+						title = m2.group(1)
 						if m1:
 							desc = decodeHtml(m1.group(1))
 						else:
 							desc = "Keine weiteren Info's vorhanden."
-						url = m2.group(2)
+						url = m2.group(2) + "/uploads?"
 						img = m2.group(3)
 						
 						self.filmliste.append(('', title, url, img, desc, 'C'))
