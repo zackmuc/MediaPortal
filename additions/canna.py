@@ -125,6 +125,8 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 			f.close()
 			
 		Screen.__init__(self, session)
+		InfoBarBase.__init__(self)
+		InfoBarSeek.__init__(self)
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
 			"ok"    : self.keyOK,
@@ -331,6 +333,8 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 			f.close()
 			
 		Screen.__init__(self, session)
+		InfoBarBase.__init__(self)
+		InfoBarSeek.__init__(self)
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
 			"ok"    : self.keyOK,
