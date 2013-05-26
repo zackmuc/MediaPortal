@@ -62,6 +62,7 @@ from additions.clipfish import *
 from additions.mlehd import *
 from additions.ddl_me import *
 from additions.ran import *
+from additions.movie25 import *
 
 # kids
 from additions.kinderkino import *
@@ -192,6 +193,7 @@ config.mediaportal.showmlehd = ConfigYesNo(default = True)
 config.mediaportal.showDdlme = ConfigYesNo(default = True)
 config.mediaportal.showCanna = ConfigYesNo(default = True)
 config.mediaportal.showRan = ConfigYesNo(default = True)
+config.mediaportal.showMovie25 = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -289,6 +291,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.showmlehd))
 		self.configlist.append(getConfigListEntry("Zeige 1channel:", config.mediaportal.show1channel))
 		self.configlist.append(getConfigListEntry("Zeige ddl.me:", config.mediaportal.showDdlme))
+		self.configlist.append(getConfigListEntry("Zeige movie25:", config.mediaportal.showMovie25))
 		
 		self.configlist.append(getConfigListEntry("----- Watchlist -----", config.mediaportal.fake_entry))
 		self.configlist.append(getConfigListEntry("Zeige Kinox Watchlist:", config.mediaportal.showKinoxWatchlist))
@@ -602,6 +605,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
 		if config.mediaportal.showDdlme.value:
 			self.grauzone.append(self.hauptListEntry("ddl.me", "ddl_me"))
+		if config.mediaportal.showMovie25.value:
+			self.grauzone.append(self.hauptListEntry("Movie25", "movie25"))
 
 		# Fun / Sport
 		if config.mediaportal.showAllMusicHouse.value:
@@ -1073,6 +1078,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(cannaGenreScreen)
 		elif auswahl == "Ran.de":
 			self.session.open(ranGenreScreen)
+		elif auswahl == "Movie25":
+			self.session.open(movie25GenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1523,6 +1530,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Movie2k Watchlist", "movie2kwatchlist", "Grauzone"))
 		if config.mediaportal.showKinoxWatchlist.value:
 			self.plugin_liste.append(("Kinox Watchlist", "kinoxwatchlist", "Grauzone"))
+		if config.mediaportal.showMovie25.value:
+			self.plugin_liste.append(("Movie25", "movie25", "Grauzone"))
 		
 		if config.mediaportal.showDoku.value:
 			self.plugin_liste.append(("Doku.me", "doku", "Mediathek"))
@@ -2135,6 +2144,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Ran.de":
 			self.hit_plugin("Ran.de")
 			self.session.open(ranGenreScreen)
+		elif auswahl == "Movie25":
+			self.hit_plugin("Movie25")
+			self.session.open(movie25GenreScreen)
 
 		# mediatheken
 		elif auswahl == "VOXNOW":

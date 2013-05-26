@@ -455,7 +455,7 @@ class chStreams(Screen):
 			for (chCode, chStreamHoster) in streams:
 				chUrl = 'http://www.1channel.ch/external.php?vid=%s&%s' % (chCode, chStreamHoster)
 				print chStreamHoster, chUrl
-				if re.match('.*?(putlocker|sockshare|filenuke|videoweed|movshare|novamov|divxstage|uploadc|sharesix)', chStreamHoster, re.S):
+				if re.match('.*?(putme|limevideo|stream2k|played|putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Zooupload|Wupfile|BitShare|Userporn|sharesix)', chStreamHoster, re.S):
 					self.streamList.append((chStreamHoster, chUrl))
 			self.streamMenuList.setList(map(chStreamListEntry, self.streamList))
 			self.keyLocked = False
