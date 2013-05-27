@@ -224,6 +224,10 @@ class get_stream_link:
 						getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.videomega).addErrback(self.errorload)
 					else:
 						self.stream_not_found()
+				
+			elif re.match('.*?vk.me', data, re.S):
+				link = data
+				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.vkme).addErrback(self.errorload)
 					
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
@@ -237,6 +241,17 @@ class get_stream_link:
 		print "stream_not_found!"
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
+
+	def vkme(self, data):
+		print "vk.me.."
+		stream_urls = re.findall('url.*?=(http://.*?.vk.me/.*?/video.*?.mp4)', data)
+		if stream_urls:
+			print stream_urls
+			stream_url = stream_urls[-1]
+			print stream_url
+			self._callback(stream_url)
+		else:
+			self.stream_not_found()
 
 	def videomega(self, data):		
 		unescape = re.findall('unescape."(.*?)"', data, re.S)
