@@ -225,7 +225,7 @@ class get_stream_link:
 					else:
 						self.stream_not_found()
 				
-			elif re.match('.*?vk.me', data, re.S):
+			elif re.match('.*?vk.com', data, re.S):
 				link = data
 				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.vkme).addErrback(self.errorload)
 					
@@ -244,7 +244,7 @@ class get_stream_link:
 
 	def vkme(self, data):
 		print "vk.me.."
-		stream_urls = re.findall('url.*?=(http://.*?.vk.me/.*?/video.*?.mp4)', data)
+		stream_urls = re.findall('url[0-9]+=(http://.*?.vk.me/.*?/videos/.*?[0-9]+.mp4)', data)
 		if stream_urls:
 			print stream_urls
 			stream_url = stream_urls[-1]
