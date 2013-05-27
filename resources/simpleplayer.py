@@ -20,9 +20,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 
 		self["actions"] = ActionMap(["WizardActions"],
 		{
-			"back":				self.leavePlayer,
-			"left":				self.playPrevStream,
-			"right":			self.playNextStream
+			"back":		self.exitPlayer,
+			"left":		self.playPrevStream,
+			"right":	self.playNextStream
 
 		}, -1)
 		
@@ -37,10 +37,12 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playIdx = playIdx
 		self.playLen = len(playList)
 		self.returning = False
+		self.onClose.append(self.playExit)
 
 		self.onLayoutFinish.append(self.getVideo)
 			
 	def playVideo(self):
+		print "playVideo:"
 		if not self.playAll:
 			self.close()
 		else:
@@ -55,7 +57,6 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		print "playStream: ",title,url
 		sref = eServiceReference(0x1001, 0, url)
 		sref.setName(title)
-		self.onClose.append(self.playExit)
 		self.session.nav.stopService()
 		self.session.nav.playService(sref)
 
@@ -75,7 +76,8 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			self.playIdx = 0
 		self.playVideo()
 	
-	def leavePlayer(self):
+	def exitPlayer(self):
+		print "exitPlayer:"
 		self.close()
 
 	def doEofInternal(self, playing):
@@ -88,4 +90,5 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.session.nav.playService(self.lastservice)
 
 	def getVideo(self):
+		print "getVideo:"
 		self.close()
