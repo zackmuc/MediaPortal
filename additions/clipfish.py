@@ -2,9 +2,11 @@
 
 import Queue
 import threading
+from Screens.InfoBarGenerics import *
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
 
-CF_Version = "Clipfish.de v0.96 (experimental)"
+CF_Version = "Clipfish.de v0.97 (experimental)"
 
 CF_siteEncoding = 'utf-8'
 
@@ -23,9 +25,68 @@ Doku Auswahl:
 
 Stream Auswahl:
 	Rot/Blau			: Die Beschreibung Seitenweise scrollen
-	Gelb				: Videopriorität 'L','M','H'
 
 """
+
+class ClipfishPlayer(SimplePlayer):
+
+	def __init__(self, session, playList, genreVideos, playIdx=0, playAll=False):
+		print "ClipfishPlayer:"
+		self.genreVideos = genreVideos
+
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll)
+		
+	def getVid(self, data):
+		print "getVid: "
+		if not self.genreVideos:
+			m = re.search('NAME="FlashVars".*?data=(.*?)&amp', data)
+		else:
+			m = re.search('data: "(.*?)"', data, re.S)
+			
+		if m:
+			url = m.group(1)
+			if url[0:4] != "http":
+				url = "http://www.clipfish.de" + url
+				
+			getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getXml).addErrback(self.dataError)
+		else:
+			print "No xml data found!"
+			self.dataError('No video data found!')
+	
+	def getXml(self, data):
+		print "getXml:"
+		url = None
+		m = re.search('rtmpe:', data)
+		if m:
+			rtmp_vid = True
+		else:
+			rtmp_vid = False
+			
+		if rtmp_vid:
+			print "musik url:"
+			m = re.search('<filename>.*?ondemand/(.*?):(.*?)\?', data)
+			if m:
+				url = 'http://video.clipfish.de/' + m.group(2) + '.' + m.group(1)
+		else:
+			print "film url:"
+			#print "data: ",data
+			m = re.search('<filename>.*?clipfish.de/(.*?)(flv|f4v|mp4).*?</filename>', data, re.S)
+			if m:
+				print "m: ",m.group(1)
+				url = 'http://video.clipfish.de/' + m.group(1) + m.group(2)
+		
+		if url != None:
+			title = str(self.playIdx + 1) + '. ' + self.playList[self.playIdx][0]
+			self.playStream(title, url)
+		else:
+			print "No video url found!"
+			self.dataError('No video data found!')
+	
+	def getVideo(self):
+		url = self.playList[self.playIdx][1]
+		print "getVidPage: ", len(url), ',', url
+		getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getVid).addErrback(self.dataError)
+			
 def CF_menuListentry(entry):
 	return [entry,
 		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
@@ -346,6 +407,7 @@ class CF_FilmListeScreen(Screen):
 			"6" : self.key_6,
 			"7" : self.key_7,
 			"9" : self.key_9,
+			"green" :  self.keyPlayAll,
 			"blue" :  self.keyTxtPageDown,
 			"red" :  self.keyTxtPageUp
 		}, -1)
@@ -364,7 +426,7 @@ class CF_FilmListeScreen(Screen):
 		self['handlung'] = ScrollLabel("")
 		self['page'] = Label("")
 		self['F1'] = Label("Text-")
-		self['F2'] = Label("")
+		self['F2'] = Label("Play All")
 		self['F3'] = Label("")
 		self['F4'] = Label("Text+")
 		self['VideoPrio'] = Label("")
@@ -538,59 +600,7 @@ class CF_FilmListeScreen(Screen):
 	def setHandlung(self, data):
 		print "setHandlung:"
 		self['handlung'].setText(decodeHtml(data))
-
-	def getVid(self, data):
-		print "getVid: "
-		if not self.genreVideos:
-			m = re.search('NAME="FlashVars".*?data=(.*?)&amp', data)
-		else:
-			m = re.search('data: "(.*?)"', data, re.S)
-			
-		if m:
-			url = m.group(1)
-			if url[0:4] != "http":
-				url = self.baseUrl + url
-				
-			getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getXml).addErrback(self.dataError)
-		else:
-			print "No xml data found!"
-			self.dataError('No video data found!')
 	
-	def getXml(self, data):
-		print "getXml:"
-		url = None
-		m = re.search('rtmpe:', data)
-		if m:
-			rtmp_vid = True
-		else:
-			rtmp_vid = False
-			
-		if rtmp_vid:
-			print "musik url:"
-			m = re.search('<filename>.*?ondemand/(.*?):(.*?)\?', data)
-			if m:
-				url = 'http://video.clipfish.de/' + m.group(2) + '.' + m.group(1)
-		else:
-			print "film url:"
-			#print "data: ",data
-			m = re.search('<filename>.*?clipfish.de/(.*?)(flv|f4v|mp4).*?</filename>', data, re.S)
-			if m:
-				print "m: ",m.group(1)
-				url = 'http://video.clipfish.de/' + m.group(1) + m.group(2)
-		
-		if url != None:
-			self.playVid(url)
-		else:
-			print "No video url found!"
-			self.dataError('No video data found!')
-	
-	def playVid(self, url):
-		print "playVid: ",url
-		title = self['liste'].getCurrent()[0][0]
-		sref = eServiceReference(0x1001, 0, url)
-		sref.setName(title)
-		self.session.open(MoviePlayer, sref)
-		
 	def ShowCover(self, picData):
 		print "ShowCover:"
 		picPath = "/tmp/Icon.jpg"
@@ -606,7 +616,6 @@ class CF_FilmListeScreen(Screen):
 		if fileExists(picPath):
 			print "picpath: ",picPath
 			self['coverArt'].instance.setPixmap(gPixmapPtr())
-			#self['coverArt'].instance.setPixmap(enigma.gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['coverArt'].instance.size()
@@ -617,13 +626,27 @@ class CF_FilmListeScreen(Screen):
 					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
-		
+	
+	def keyPlayAll(self):
+		if (self.keyLocked|self.eventL.is_set()):
+			return
+		self.session.open(
+			ClipfishPlayer,
+			self.musicListe,
+			self.genreVideos,
+			self['liste'].getSelectedIndex(),
+			playAll = True
+			)
+	
 	def keyOK(self):
 		if (self.keyLocked|self.eventL.is_set()):
 			return
-		url = self['liste'].getCurrent()[0][1]
-		print "keyOK: ", len(url), ',', url
-		getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getVid).addErrback(self.dataError)
+		self.session.open(
+			ClipfishPlayer,
+			self.musicListe,
+			self.genreVideos,
+			self['liste'].getSelectedIndex()
+			)
 	
 	def keyUp(self):
 		if self.keyLocked:
