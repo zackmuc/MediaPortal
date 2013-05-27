@@ -1047,7 +1047,7 @@ class get_stream_link:
 			self.stream_not_found()
 			
 	def movreel_post_data2(self, data, fname):
-		stream_url = re.findall('<a href="(.*?'+fname+')">', data, re.M)
+		stream_url = re.findall("var file_link = '(.*?)'", data, re.S)
 		if stream_url:
 			self._callback(stream_url[0])
 		else:
