@@ -49,10 +49,10 @@ class sexxxhdGenreScreen(Screen):
 		
 	def layoutFinished(self):
 		self.keyLocked = True
-		self.genreliste.insert(0, ("Recent", "http://sexxxhd.com/videos/", None))
-		self.genreliste.insert(0, ("Popular", "http://sexxxhd.com/videos/order/popular/", None))
-		self.genreliste.insert(0, ("Top Rated", "http://sexxxhd.com/videos/order/rated/", None))
 		self.genreliste.insert(0, ("Most Viewed", "http://sexxxhd.com/videos/order/views/", None))
+		self.genreliste.insert(0, ("Top Rated", "http://sexxxhd.com/videos/order/rated/", None))
+		self.genreliste.insert(0, ("Popular", "http://sexxxhd.com/videos/order/popular/", None))
+		self.genreliste.insert(0, ("Recent", "http://sexxxhd.com/videos/", None))
 		self.chooseMenuList.setList(map(sexxxhdGenreListEntry, self.genreliste))
 		self.chooseMenuList.moveToIndex(0)
 		self.keyLocked = False
