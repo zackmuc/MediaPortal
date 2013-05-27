@@ -158,11 +158,12 @@ class mlehdFilmListeScreen(Screen):
 		
 	def loadPageData(self, data):
 		print "drin"
-		#countp = re.findall('totalPages: (.*?),', data, re.S)
-		#if countp:
-		#	self['page'].setText(countp[0])
+		lastpage = re.findall('<div id="pagination"><span>Page.*?of (.*?)</span>', data)
+		if lastpage:
+			self['page'].setText(lastpage[0])
 
-		movies = re.findall('<div class="chipsetl1data">.*?<a href="(http://www.mle-hd.se/.*?)" rel="bookmark" title="Permanent Link to (.*?)" class="img1">.*?<img.*?src="(http://www.mle-hd.se/wp-content/uploads/.*?)"', data, re.S)
+		#movies = re.findall('<div class="chipsetl1data">.*?<a href="(http://www.mle-hd.se/.*?)" rel="bookmark" title="Permanent Link to (.*?)" class="img1">.*?<img.*?src="(http://www.mle-hd.se/wp-content/uploads/.*?)"', data, re.S)
+		movies = re.findall('<div class="entry ">.*?<a href="(http://www.mle-hd.se/.*?)" title="(.*?)" class="opacity"><img.*?src="(http://www.mle-hd.se/wp-content/uploads/.*?)"', data, re.S)
 		if movies:
 			self.filmliste = []
 			for (url,title,image) in movies:

@@ -63,6 +63,7 @@ from additions.mlehd import *
 from additions.ddl_me import *
 from additions.ran import *
 from additions.movie25 import *
+from additions.eighties import *
 
 # kids
 from additions.kinderkino import *
@@ -194,6 +195,7 @@ config.mediaportal.showDdlme = ConfigYesNo(default = True)
 config.mediaportal.showCanna = ConfigYesNo(default = True)
 config.mediaportal.showRan = ConfigYesNo(default = True)
 config.mediaportal.showMovie25 = ConfigYesNo(default = True)
+config.mediaportal.showEighties = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -325,6 +327,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige YouTube:", config.mediaportal.showYoutube))
 		self.configlist.append(getConfigListEntry("Zeige Clipfish:", config.mediaportal.showClipfish))
 		self.configlist.append(getConfigListEntry("Zeige Canna-Power:", config.mediaportal.showCanna))
+		self.configlist.append(getConfigListEntry("Zeige 80s & 90s Music:", config.mediaportal.showEighties))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -1617,6 +1620,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Canna-Power", "canna", "Fun"))
 		if config.mediaportal.showRan.value:
 			self.plugin_liste.append(("Ran.de", "ran", "Sport"))
+		if config.mediaportal.showEighties.value:
+			self.plugin_liste.append(("80s & 90s Music", "eighties", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2147,7 +2152,10 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Movie25":
 			self.hit_plugin("Movie25")
 			self.session.open(movie25GenreScreen)
-
+		elif auswahl == "80s & 90s Music":
+			self.hit_plugin("80s & 90s Music")
+			self.session.open(eightiesGenreScreen)
+			
 		# mediatheken
 		elif auswahl == "VOXNOW":
 			self.hit_plugin("VOXNOW")
