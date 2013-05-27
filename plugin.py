@@ -656,6 +656,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("Canna-Power", "canna"))
 		if config.mediaportal.showRan.value:
 			self.funsport.append(self.hauptListEntry("Ran.de", "ran"))
+		if config.mediaportal.showEighties.value:
+			self.funsport.append(self.hauptListEntry("80s & 90s Music", "eighties"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1083,6 +1085,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(ranGenreScreen)
 		elif auswahl == "Movie25":
 			self.session.open(movie25GenreScreen)
+		elif auswahl == "80s & 90s Music":
+			self.session.open(eightiesGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
