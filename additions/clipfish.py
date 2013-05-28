@@ -30,7 +30,7 @@ Stream Auswahl:
 
 class ClipfishPlayer(SimplePlayer):
 
-	def __init__(self, session, playList, genreVideos, playIdx=0, playAll=False):
+	def __init__(self, session, playList, genreVideos, playIdx=0, playAll=False, listTitle=None):
 		print "ClipfishPlayer:"
 		self.genreVideos = genreVideos
 
@@ -407,7 +407,6 @@ class CF_FilmListeScreen(Screen):
 			"6" : self.key_6,
 			"7" : self.key_7,
 			"9" : self.key_9,
-			"green" :  self.keyPlayAll,
 			"blue" :  self.keyTxtPageDown,
 			"red" :  self.keyTxtPageUp
 		}, -1)
@@ -426,7 +425,7 @@ class CF_FilmListeScreen(Screen):
 		self['handlung'] = ScrollLabel("")
 		self['page'] = Label("")
 		self['F1'] = Label("Text-")
-		self['F2'] = Label("Play All")
+		self['F2'] = Label("")
 		self['F3'] = Label("")
 		self['F4'] = Label("Text+")
 		self['VideoPrio'] = Label("")
@@ -627,7 +626,7 @@ class CF_FilmListeScreen(Screen):
 					self['coverArt'].show()
 					del self.picload
 	
-	def keyPlayAll(self):
+	def keyOK(self):
 		if (self.keyLocked|self.eventL.is_set()):
 			return
 		self.session.open(
@@ -636,16 +635,6 @@ class CF_FilmListeScreen(Screen):
 			self.genreVideos,
 			self['liste'].getSelectedIndex(),
 			playAll = True
-			)
-	
-	def keyOK(self):
-		if (self.keyLocked|self.eventL.is_set()):
-			return
-		self.session.open(
-			ClipfishPlayer,
-			self.musicListe,
-			self.genreVideos,
-			self['liste'].getSelectedIndex()
 			)
 	
 	def keyUp(self):

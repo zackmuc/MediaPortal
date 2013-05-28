@@ -1,7 +1,7 @@
 ﻿from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.decrypt import *
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer, SimplePlaylist
 
-STV_Version = "Science-Tv.com v0.91"
+STV_Version = "Science-Tv.com v0.92"
 
 STV_siteEncoding = 'utf-8'
 
@@ -57,6 +57,7 @@ class scienceTvGenreScreen(Screen):
 		self.genreliste.append((3,'TV-Programmvorschau', 'http://www.science-tv.com/c/mid,2670,TV-Programmvorschau/'))
 		self.chooseMenuList.setList(map(scienceTvGenreListEntry, self.genreliste))
 	
+	"""
 	def genreData(self, data):
 		stvStream = re.findall('<video src="(.*?)"', data)
 		if stvStream:
@@ -69,13 +70,20 @@ class scienceTvGenreScreen(Screen):
 			
 	def dataError(self, error):
 		print error
-		
+	"""
+	
 	def keyOK(self):
 		genreID = self['genreList'].getCurrent()[0][0]
 		genre = self['genreList'].getCurrent()[0][1]
 		stvLink = self['genreList'].getCurrent()[0][2]
 		if genreID == 1:
-			getPage(stvLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
+			#getPage(stvLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
+			self.session.open(
+				ScienceTvPlayer2,
+				[(1,'Aktuelles Programm', 'http://www.science-tv.com/c/mid,2668,aktuelles_Programm/')],
+				playIdx = 0,
+				playAll = True
+				)
 		else:
 			self.session.open(scienceTvListScreen, genreID, stvLink, genre)
 
@@ -143,7 +151,7 @@ class scienceTvListScreen(Screen):
 			if stvDaten:
 				print "Movies found"
 				for (href,title,img,dura) in stvDaten:
-					self.filmliste.append(('',title.replace(' - ','\n')+' ['+dura+']',href,img))
+					self.filmliste.append(('',title.replace(' - ','\n',1)+' ['+dura+']',href,img))
 				self.keyLocked = False
 			else:
 				self.filmliste.append(('Keine Filme gefunden !','','',''))
@@ -158,7 +166,7 @@ class scienceTvListScreen(Screen):
 			if stvDaten:
 				print "EPG Data found"
 				for (ptime,title,img) in stvDaten:
-					title = title.replace(' - ','\n\t')
+					title = title.replace(' - ','\n\t',1)
 					self.filmliste.append((ptime+'\t',title,'',img))
 				self.keyLocked = False
 			else:
@@ -222,12 +230,88 @@ class scienceTvListScreen(Screen):
 		if self.keyLocked:
 			return
 		if self.genreID == 2:
+			"""
 			stvLink = "http://www.science-tv.com/inc/mod/video/play.php/vid,%s/q,mp4/typ,ondemand/file.mp4"\
 						% self['genreList'].getCurrent()[0][2]
 			stvTitle = self['genreList'].getCurrent()[0][1]
 			sref = eServiceReference(0x1001, 0, stvLink)
 			sref.setName(stvTitle)
 			self.session.open(MoviePlayer, sref)
-
+			"""
+			
+			self.session.open(
+				ScienceTvPlayer,
+				self.filmliste,
+				playIdx = self['genreList'].getSelectedIndex(),
+				playAll = True,
+				listTitle = self.genreName
+				)
+			
 	def keyCancel(self):
 		self.close()
+		
+class ScienceTvPlayer(SimplePlayer):
+
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
+		print "ScienceTvPlayer:"
+
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
+		
+	def getVideo(self):
+		stvLink = "http://www.science-tv.com/inc/mod/video/play.php/vid,%s/q,mp4/typ,ondemand/file.mp4"\
+						% self.playList[self.playIdx][2]
+		stvTitle = self.playList[self.playIdx][1]
+		self.playStream(stvTitle, stvLink)
+
+	def openPlaylist(self):
+		self.session.openWithCallback(self.cb_Playlist, ScienceTvPlaylist, self.playList, self.playIdx, listTitle=self.listTitle)
+
+class ScienceTvPlayer2(SimplePlayer):
+
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
+		print "ScienceTvPlayer2:"
+		self.stvTitle = 'Science-TV - aktuelles Programm'
+
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
+		
+	def getVideo(self):
+		stvLink = self.playList[self.playIdx][2]
+		getPage(stvLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
+
+	def genreData(self, data):
+		stvStream = re.findall('<video src="(.*?)"', data)
+		if stvStream:
+			print "S-TV stream found"
+			self.stvLink = stvStream[0]
+			self.playStream(self.stvTitle, self.stvLink)
+			
+	def dataError(self, error):
+		print error
+
+	def openPlaylist(self):
+		pass
+		
+	def doEofInternal(self, playing):
+		print "doEofInt:"
+		if playing == True:
+			reactor.callLater(7, self.getVideo)
+			self.session.open(MessageBox, _("Bitte warten..."), MessageBox.TYPE_INFO, timeout=7)				
+			
+	def playNextStream(self):
+		pass
+		
+	def playPrevStream(self):
+		pass
+
+class ScienceTvPlaylist(SimplePlaylist):
+
+	def __init__(self, session, playList, playIdx, listTitle=None):
+
+		SimplePlaylist.__init__(self, session, playList, playIdx, listTitle)
+		
+		self.chooseMenuList.l.setItemHeight(50)
+		
+	def playListEntry(self, entry):
+		return [entry,
+			(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 50, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0]+entry[1])
+			]	 

@@ -7,17 +7,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
 		self.session = session
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
 		
-		InfoBarNotifications.__init__(self)
-		InfoBarBase.__init__(self)
-		InfoBarShowHide.__init__(self)
-
 		self["actions"] = ActionMap(["WizardActions"],
 		{
 			"up": 		self.openPlaylist,
@@ -27,12 +23,17 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 
 		}, -1)
 		
+		InfoBarNotifications.__init__(self)
+		InfoBarBase.__init__(self)
+		InfoBarShowHide.__init__(self)
+
 		self.allowPiP = False
 		InfoBarSeek.__init__(self)
 
 		self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 
+		self.listTitle = listTitle
 		self.playAll = playAll
 		self.playList = playList
 		self.playIdx = playIdx
@@ -95,17 +96,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.close()
 
 	def openPlaylist(self):
-		self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx)
+		self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle)
 		
 	def cb_Playlist(self, data):
 		if data != -1:
 			self.playIdx = data
 			self.getVideo()
 		
-def playListEntry(entry):
-	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
-		] 
 class SimplePlaylist(Screen):
 
 	def __init__(self, session, playList, playIdx, listTitle=None):
@@ -149,6 +146,11 @@ class SimplePlaylist(Screen):
 		
 		self.onLayoutFinish.append(self.showPlaylist)
 
+	def playListEntry(self, entry):
+		return [entry,
+			(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+			] 
+		
 	def showPlaylist(self):
 		print 'showPlaylist:'
 		if self.listTitle != None:
@@ -156,7 +158,7 @@ class SimplePlaylist(Screen):
 		else:
 			self['ContentTitle'].setText("Auswahl")
 
-		self.chooseMenuList.setList(map(playListEntry, self.playList))
+		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
 		self['genreList'].moveToIndex(self.playIdx)
 
 	def exit(self):
