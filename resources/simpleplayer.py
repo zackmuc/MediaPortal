@@ -20,6 +20,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 
 		self["actions"] = ActionMap(["WizardActions"],
 		{
+			"up": 		self.openPlaylist,
 			"back":		self.exitPlayer,
 			"left":		self.playPrevStream,
 			"right":	self.playNextStream
@@ -92,3 +93,75 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	def getVideo(self):
 		print "getVideo:"
 		self.close()
+
+	def openPlaylist(self):
+		self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx)
+		
+	def cb_Playlist(self, data):
+		if data != -1:
+			self.playIdx = data
+			self.getVideo()
+		
+def playListEntry(entry):
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+		] 
+class SimplePlaylist(Screen):
+
+	def __init__(self, session, playList, playIdx, listTitle=None):
+		self.session = session
+	
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/defaultGenreScreen.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self['OkCancelActions'] = HelpableActionMap(self, 'OkCancelActions',
+		{
+			'cancel':	self.exit,
+			'ok': 		self.ok
+		}, -1)
+			
+		self.playList = playList
+		self.playIdx = playIdx
+		self.listTitle = listTitle
+
+		self['title'] = Label("Playlist")
+		self['ContentTitle'] = Label("")
+		self['name'] = Label("")
+		self['F1'] = Label("")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
+		
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['genreList'] = self.chooseMenuList
+		
+		self.onLayoutFinish.append(self.showPlaylist)
+
+	def showPlaylist(self):
+		print 'showPlaylist:'
+		if self.listTitle != None:
+			self['ContentTitle'].setText(self.listTitle)
+		else:
+			self['ContentTitle'].setText("Auswahl")
+
+		self.chooseMenuList.setList(map(playListEntry, self.playList))
+		self['genreList'].moveToIndex(self.playIdx)
+
+	def exit(self):
+		self.close(-1)
+
+	def ok(self):
+		idx = self['genreList'].getSelectedIndex()
+		self.close(idx)
