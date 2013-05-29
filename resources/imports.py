@@ -25,29 +25,21 @@ from Screens.InfoBarGenerics import InfoBarSeek, InfoBarNotifications
 from Screens.InfoBar import MoviePlayer, InfoBar
 from Screens.Standby import TryQuitMainloop
 from twisted.web.client import downloadPage, getPage, error
-from twisted.internet import reactor
-from twisted.internet import defer
+from twisted.internet import reactor, defer
 from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS
 from Tools.LoadPixmap import LoadPixmap
 
-import re, urllib, urllib2, os, cookielib, time, socket
-import sha, cookielib, urllib2, re, shutil, urllib
 from jsunpacker import cJsUnpacker
+
+import re, urllib, urllib2, os, cookielib, time, socket, sha, shutil, base64, datetime, math, hashlib
 from urllib2 import Request, URLError, urlopen as urlopen2
 from socket import gaierror, error
 from urllib import quote, unquote_plus, unquote, urlencode
 from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
-from time import strptime, mktime
 from base64 import b64decode
 from binascii import unhexlify
 from urlparse import parse_qs
 from streams import get_stream_link
-import sha
-import base64
-import datetime
-import math
-import time
-import hashlib
 from time import *
 
 from Screens.VirtualKeyBoard import VirtualKeyBoard
