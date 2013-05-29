@@ -2,6 +2,11 @@
 
 from Screens.InfoBarGenerics import *
 from Plugins.Extensions.MediaPortal.resources.imports import *
+if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
+	from Plugins.Extensions.mediainfo.plugin import mediaInfo
+	MediainfoPresent = True
+else:
+	MediainfoPresent = False
 
 class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
 	ENABLE_RESUME_SUPPORT = True
@@ -14,8 +19,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
 		
-		self["actions"] = ActionMap(["WizardActions"],
+		self["actions"] = ActionMap(["WizardActions","EPGSelectActions"],
 		{
+			"info":		self.openMediainfo,
 			"up": 		self.openPlaylist,
 			"back":		self.exitPlayer,
 			"left":		self.playPrevStream,
@@ -102,7 +108,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		if data != -1:
 			self.playIdx = data
 			self.getVideo()
-		
+			
+	def openMediainfo(self):
+		if MediainfoPresent:
+			url = self.session.nav.getCurrentlyPlayingServiceReference().getPath()
+			if re.match('.*?http://', url, re.S):
+				self.session.open(mediaInfo, True)
+	
 class SimplePlaylist(Screen):
 
 	def __init__(self, session, playList, playIdx, listTitle=None):
