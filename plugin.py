@@ -669,6 +669,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("80s & 90s Music", "eighties"))
 		if config.mediaportal.showGEOde.value:
 			self.funsport.append(self.hauptListEntry("GEO.de", "geo_de"))
+		if config.mediaportal.showTeledunet.value:
+			self.funsport.append(self.hauptListEntry("Teledunet", "teledunet"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1102,6 +1104,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(eightiesGenreScreen)
 		elif auswahl == "GEO.de":
 			self.session.open(GEOdeGenreScreen)
+		elif auswahl == "Teledunet":
+			self.session.open(teleGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
