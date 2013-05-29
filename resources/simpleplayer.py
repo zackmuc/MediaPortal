@@ -19,11 +19,12 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
 		
-		self["actions"] = ActionMap(["WizardActions","EPGSelectActions"],
+		self["actions"] = ActionMap(["WizardActions","EPGSelectActions",'MoviePlayerActions','MediaPlayerSeekActions','ColorActions','InfobarActions'],
 		{
+			"leavePlayer": self.leavePlayer,
 			"info":		self.openMediainfo,
 			"up": 		self.openPlaylist,
-			"back":		self.exitPlayer,
+			"back":		self.leavePlayer,
 			"left":		self.playPrevStream,
 			"right":	self.playNextStream
 
@@ -84,7 +85,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			self.playIdx = 0
 		self.playVideo()
 	
-	def exitPlayer(self):
+	def leavePlayer(self):
 		print "exitPlayer:"
 		self.close()
 
