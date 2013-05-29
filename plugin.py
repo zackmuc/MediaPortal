@@ -664,6 +664,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("Ran.de", "ran"))
 		if config.mediaportal.showEighties.value:
 			self.funsport.append(self.hauptListEntry("80s & 90s Music", "eighties"))
+		if config.mediaportal.showTeledunet.value:
+			self.funsport.append(("Teledunet", "teledunet"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1095,6 +1097,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(movie25GenreScreen)
 		elif auswahl == "80s & 90s Music":
 			self.session.open(eightiesGenreScreen)
+		elif auswahl == "Teledunet":
+			self.session.open(teleGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
