@@ -64,6 +64,7 @@ from additions.ddl_me import *
 from additions.ran import *
 from additions.movie25 import *
 from additions.eighties import *
+from additions.teledunet import *
 
 # kids
 from additions.kinderkino import *
@@ -197,6 +198,7 @@ config.mediaportal.showCanna = ConfigYesNo(default = True)
 config.mediaportal.showRan = ConfigYesNo(default = True)
 config.mediaportal.showMovie25 = ConfigYesNo(default = True)
 config.mediaportal.showEighties = ConfigYesNo(default = True)
+config.mediaportal.showTeledunet = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -330,6 +332,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Clipfish:", config.mediaportal.showClipfish))
 		self.configlist.append(getConfigListEntry("Zeige Canna-Power:", config.mediaportal.showCanna))
 		self.configlist.append(getConfigListEntry("Zeige 80s & 90s Music:", config.mediaportal.showEighties))
+		self.configlist.append(getConfigListEntry("Zeige Teledunet:", config.mediaportal.showTeledunet))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -1640,6 +1643,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Ran.de", "ran", "Sport"))
 		if config.mediaportal.showEighties.value:
 			self.plugin_liste.append(("80s & 90s Music", "eighties", "Fun"))
+		if config.mediaportal.showTeledunet.value:
+			self.plugin_liste.append(("Teledunet", "teledunet", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2175,6 +2180,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "80s & 90s Music":
 			self.hit_plugin("80s & 90s Music")
 			self.session.open(eightiesGenreScreen)
+		elif auswahl == "Teledunet":
+			self.hit_plugin("Teledunet")
+			self.session.open(teleGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
