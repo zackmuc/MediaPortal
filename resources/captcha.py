@@ -1,18 +1,4 @@
 # -*- coding: UTF-8 -*-
-from enigma import eListboxPythonMultiContent, gFont, RT_HALIGN_CENTER, RT_VALIGN_CENTER, getPrevAsciiCode
-from Screens.Screen import Screen
-from Components.AVSwitch import AVSwitch
-from Components.Language import language
-from Components.GUIComponent import GUIComponent
-from Components.ActionMap import ActionMap
-from Components.Sources.StaticText import StaticText
-from Components.Label import Label
-from Components.Pixmap import Pixmap
-from Components.MenuList import MenuList
-from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
-from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN, fileExists
-from Tools.LoadPixmap import LoadPixmap
-
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
 class VirtualKeyBoardList(MenuList):

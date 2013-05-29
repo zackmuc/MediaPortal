@@ -10,11 +10,12 @@ from Components.MenuList import MenuList
 from Components.Pixmap import Pixmap, MovingPixmap
 from Components.PluginList import PluginEntryComponent, PluginList
 # All import which are necessary
+from Components.Language import language
 from Components.AVSwitch import AVSwitch
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmap, MultiContentEntryPixmapAlphaTest
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 
-from enigma import gFont, addFont, eTimer, eConsoleAppContainer, ePicLoad, loadPNG, getDesktop, eServiceReference, iPlayableService, eListboxPythonMultiContent, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, eListbox, gPixmapPtr
+from enigma import gFont, addFont, eTimer, eConsoleAppContainer, ePicLoad, loadPNG, getDesktop, eServiceReference, iPlayableService, eListboxPythonMultiContent, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, eListbox, gPixmapPtr, getPrevAsciiCode
 from Plugins.Plugin import PluginDescriptor
 
 from Screens.Screen import Screen
@@ -26,7 +27,7 @@ from Screens.InfoBar import MoviePlayer, InfoBar
 from Screens.Standby import TryQuitMainloop
 from twisted.web.client import downloadPage, getPage, error
 from twisted.internet import reactor, defer
-from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS
+from Tools.Directories import fileExists, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
 from Tools.LoadPixmap import LoadPixmap
 
 from jsunpacker import cJsUnpacker
