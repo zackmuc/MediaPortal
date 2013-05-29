@@ -1,5 +1,4 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from urllib2 import (urlopen, Request)
 
 # inspired by teledunet xbmc addon (thx).
 
