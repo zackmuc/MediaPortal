@@ -8,20 +8,22 @@ included with the distribution).
 
 """
 
-import re, copy, htmlentitydefs
-import sgmllib, ClientForm
+import codecs
+import copy
+import htmlentitydefs
+import re
 
-import _request
+import _sgmllib_copy as sgmllib
+
+import _beautifulsoup
+import _form
 from _headersutil import split_header_words, is_html as _is_html
+import _request
 import _rfc3986
 
 DEFAULT_ENCODING = "latin-1"
 
 COMPRESS_RE = re.compile(r"\s+")
-
-
-# the base classe is purely for backwards compatibility
-class ParseError(ClientForm.ParseError): pass
 
 
 class CachingGeneratorFunction(object):
@@ -52,8 +54,15 @@ class EncodingFinder:
         for ct in response.info().getheaders("content-type"):
             for k, v in split_header_words([ct])[0]:
                 if k == "charset":
-                    return v
+                    encoding = v
+                    try:
+                        codecs.lookup(v)
+                    except LookupError:
+                        continue
+                    else:
+                        return encoding
         return self._default_encoding
+
 
 class ResponseTypeFinder:
     def __init__(self, allow_xhtml):
@@ -65,15 +74,24 @@ class ResponseTypeFinder:
         return _is_html(ct_hdrs, url, self._allow_xhtml)
 
 
-# idea for this argument-processing trick is from Peter Otten
-class Args:
+class Args(object):
+
+    # idea for this argument-processing trick is from Peter Otten
+
     def __init__(self, args_map):
-        self.dictionary = dict(args_map)
+        self.__dict__["dictionary"] = dict(args_map)
+
     def __getattr__(self, key):
         try:
             return self.dictionary[key]
         except KeyError:
             return getattr(self.__class__, key)
+
+    def __setattr__(self, key, value):
+        if key == "dictionary":
+            raise AttributeError()
+        self.dictionary[key] = value
+
 
 def form_parser_args(
     select_default=False,
@@ -149,7 +167,6 @@ class LinksFactory:
                     continue
                 attrs = dict(token.attrs)
                 tag = token.data
-                name = attrs.get("name")
                 text = None
                 # XXX use attr_encoding for ref'd doc if that doc does not
                 #  provide one by other means
@@ -166,24 +183,22 @@ class LinksFactory:
                     if token.type != "startendtag":
                         # hmm, this'd break if end tag is missing
                         text = p.get_compressed_text(("endtag", tag))
-                    # but this doesn't work for eg.
+                    # but this doesn't work for e.g.
                     # <a href="blah"><b>Andy</b></a>
                     #text = p.get_compressed_text()
 
                 yield Link(base_url, url, text, tag, token.attrs)
         except sgmllib.SGMLParseError, exc:
-            raise ParseError(exc)
+            raise _form.ParseError(exc)
 
 class FormsFactory:
 
-    """Makes a sequence of objects satisfying ClientForm.HTMLForm interface.
+    """Makes a sequence of objects satisfying HTMLForm interface.
 
     After calling .forms(), the .global_form attribute is a form object
     containing all controls not a descendant of any FORM element.
 
-    For constructor argument docs, see ClientForm.ParseResponse
-    argument docs.
-
+    For constructor argument docs, see ParseResponse argument docs.
     """
 
     def __init__(self,
@@ -192,10 +207,9 @@ class FormsFactory:
                  request_class=None,
                  backwards_compat=False,
                  ):
-        import ClientForm
         self.select_default = select_default
         if form_parser_class is None:
-            form_parser_class = ClientForm.FormParser
+            form_parser_class = _form.FormParser
         self.form_parser_class = form_parser_class
         if request_class is None:
             request_class = _request.Request
@@ -211,21 +225,17 @@ class FormsFactory:
         self.global_form = None
 
     def forms(self):
-        import ClientForm
         encoding = self.encoding
-        try:
-            forms = ClientForm.ParseResponseEx(
-                self._response,
-                select_default=self.select_default,
-                form_parser_class=self.form_parser_class,
-                request_class=self.request_class,
-                encoding=encoding,
-                _urljoin=_rfc3986.urljoin,
-                _urlparse=_rfc3986.urlsplit,
-                _urlunparse=_rfc3986.urlunsplit,
-                )
-        except ClientForm.ParseError, exc:
-            raise ParseError(exc)
+        forms = _form.ParseResponseEx(
+            self._response,
+            select_default=self.select_default,
+            form_parser_class=self.form_parser_class,
+            request_class=self.request_class,
+            encoding=encoding,
+            _urljoin=_rfc3986.urljoin,
+            _urlparse=_rfc3986.urlsplit,
+            _urlunparse=_rfc3986.urlunsplit,
+            )
         self.global_form = forms[0]
         return forms[1:]
 
@@ -274,7 +284,7 @@ class TitleFactory:
             else:
                 return self._get_title_text(p)
         except sgmllib.SGMLParseError, exc:
-            raise ParseError(exc)
+            raise _form.ParseError(exc)
 
 
 def unescape(data, entities, encoding):
@@ -314,15 +324,6 @@ def unescape_charref(data, encoding):
             repl = "&#%s;" % data
         return repl
 
-
-# bizarre import gymnastics for bundled BeautifulSoup
-import _beautifulsoup
-import ClientForm
-RobustFormParser, NestingRobustFormParser = ClientForm._create_bs_classes(
-    _beautifulsoup.BeautifulSoup, _beautifulsoup.ICantBelieveItsBeautifulSoup
-    )
-# monkeypatch sgmllib to fix http://www.python.org/sf/803422 :-(
-sgmllib.charref = re.compile("&#(x?[0-9a-fA-F]+)[^0-9a-fA-F]")
 
 class MechanizeBs(_beautifulsoup.BeautifulSoup):
     _entitydefs = htmlentitydefs.name2codepoint
@@ -383,11 +384,9 @@ class RobustLinksFactory:
         self._encoding = encoding
 
     def links(self):
-        import _beautifulsoup
         bs = self._bs
         base_url = self._base_url
         encoding = self._encoding
-        gen = bs.recursiveChildGenerator()
         for ch in bs.recursiveChildGenerator():
             if (isinstance(ch, _beautifulsoup.Tag) and
                 ch.name in self.urltags.keys()+["base"]):
@@ -420,7 +419,7 @@ class RobustFormsFactory(FormsFactory):
     def __init__(self, *args, **kwds):
         args = form_parser_args(*args, **kwds)
         if args.form_parser_class is None:
-            args.form_parser_class = RobustFormParser
+            args.form_parser_class = _form.RobustFormParser
         FormsFactory.__init__(self, **args.dictionary)
 
     def set_response(self, response, encoding):
@@ -437,7 +436,6 @@ class RobustTitleFactory:
         self._encoding = encoding
 
     def title(self):
-        import _beautifulsoup
         title = self._bs.first("title")
         if title == _beautifulsoup.Null:
             return None
@@ -500,10 +498,10 @@ class Factory:
         self.set_response(None)
 
     def set_request_class(self, request_class):
-        """Set urllib2.Request class.
+        """Set request class (mechanize.Request by default).
 
-        ClientForm.HTMLForm instances returned by .forms() will return
-        instances of this class when .click()ed.
+        HTMLForm instances returned by .forms() will return instances of this
+        class when .click()ed.
 
         """
         self._forms_factory.request_class = request_class
@@ -512,7 +510,7 @@ class Factory:
         """Set response.
 
         The response must either be None or implement the same interface as
-        objects returned by urllib2.urlopen().
+        objects returned by mechanize.urlopen().
 
         """
         self._response = response
@@ -547,7 +545,7 @@ class Factory:
             return self.global_form
 
     def forms(self):
-        """Return iterable over ClientForm.HTMLForm-like objects.
+        """Return iterable over HTMLForm-like objects.
 
         Raises mechanize.ParseError on failure.
         """
@@ -623,7 +621,6 @@ class RobustFactory(Factory):
         Factory.set_response(self, response)
         if response is not None:
             data = response.read()
-            response.seek(0)
             soup = self._soup_class(self.encoding, data)
             self._forms_factory.set_response(
                 copy.copy(response), self.encoding)

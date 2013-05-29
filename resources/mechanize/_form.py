@@ -1,10 +1,9 @@
 """HTML form handling for web clients.
 
-ClientForm is a Python module for handling HTML forms on the client
-side, useful for parsing HTML forms, filling them in and returning the
-completed forms to the server.  It has developed from a port of Gisle
-Aas' Perl module HTML::Form, from the libwww-perl library, but the
-interface is not the same.
+HTML form handling for web clients: useful for parsing HTML forms, filling them
+in and returning the completed forms to the server.  This code developed from a
+port of Gisle Aas' Perl module HTML::Form, from the libwww-perl library, but
+the interface is not the same.
 
 The most useful docstring is the one for HTMLForm.
 
@@ -26,35 +25,29 @@ COPYING.txt included with the distribution).
 
 """
 
-# XXX
+# TODO:
+# Clean up post the merge into mechanize
+#  * Remove code that was duplicated in ClientForm and mechanize
+#  * Remove weird import stuff
+#  * Remove pre-Python 2.4 compatibility cruft
+#  * Clean up tests
+#  * Later release: Remove the ClientForm 0.1 backwards-compatibility switch
 # Remove parser testing hack
-# safeUrl()-ize action
-# Switch to unicode throughout (would be 0.3.x)
+# Clean action URI
+# Switch to unicode throughout
 #  See Wichert Akkerman's 2004-01-22 message to c.l.py.
+# Apply recommendations from google code project CURLIES
+# Apply recommendations from HTML 5 spec
 # Add charset parameter to Content-type headers?  How to find value??
-# Add some more functional tests
-#  Especially single and multiple file upload on the internet.
-#  Does file upload work when name is missing?  Sourceforge tracker form
-#   doesn't like it.  Check standards, and test with Apache.  Test
-#   binary upload with Apache.
-# mailto submission & enctype text/plain
-# I'm not going to fix this unless somebody tells me what real servers
-#  that want this encoding actually expect: If enctype is
-#  application/x-www-form-urlencoded and there's a FILE control present.
-#  Strictly, it should be 'name=data' (see HTML 4.01 spec., section
-#  17.13.2), but I send "name=" ATM.  What about multiple file upload??
+# Functional tests to add:
+#  Single and multiple file upload
+#  File upload with missing name (check standards)
+# mailto: submission & enctype text/plain??
 
-# Would be nice, but I'm not going to do it myself:
-# -------------------------------------------------
-# Maybe a 0.4.x?
-#   Replace by_label etc. with moniker / selector concept. Allows, eg.,
-#    a choice between selection by value / id / label / element
-#    contents.  Or choice between matching labels exactly or by
-#    substring.  Etc.
-#   Remove deprecated methods.
-#   ...what else?
-# Work on DOMForm.
-# XForms?  Don't know if there's a need here.
+# Replace by_label etc. with moniker / selector concept.  Allows, e.g., a
+#  choice between selection by value / id / label / element contents.  Or
+#  choice between matching labels exactly or by substring.  etc.
+
 
 __all__ = ['AmbiguityError', 'CheckboxControl', 'Control',
            'ControlNotFoundError', 'FileControl', 'FormParser', 'HTMLForm',
@@ -66,75 +59,56 @@ __all__ = ['AmbiguityError', 'CheckboxControl', 'Control',
            'SubmitButtonControl', 'SubmitControl', 'TextControl',
            'TextareaControl', 'XHTMLCompatibleFormParser']
 
-try: True
-except NameError:
-    True = 1
-    False = 0
-
-try: bool
-except NameError:
-    def bool(expr):
-        if expr: return True
-        else: return False
-
-try:
-    import logging
-    import inspect
-except ImportError:
-    def debug(msg, *args, **kwds):
-        pass
-else:
-    _logger = logging.getLogger("ClientForm")
-    OPTIMIZATION_HACK = True
-
-    def debug(msg, *args, **kwds):
-        if OPTIMIZATION_HACK:
-            return
-
-        caller_name = inspect.stack()[1][3]
-        extended_msg = '%%s %s' % msg
-        extended_args = (caller_name,)+args
-        debug = _logger.debug(extended_msg, *extended_args, **kwds)
-
-    def _show_debug_messages():
-        global OPTIMIZATION_HACK
-        OPTIMIZATION_HACK = False
-        _logger.setLevel(logging.DEBUG)
-        handler = logging.StreamHandler(sys.stdout)
-        handler.setLevel(logging.DEBUG)
-        _logger.addHandler(handler)
-
-import sys, urllib, urllib2, types, mimetools, copy, urlparse, \
-       htmlentitydefs, re, random
+import HTMLParser
 from cStringIO import StringIO
+import inspect
+import logging
+import random
+import re
+import sys
+import urllib
+import urlparse
+import warnings
 
+import _beautifulsoup
+import _request
+
+# from Python itself, for backwards compatibility of raised exceptions
 import sgmllib
-# monkeypatch to fix http://www.python.org/sf/803422 :-(
-sgmllib.charref = re.compile("&#(x?[0-9a-fA-F]+)[^0-9a-fA-F]")
+# bundled copy of sgmllib
+import _sgmllib_copy
 
-# HTMLParser.HTMLParser is recent, so live without it if it's not available
-# (also, sgmllib.SGMLParser is much more tolerant of bad HTML)
-try:
-    import HTMLParser
-except ImportError:
-    HAVE_MODULE_HTMLPARSER = False
-else:
-    HAVE_MODULE_HTMLPARSER = True
 
-try:
-    import warnings
-except ImportError:
-    def deprecation(message, stack_offset=0):
-        pass
-else:
-    def deprecation(message, stack_offset=0):
-        warnings.warn(message, DeprecationWarning, stacklevel=3+stack_offset)
-
-VERSION = "0.2.9"
+VERSION = "0.2.11"
 
 CHUNK = 1024  # size of chunks fed to parser, in bytes
 
 DEFAULT_ENCODING = "latin-1"
+
+_logger = logging.getLogger("mechanize.forms")
+OPTIMIZATION_HACK = True
+
+def debug(msg, *args, **kwds):
+    if OPTIMIZATION_HACK:
+        return
+
+    caller_name = inspect.stack()[1][3]
+    extended_msg = '%%s %s' % msg
+    extended_args = (caller_name,)+args
+    _logger.debug(extended_msg, *extended_args, **kwds)
+
+def _show_debug_messages():
+    global OPTIMIZATION_HACK
+    OPTIMIZATION_HACK = False
+    _logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.DEBUG)
+    _logger.addHandler(handler)
+
+
+def deprecation(message, stack_offset=0):
+    warnings.warn(message, DeprecationWarning, stacklevel=3+stack_offset)
+
 
 class Missing: pass
 
@@ -144,75 +118,6 @@ def compress_text(text): return _compress_re.sub(" ", text.strip())
 def normalize_line_endings(text):
     return re.sub(r"(?:(?<!\r)\n)|(?:\r(?!\n))", "\r\n", text)
 
-
-# This version of urlencode is from my Python 1.5.2 back-port of the
-# Python 2.1 CVS maintenance branch of urllib.  It will accept a sequence
-# of pairs instead of a mapping -- the 2.0 version only accepts a mapping.
-def urlencode(query,doseq=False,):
-    """Encode a sequence of two-element tuples or dictionary into a URL query \
-string.
-
-    If any values in the query arg are sequences and doseq is true, each
-    sequence element is converted to a separate parameter.
-
-    If the query arg is a sequence of two-element tuples, the order of the
-    parameters in the output will match the order of parameters in the
-    input.
-    """
-
-    if hasattr(query,"items"):
-        # mapping objects
-        query = query.items()
-    else:
-        # it's a bother at times that strings and string-like objects are
-        # sequences...
-        try:
-            # non-sequence items should not work with len()
-            x = len(query)
-            # non-empty strings will fail this
-            if len(query) and type(query[0]) != types.TupleType:
-                raise TypeError()
-            # zero-length sequences of all types will get here and succeed,
-            # but that's a minor nit - since the original implementation
-            # allowed empty dicts that type of behavior probably should be
-            # preserved for consistency
-        except TypeError:
-            ty,va,tb = sys.exc_info()
-            raise TypeError("not a valid non-string sequence or mapping "
-                            "object", tb)
-
-    l = []
-    if not doseq:
-        # preserve old behavior
-        for k, v in query:
-            k = urllib.quote_plus(str(k))
-            v = urllib.quote_plus(str(v))
-            l.append(k + '=' + v)
-    else:
-        for k, v in query:
-            k = urllib.quote_plus(str(k))
-            if type(v) == types.StringType:
-                v = urllib.quote_plus(v)
-                l.append(k + '=' + v)
-            elif type(v) == types.UnicodeType:
-                # is there a reasonable way to convert to ASCII?
-                # encode generates a string, but "replace" or "ignore"
-                # lose information and "strict" can raise UnicodeError
-                v = urllib.quote_plus(v.encode("ASCII","replace"))
-                l.append(k + '=' + v)
-            else:
-                try:
-                    # is this a sufficient test for sequence-ness?
-                    x = len(v)
-                except TypeError:
-                    # not a sequence
-                    v = urllib.quote_plus(str(v))
-                    l.append(k + '=' + v)
-                else:
-                    # loop over the sequence
-                    for elt in v:
-                        l.append(k + '=' + urllib.quote_plus(str(elt)))
-    return '&'.join(l)
 
 def unescape(data, entities, encoding=DEFAULT_ENCODING):
     if data is None or "&" not in data:
@@ -381,12 +286,13 @@ class MimeWriter:
         while lines and not lines[0]: del lines[0]
         if add_to_http_hdrs:
             value = "".join(lines)
-            self._http_hdrs.append((key, value))
+            # 2.2 urllib2 doesn't normalize header case
+            self._http_hdrs.append((key.capitalize(), value))
         else:
             for i in range(1, len(lines)):
                 lines[i] = "    " + lines[i].strip()
             value = "\r\n".join(lines) + "\r\n"
-            line = key + ": " + value
+            line = key.title() + ": " + value
             if prefix:
                 self._headers.insert(0, line)
             else:
@@ -404,7 +310,7 @@ class MimeWriter:
         if content_type and ctype:
             for name, value in plist:
                 ctype = ctype + ';\r\n %s=%s' % (name, value)
-            self.addheader("Content-type", ctype, prefix=prefix,
+            self.addheader("Content-Type", ctype, prefix=prefix,
                            add_to_http_hdrs=add_to_http_hdrs)
         self.flushheaders()
         if not add_to_http_hdrs: self._fp.write("\r\n")
@@ -446,21 +352,15 @@ class ItemCountError(ValueError): pass
 
 # for backwards compatibility, ParseError derives from exceptions that were
 # raised by versions of ClientForm <= 0.2.5
-if HAVE_MODULE_HTMLPARSER:
-    SGMLLIB_PARSEERROR = sgmllib.SGMLParseError
-    class ParseError(sgmllib.SGMLParseError,
-                     HTMLParser.HTMLParseError,
-                     ):
-        pass
-else:
-    if hasattr(sgmllib, "SGMLParseError"):
-        SGMLLIB_PARSEERROR = sgmllib.SGMLParseError
-        class ParseError(sgmllib.SGMLParseError):
-            pass
-    else:
-        SGMLLIB_PARSEERROR = RuntimeError
-        class ParseError(RuntimeError):
-            pass
+# TODO: move to _html
+class ParseError(sgmllib.SGMLParseError,
+                 HTMLParser.HTMLParseError):
+
+    def __init__(self, *args, **kwds):
+        Exception.__init__(self, *args, **kwds)
+
+    def __str__(self):
+        return Exception.__str__(self)
 
 
 class _AbstractFormParser:
@@ -670,15 +570,6 @@ class _AbstractFormParser:
     def handle_data(self, data):
         debug("%s", data)
 
-        # according to http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1
-        # line break immediately after start tags or immediately before end
-        # tags must be ignored, but real browsers only ignore a line break
-        # after a start tag, so we'll do that.
-        if data[0:2] == "\r\n":
-            data = data[2:]
-        if data[0:1] in ["\n", "\r"]:
-            data = data[1:]
-
         if self._option is not None:
             # self._option is a dictionary of the OPTION element's HTML
             # attributes, but it has two special keys, one of which is the
@@ -697,7 +588,16 @@ class _AbstractFormParser:
         else:
             return
 
-        if not map.has_key(key):
+        if data and not map.has_key(key):
+            # according to
+            # http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 line break
+            # immediately after start tags or immediately before end tags must
+            # be ignored, but real browsers only ignore a line break after a
+            # start tag, so we'll do that.
+            if data[0:2] == "\r\n":
+                data = data[2:]
+            elif data[0:1] in ["\n", "\r"]:
+                data = data[1:]
             map[key] = data
         else:
             map[key] = map[key] + data
@@ -774,60 +674,59 @@ class _AbstractFormParser:
     def unknown_charref(self, ref): self.handle_data("&#%s;" % ref)
 
 
-if not HAVE_MODULE_HTMLPARSER:
-    class XHTMLCompatibleFormParser:
-        def __init__(self, entitydefs=None, encoding=DEFAULT_ENCODING):
-            raise ValueError("HTMLParser could not be imported")
-else:
-    class XHTMLCompatibleFormParser(_AbstractFormParser, HTMLParser.HTMLParser):
-        """Good for XHTML, bad for tolerance of incorrect HTML."""
-        # thanks to Michael Howitz for this!
-        def __init__(self, entitydefs=None, encoding=DEFAULT_ENCODING):
-            HTMLParser.HTMLParser.__init__(self)
-            _AbstractFormParser.__init__(self, entitydefs, encoding)
+class XHTMLCompatibleFormParser(_AbstractFormParser, HTMLParser.HTMLParser):
+    """Good for XHTML, bad for tolerance of incorrect HTML."""
+    # thanks to Michael Howitz for this!
+    def __init__(self, entitydefs=None, encoding=DEFAULT_ENCODING):
+        HTMLParser.HTMLParser.__init__(self)
+        _AbstractFormParser.__init__(self, entitydefs, encoding)
 
-        def feed(self, data):
+    def feed(self, data):
+        try:
+            HTMLParser.HTMLParser.feed(self, data)
+        except HTMLParser.HTMLParseError, exc:
+            raise ParseError(exc)
+
+    def start_option(self, attrs):
+        _AbstractFormParser._start_option(self, attrs)
+
+    def end_option(self):
+        _AbstractFormParser._end_option(self)
+
+    def handle_starttag(self, tag, attrs):
+        try:
+            method = getattr(self, "start_" + tag)
+        except AttributeError:
             try:
-                HTMLParser.HTMLParser.feed(self, data)
-            except HTMLParser.HTMLParseError, exc:
-                raise ParseError(exc)
-
-        def start_option(self, attrs):
-            _AbstractFormParser._start_option(self, attrs)
-
-        def end_option(self):
-            _AbstractFormParser._end_option(self)
-
-        def handle_starttag(self, tag, attrs):
-            try:
-                method = getattr(self, "start_" + tag)
-            except AttributeError:
-                try:
-                    method = getattr(self, "do_" + tag)
-                except AttributeError:
-                    pass  # unknown tag
-                else:
-                    method(attrs)
-            else:
-                method(attrs)
-
-        def handle_endtag(self, tag):
-            try:
-                method = getattr(self, "end_" + tag)
+                method = getattr(self, "do_" + tag)
             except AttributeError:
                 pass  # unknown tag
             else:
-                method()
+                method(attrs)
+        else:
+            method(attrs)
 
-        def unescape(self, name):
-            # Use the entitydefs passed into constructor, not
-            # HTMLParser.HTMLParser's entitydefs.
-            return self.unescape_attr(name)
+    def handle_endtag(self, tag):
+        try:
+            method = getattr(self, "end_" + tag)
+        except AttributeError:
+            pass  # unknown tag
+        else:
+            method()
 
-        def unescape_attr_if_required(self, name):
-            return name  # HTMLParser.HTMLParser already did it
-        def unescape_attrs_if_required(self, attrs):
-            return attrs  # ditto
+    def unescape(self, name):
+        # Use the entitydefs passed into constructor, not
+        # HTMLParser.HTMLParser's entitydefs.
+        return self.unescape_attr(name)
+
+    def unescape_attr_if_required(self, name):
+        return name  # HTMLParser.HTMLParser already did it
+    def unescape_attrs_if_required(self, attrs):
+        return attrs  # ditto
+
+    def close(self):
+        HTMLParser.HTMLParser.close(self)
+        self.end_body()
 
 
 class _AbstractSgmllibParser(_AbstractFormParser):
@@ -835,88 +734,76 @@ class _AbstractSgmllibParser(_AbstractFormParser):
     def do_option(self, attrs):
         _AbstractFormParser._start_option(self, attrs)
 
-    if sys.version_info[:2] >= (2,5):
-        # we override this attr to decode hex charrefs
-        entity_or_charref = re.compile(
-            '&(?:([a-zA-Z][-.a-zA-Z0-9]*)|#(x?[0-9a-fA-F]+))(;?)')
-        def convert_entityref(self, name):
-            return unescape("&%s;" % name, self._entitydefs, self._encoding)
-        def convert_charref(self, name):
-            return unescape_charref("%s" % name, self._encoding)
-        def unescape_attr_if_required(self, name):
-            return name  # sgmllib already did it
-        def unescape_attrs_if_required(self, attrs):
-            return attrs  # ditto
-    else:
-        def unescape_attr_if_required(self, name):
-            return self.unescape_attr(name)
-        def unescape_attrs_if_required(self, attrs):
-            return self.unescape_attrs(attrs)
+    # we override this attr to decode hex charrefs
+    entity_or_charref = re.compile(
+        '&(?:([a-zA-Z][-.a-zA-Z0-9]*)|#(x?[0-9a-fA-F]+))(;?)')
+    def convert_entityref(self, name):
+        return unescape("&%s;" % name, self._entitydefs, self._encoding)
+    def convert_charref(self, name):
+        return unescape_charref("%s" % name, self._encoding)
+    def unescape_attr_if_required(self, name):
+        return name  # sgmllib already did it
+    def unescape_attrs_if_required(self, attrs):
+        return attrs  # ditto
 
 
-class FormParser(_AbstractSgmllibParser, sgmllib.SGMLParser):
+class FormParser(_AbstractSgmllibParser, _sgmllib_copy.SGMLParser):
     """Good for tolerance of incorrect HTML, bad for XHTML."""
     def __init__(self, entitydefs=None, encoding=DEFAULT_ENCODING):
-        sgmllib.SGMLParser.__init__(self)
+        _sgmllib_copy.SGMLParser.__init__(self)
         _AbstractFormParser.__init__(self, entitydefs, encoding)
 
     def feed(self, data):
         try:
-            sgmllib.SGMLParser.feed(self, data)
-        except SGMLLIB_PARSEERROR, exc:
+            _sgmllib_copy.SGMLParser.feed(self, data)
+        except _sgmllib_copy.SGMLParseError, exc:
             raise ParseError(exc)
 
+    def close(self):
+        _sgmllib_copy.SGMLParser.close(self)
+        self.end_body()
 
 
-# sigh, must support mechanize by allowing dynamic creation of classes based on
-# its bundled copy of BeautifulSoup (which was necessary because of dependency
-# problems)
+class _AbstractBSFormParser(_AbstractSgmllibParser):
 
-def _create_bs_classes(bs,
-                       icbinbs,
-                       ):
-    class _AbstractBSFormParser(_AbstractSgmllibParser):
-        bs_base_class = None
-        def __init__(self, entitydefs=None, encoding=DEFAULT_ENCODING):
-            _AbstractFormParser.__init__(self, entitydefs, encoding)
-            self.bs_base_class.__init__(self)
-        def handle_data(self, data):
-            _AbstractFormParser.handle_data(self, data)
-            self.bs_base_class.handle_data(self, data)
-        def feed(self, data):
-            try:
-                self.bs_base_class.feed(self, data)
-            except SGMLLIB_PARSEERROR, exc:
-                raise ParseError(exc)
+    bs_base_class = None
+
+    def __init__(self, entitydefs=None, encoding=DEFAULT_ENCODING):
+        _AbstractFormParser.__init__(self, entitydefs, encoding)
+        self.bs_base_class.__init__(self)
+
+    def handle_data(self, data):
+        _AbstractFormParser.handle_data(self, data)
+        self.bs_base_class.handle_data(self, data)
+
+    def feed(self, data):
+        try:
+            self.bs_base_class.feed(self, data)
+        except _sgmllib_copy.SGMLParseError, exc:
+            raise ParseError(exc)
+
+    def close(self):
+        self.bs_base_class.close(self)
+        self.end_body()
 
 
-    class RobustFormParser(_AbstractBSFormParser, bs):
-        """Tries to be highly tolerant of incorrect HTML."""
-        pass
-    RobustFormParser.bs_base_class = bs
-    class NestingRobustFormParser(_AbstractBSFormParser, icbinbs):
-        """Tries to be highly tolerant of incorrect HTML.
+class RobustFormParser(_AbstractBSFormParser, _beautifulsoup.BeautifulSoup):
 
-        Different from RobustFormParser in that it more often guesses nesting
-        above missing end tags (see BeautifulSoup docs).
+    """Tries to be highly tolerant of incorrect HTML."""
 
-        """
-        pass
-    NestingRobustFormParser.bs_base_class = icbinbs
+    bs_base_class = _beautifulsoup.BeautifulSoup
 
-    return RobustFormParser, NestingRobustFormParser
 
-try:
-    if sys.version_info[:2] < (2, 2):
-        raise ImportError  # BeautifulSoup uses generators
-    import BeautifulSoup
-except ImportError:
-    pass
-else:
-    RobustFormParser, NestingRobustFormParser = _create_bs_classes(
-        BeautifulSoup.BeautifulSoup, BeautifulSoup.ICantBelieveItsBeautifulSoup
-        )
-    __all__ += ['RobustFormParser', 'NestingRobustFormParser']
+class NestingRobustFormParser(_AbstractBSFormParser,
+                              _beautifulsoup.ICantBelieveItsBeautifulSoup):
+
+    """Tries to be highly tolerant of incorrect HTML.
+
+    Different from RobustFormParser in that it more often guesses nesting
+    above missing end tags (see BeautifulSoup docs).
+    """
+
+    bs_base_class = _beautifulsoup.ICantBelieveItsBeautifulSoup
 
 
 #FormParser = XHTMLCompatibleFormParser  # testing hack
@@ -926,7 +813,7 @@ else:
 def ParseResponseEx(response,
                     select_default=False,
                     form_parser_class=FormParser,
-                    request_class=urllib2.Request,
+                    request_class=_request.Request,
                     entitydefs=None,
                     encoding=DEFAULT_ENCODING,
 
@@ -960,7 +847,7 @@ def ParseResponseEx(response,
 def ParseFileEx(file, base_uri,
                 select_default=False,
                 form_parser_class=FormParser,
-                request_class=urllib2.Request,
+                request_class=_request.Request,
                 entitydefs=None,
                 encoding=DEFAULT_ENCODING,
 
@@ -991,13 +878,17 @@ def ParseFileEx(file, base_uri,
                         _urlunparse=_urlunparse,
                         )
 
+def ParseString(text, base_uri, *args, **kwds):
+    fh = StringIO(text)
+    return ParseFileEx(fh, base_uri, *args, **kwds)
+
 def ParseResponse(response, *args, **kwds):
     """Parse HTTP response and return a list of HTMLForm instances.
 
-    The return value of urllib2.urlopen can be conveniently passed to this
+    The return value of mechanize.urlopen can be conveniently passed to this
     function as the response parameter.
 
-    ClientForm.ParseError is raised on parse errors.
+    mechanize.ParseError is raised on parse errors.
 
     response: file-like object (supporting read() method) with a method
      geturl(), returning the URI of the HTTP response
@@ -1005,13 +896,13 @@ def ParseResponse(response, *args, **kwds):
      pick the first item as the default if none are selected in the HTML
     form_parser_class: class to instantiate and use to pass
     request_class: class to return from .click() method (default is
-     urllib2.Request)
+     mechanize.Request)
     entitydefs: mapping like {"&amp;": "&", ...} containing HTML entity
      definitions (a sensible default is used)
     encoding: character encoding used for encoding numeric character references
-     when matching link text.  ClientForm does not attempt to find the encoding
+     when matching link text.  mechanize does not attempt to find the encoding
      in a META HTTP-EQUIV attribute in the document itself (mechanize, for
-     example, does do that and will pass the correct value to ClientForm using
+     example, does do that and will pass the correct value to mechanize using
      this parameter).
 
     backwards_compat: boolean that determines whether the returned HTMLForm
@@ -1031,7 +922,7 @@ def ParseResponse(response, *args, **kwds):
      - De-selecting individual list items is allowed even if the Item is
        disabled.
 
-    The backwards_compat argument will be deprecated in a future release.
+    The backwards_compat argument will be removed in a future release.
 
     Pass a true value for select_default if you want the behaviour specified by
     RFC 1866 (the HTML 2.0 standard), which is to select the first item in a
@@ -1043,12 +934,12 @@ def ParseResponse(response, *args, **kwds):
     button should be checked at all times, in contradiction to browser
     behaviour.
 
-    There is a choice of parsers.  ClientForm.XHTMLCompatibleFormParser (uses
-    HTMLParser.HTMLParser) works best for XHTML, ClientForm.FormParser (uses
-    sgmllib.SGMLParser) (the default) works better for ordinary grubby HTML.
-    Note that HTMLParser is only available in Python 2.2 and later.  You can
-    pass your own class in here as a hack to work around bad HTML, but at your
-    own risk: there is no well-defined interface.
+    There is a choice of parsers.  mechanize.XHTMLCompatibleFormParser (uses
+    HTMLParser.HTMLParser) works best for XHTML, mechanize.FormParser (uses
+    bundled copy of sgmllib.SGMLParser) (the default) works better for ordinary
+    grubby HTML.  Note that HTMLParser is only available in Python 2.2 and
+    later.  You can pass your own class in here as a hack to work around bad
+    HTML, but at your own risk: there is no well-defined interface.
 
     """
     return _ParseFileEx(response, response.geturl(), *args, **kwds)[1:]
@@ -1056,7 +947,7 @@ def ParseResponse(response, *args, **kwds):
 def ParseFile(file, base_uri, *args, **kwds):
     """Parse HTML and return a list of HTMLForm instances.
 
-    ClientForm.ParseError is raised on parse errors.
+    mechanize.ParseError is raised on parse errors.
 
     file: file-like object (supporting read() method) containing HTML with zero
      or more forms to be parsed
@@ -1073,7 +964,7 @@ def _ParseFileEx(file, base_uri,
                  select_default=False,
                  ignore_errors=False,
                  form_parser_class=FormParser,
-                 request_class=urllib2.Request,
+                 request_class=_request.Request,
                  entitydefs=None,
                  backwards_compat=True,
                  encoding=DEFAULT_ENCODING,
@@ -1092,6 +983,7 @@ def _ParseFileEx(file, base_uri,
             e.base_uri = base_uri
             raise
         if len(data) != CHUNK: break
+    fp.close()
     if fp.base is not None:
         # HTML BASE element takes precedence over document URI
         base_uri = fp.base
@@ -1258,7 +1150,7 @@ class Control:
         """Write data for a subitem of this control to a MimeWriter."""
         # called by HTMLForm
         mw2 = mw.nextpart()
-        mw2.addheader("Content-disposition",
+        mw2.addheader("Content-Disposition",
                       'form-data; name="%s"' % name, 1)
         f = mw2.startbody(prefix=0)
         f.write(value)
@@ -1425,29 +1317,41 @@ class FileControl(ScalarControl):
             return []
         return [(self._index, self.name, "")]
 
+    # If enctype is application/x-www-form-urlencoded and there's a FILE
+    # control present, what should be sent?  Strictly, it should be 'name=data'
+    # (see HTML 4.01 spec., section 17.13.2), but code sends "name=" ATM.  What
+    # about multiple file upload?
     def _write_mime_data(self, mw, _name, _value):
         # called by HTMLForm
         # assert _name == self.name and _value == ''
-        if len(self._upload_data) == 1:
-            # single file
-            file_object, content_type, filename = self._upload_data[0]
+        if len(self._upload_data) < 2:
+            if len(self._upload_data) == 0:
+                file_object = StringIO()
+                content_type = "application/octet-stream"
+                filename = ""
+            else:
+                file_object, content_type, filename = self._upload_data[0]
+                if filename is None:
+                    filename = ""
             mw2 = mw.nextpart()
-            fn_part = filename and ('; filename="%s"' % filename) or ""
+            fn_part = '; filename="%s"' % filename
             disp = 'form-data; name="%s"%s' % (self.name, fn_part)
-            mw2.addheader("Content-disposition", disp, prefix=1)
+            mw2.addheader("Content-Disposition", disp, prefix=1)
             fh = mw2.startbody(content_type, prefix=0)
             fh.write(file_object.read())
-        elif len(self._upload_data) != 0:
+        else:
             # multiple files
             mw2 = mw.nextpart()
             disp = 'form-data; name="%s"' % self.name
-            mw2.addheader("Content-disposition", disp, prefix=1)
+            mw2.addheader("Content-Disposition", disp, prefix=1)
             fh = mw2.startmultipartbody("mixed", prefix=0)
             for file_object, content_type, filename in self._upload_data:
                 mw3 = mw2.nextpart()
-                fn_part = filename and ('; filename="%s"' % filename) or ""
+                if filename is None:
+                    filename = ""
+                fn_part = '; filename="%s"' % filename
                 disp = "file%s" % fn_part
-                mw3.addheader("Content-disposition", disp, prefix=1)
+                mw3.addheader("Content-Disposition", disp, prefix=1)
                 fh2 = mw3.startbody(content_type, prefix=0)
                 fh2.write(file_object.read())
             mw2.lastpart()
@@ -1495,13 +1399,13 @@ class IsindexControl(ScalarControl):
     control, in which case the ISINDEX gets submitted instead of the form:
 
     form.set_value("my isindex value", type="isindex")
-    urllib2.urlopen(form.click(type="isindex"))
+    mechanize.urlopen(form.click(type="isindex"))
 
     ISINDEX elements outside of FORMs are ignored.  If you want to submit one
     by hand, do it like so:
 
     url = urlparse.urljoin(page_uri, "?"+urllib.quote_plus("my isindex value"))
-    result = urllib2.urlopen(url)
+    result = mechanize.urlopen(url)
 
     """
     def __init__(self, type, name, attrs, index=None):
@@ -1514,7 +1418,7 @@ class IsindexControl(ScalarControl):
     def _totally_ordered_pairs(self):
         return []
 
-    def _click(self, form, coord, return_type, request_class=urllib2.Request):
+    def _click(self, form, coord, return_type, request_class=_request.Request):
         # Relative URL for ISINDEX submission: instead of "foo=bar+baz",
         # want "bar+baz".
         # This doesn't seem to be specified in HTML 4.01 spec. (ISINDEX is
@@ -1829,7 +1733,7 @@ class ListControl(Control):
 
         If label is specified, then the item must have a label whose
         whitespace-compressed, stripped, text substring-matches the indicated
-        label string (eg. label="please choose" will match
+        label string (e.g. label="please choose" will match
         "  Do  please  choose an item ").
 
         If id is specified, then the item must have the indicated id.
@@ -2308,7 +2212,7 @@ class SelectControl(ListControl):
     SELECT (and OPTION)
 
 
-    OPTION 'values', in HTML parlance, are Item 'names' in ClientForm parlance.
+    OPTION 'values', in HTML parlance, are Item 'names' in mechanize parlance.
 
     SELECT control values and labels are subject to some messy defaulting
     rules.  For example, if the HTML representation of the control is:
@@ -2441,7 +2345,7 @@ class SubmitControl(ScalarControl):
 
     def is_of_kind(self, kind): return kind == "clickable"
 
-    def _click(self, form, coord, return_type, request_class=urllib2.Request):
+    def _click(self, form, coord, return_type, request_class=_request.Request):
         self._clicked = coord
         r = form._switch_click(return_type, request_class)
         self._clicked = False
@@ -2506,17 +2410,17 @@ class HTMLForm:
 
     Forms can be filled in with data to be returned to the server, and then
     submitted, using the click method to generate a request object suitable for
-    passing to urllib2.urlopen (or the click_request_data or click_pairs
-    methods if you're not using urllib2).
+    passing to mechanize.urlopen (or the click_request_data or click_pairs
+    methods for integration with third-party code).
 
-    import ClientForm
-    forms = ClientForm.ParseFile(html, base_uri)
+    import mechanize
+    forms = mechanize.ParseFile(html, base_uri)
     form = forms[0]
 
     form["query"] = "Python"
     form.find_control("nr_results").get("lots").selected = True
 
-    response = urllib2.urlopen(form.click())
+    response = mechanize.urlopen(form.click())
 
     Usually, HTMLForm instances are not created directly.  Instead, the
     ParseFile or ParseResponse factory functions are used.  If you do construct
@@ -2737,7 +2641,7 @@ class HTMLForm:
     def __init__(self, action, method="GET",
                  enctype="application/x-www-form-urlencoded",
                  name=None, attrs=None,
-                 request_class=urllib2.Request,
+                 request_class=_request.Request,
                  forms=None, labels=None, id_to_labels=None,
                  backwards_compat=True):
         """
@@ -3068,12 +2972,12 @@ class HTMLForm:
 # Form submission methods, applying only to clickable controls.
 
     def click(self, name=None, type=None, id=None, nr=0, coord=(1,1),
-              request_class=urllib2.Request,
+              request_class=_request.Request,
               label=None):
         """Return request that would result from clicking on a control.
 
-        The request object is a urllib2.Request instance, which you can pass to
-        urllib2.urlopen (or ClientCookie.urlopen).
+        The request object is a mechanize.Request instance, which you can pass
+        to mechanize.urlopen.
 
         Only some control types (INPUT/SUBMIT & BUTTON/SUBMIT buttons and
         IMAGEs) can be clicked.
@@ -3097,22 +3001,22 @@ class HTMLForm:
     def click_request_data(self,
                            name=None, type=None, id=None,
                            nr=0, coord=(1,1),
-                           request_class=urllib2.Request,
+                           request_class=_request.Request,
                            label=None):
         """As for click method, but return a tuple (url, data, headers).
 
         You can use this data to send a request to the server.  This is useful
-        if you're using httplib or urllib rather than urllib2.  Otherwise, use
-        the click method.
+        if you're using httplib or urllib rather than mechanize.  Otherwise,
+        use the click method.
 
-        # Untested.  Have to subclass to add headers, I think -- so use urllib2
-        # instead!
+        # Untested.  Have to subclass to add headers, I think -- so use
+        # mechanize instead!
         import urllib
         url, data, hdrs = form.click_request_data()
         r = urllib.urlopen(url, data)
 
         # Untested.  I don't know of any reason to use httplib -- you can get
-        # just as much control with urllib2.
+        # just as much control with mechanize.
         import httplib, urlparse
         url, data, hdrs = form.click_request_data()
         tup = urlparse(url)
@@ -3133,22 +3037,16 @@ class HTMLForm:
                     label=None):
         """As for click_request_data, but returns a list of (key, value) pairs.
 
-        You can use this list as an argument to ClientForm.urlencode.  This is
+        You can use this list as an argument to urllib.urlencode.  This is
         usually only useful if you're using httplib or urllib rather than
-        urllib2 or ClientCookie.  It may also be useful if you want to manually
-        tweak the keys and/or values, but this should not be necessary.
-        Otherwise, use the click method.
+        mechanize.  It may also be useful if you want to manually tweak the
+        keys and/or values, but this should not be necessary.  Otherwise, use
+        the click method.
 
         Note that this method is only useful for forms of MIME type
         x-www-form-urlencoded.  In particular, it does not return the
         information required for file upload.  If you need file upload and are
-        not using urllib2, use click_request_data.
-
-        Also note that Python 2.0's urllib.urlencode is slightly broken: it
-        only accepts a mapping, not a sequence of pairs, as an argument.  This
-        messes up any ordering in the argument.  Use ClientForm.urlencode
-        instead.
-
+        not using mechanize, use click_request_data.
         """
         return self._click(name, type, id, label, nr, coord, "pairs",
                            self._request_class)
@@ -3288,13 +3186,13 @@ class HTMLForm:
         assert False
 
     def _click(self, name, type, id, label, nr, coord, return_type,
-               request_class=urllib2.Request):
+               request_class=_request.Request):
         try:
             control = self._find_control(
                 name, type, "clickable", id, label, None, nr)
         except ControlNotFoundError:
             if ((name is not None) or (type is not None) or (id is not None) or
-                (nr != 0)):
+                (label is not None) or (nr != 0)):
                 raise
             # no clickable controls, but no control was explicitly requested,
             # so return state without clicking any control
@@ -3335,21 +3233,21 @@ class HTMLForm:
             if self.enctype != "application/x-www-form-urlencoded":
                 raise ValueError(
                     "unknown GET form encoding type '%s'" % self.enctype)
-            parts = rest + (urlencode(self._pairs()), None)
+            parts = rest + (urllib.urlencode(self._pairs()), None)
             uri = self._urlunparse(parts)
             return uri, None, []
         elif method == "POST":
             parts = rest + (query, None)
             uri = self._urlunparse(parts)
             if self.enctype == "application/x-www-form-urlencoded":
-                return (uri, urlencode(self._pairs()),
-                        [("Content-type", self.enctype)])
+                return (uri, urllib.urlencode(self._pairs()),
+                        [("Content-Type", self.enctype)])
             elif self.enctype == "multipart/form-data":
                 data = StringIO()
                 http_hdrs = []
                 mw = MimeWriter(data, http_hdrs)
-                f = mw.startmultipartbody("form-data", add_to_http_hdrs=True,
-                                          prefix=0)
+                mw.startmultipartbody("form-data", add_to_http_hdrs=True,
+                                      prefix=0)
                 for ii, k, v, control_index in self._pairs_and_controls():
                     self.controls[control_index]._write_mime_data(mw, k, v)
                 mw.lastpart()
@@ -3360,7 +3258,7 @@ class HTMLForm:
         else:
             raise ValueError("Unknown method '%s'" % method)
 
-    def _switch_click(self, return_type, request_class=urllib2.Request):
+    def _switch_click(self, return_type, request_class=_request.Request):
         # This is called by HTMLForm and clickable Controls to hide switching
         # on return_type.
         if return_type == "pairs":

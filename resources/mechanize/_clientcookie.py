@@ -181,14 +181,12 @@ def effective_request_host(request):
     return eff_request_host(request)[1]
 
 def request_path(request):
-    """request-URI, as defined by RFC 2965."""
+    """Return path component of request-URI, as defined by RFC 2965."""
     url = request.get_full_url()
-    path, query, frag = _rfc3986.urlsplit(url)[2:]
-    path = escape_path(path)
-    req_path = _rfc3986.urlunsplit((None, None, path, query, frag))
-    if not req_path.startswith("/"):
-        req_path = "/"+req_path
-    return req_path
+    path = escape_path(_rfc3986.urlsplit(url)[2])
+    if not path.startswith("/"):
+        path = "/" + path
+    return path
 
 def request_port(request):
     host = request.get_host()
@@ -286,6 +284,17 @@ def is_third_party(request):
     return not domain_match(req_host, reach(request.origin_req_host))
 
 
+try:
+    all
+except NameError:
+    # python 2.4
+    def all(iterable):
+        for x in iterable:
+            if not x:
+                return False
+        return True
+
+
 class Cookie:
     """HTTP Cookie.
 
@@ -302,9 +311,9 @@ class Cookie:
     version: integer;
     name: string;
     value: string (may be None);
-    port: string; None indicates no attribute was supplied (eg. "Port", rather
+    port: string; None indicates no attribute was supplied (e.g. "Port", rather
      than eg. "Port=80"); otherwise, a port string (eg. "80") or a port list
-     string (eg. "80,8080")
+     string (e.g. "80,8080")
     port_specified: boolean; true if a value was supplied with the Port
      cookie-attribute
     domain: string;
@@ -328,6 +337,14 @@ class Cookie:
     rather than"Port=80", for example); if this is the case, port is None.
 
     """
+
+
+    _attrs = ("version", "name", "value",
+              "port", "port_specified",
+              "domain", "domain_specified", "domain_initial_dot",
+              "path", "path_specified",
+              "secure", "expires", "discard", "comment", "comment_url",
+              "rfc2109", "_rest")
 
     def __init__(self, version, name, value,
                  port, port_specified,
@@ -383,6 +400,12 @@ class Cookie:
     def is_expired(self, now=None):
         if now is None: now = time.time()
         return (self.expires is not None) and (self.expires <= now)
+
+    def __eq__(self, other):
+        return all(getattr(self, a) == getattr(other, a) for a in self._attrs)
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def __str__(self):
         if self.port is None: p = ""
@@ -560,11 +583,11 @@ class DefaultCookiePolicy(CookiePolicy):
     strict_ns_domain: flags indicating how strict to be with domain-matching
      rules for Netscape cookies:
       DomainStrictNoDots: when setting cookies, host prefix must not contain a
-       dot (eg. www.foo.bar.com can't set a cookie for .bar.com, because
+       dot (e.g. www.foo.bar.com can't set a cookie for .bar.com, because
        www.foo contains a dot)
       DomainStrictNonDomain: cookies that did not explicitly specify a Domain
        cookie-attribute can only be returned to a domain that string-compares
-       equal to the domain that set the cookie (eg. rockets.acme.com won't
+       equal to the domain that set the cookie (e.g. rockets.acme.com won't
        be returned cookies from acme.com that had no Domain cookie-attribute)
       DomainRFC2965Match: when setting cookies, require a full RFC 2965
        domain-match
@@ -1158,19 +1181,14 @@ class CookieJar:
         return attrs
 
     def add_cookie_header(self, request):
-        """Add correct Cookie: header to request (urllib2.Request object).
+        """Add correct Cookie: header to request (mechanize.Request object).
 
         The Cookie2 header is also added unless policy.hide_cookie2 is true.
 
-        The request object (usually a urllib2.Request instance) must support
+        The request object (usually a mechanize.Request instance) must support
         the methods get_full_url, get_host, is_unverifiable, get_type,
         has_header, get_header, header_items and add_unredirected_header, as
-        documented by urllib2, and the port attribute (the port number).
-        Actually, RequestUpgradeProcessor will automatically upgrade your
-        Request object to one with has_header, get_header, header_items and
-        add_unredirected_header, if it lacks those methods, for compatibility
-        with pre-2.4 versions of urllib2.
-
+        documented by urllib2.
         """
         debug("add_cookie_header")
         cookies = self.cookies_for_request(request)
@@ -1495,9 +1513,9 @@ class CookieJar:
         returns a mimetools.Message object (in fact, the 'mimetools.Message
         object' may be any object that provides a getheaders method).
 
-        The request object (usually a urllib2.Request instance) must support
+        The request object (usually a mechanize.Request instance) must support
         the methods get_full_url, get_type, get_host, and is_unverifiable, as
-        documented by urllib2, and the port attribute (the port number).  The
+        documented by mechanize, and the port attribute (the port number).  The
         request is used to set default values for cookie-attributes as well as
         for checking that the cookie is OK to be set.
 

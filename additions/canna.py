@@ -1,6 +1,6 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
-import Plugins.Extensions.MediaPortal.resources.tools as mechanize
+import Plugins.Extensions.MediaPortal.resources.mechanize as mechanize
 
 def cannaGenreListEntry(entry):
 	return [entry,
