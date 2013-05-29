@@ -65,6 +65,7 @@ from additions.ran import *
 from additions.movie25 import *
 from additions.eighties import *
 from additions.teledunet import *
+from additions.geo_de import *
 
 # kids
 from additions.kinderkino import *
@@ -199,6 +200,7 @@ config.mediaportal.showRan = ConfigYesNo(default = True)
 config.mediaportal.showMovie25 = ConfigYesNo(default = True)
 config.mediaportal.showEighties = ConfigYesNo(default = True)
 config.mediaportal.showTeledunet = ConfigYesNo(default = True)
+config.mediaportal.showGEOde = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -333,6 +335,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Canna-Power:", config.mediaportal.showCanna))
 		self.configlist.append(getConfigListEntry("Zeige 80s & 90s Music:", config.mediaportal.showEighties))
 		self.configlist.append(getConfigListEntry("Zeige Teledunet:", config.mediaportal.showTeledunet))
+		self.configlist.append(getConfigListEntry("Zeige GEOde:", config.mediaportal.showGEOde))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -664,6 +667,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("Ran.de", "ran"))
 		if config.mediaportal.showEighties.value:
 			self.funsport.append(self.hauptListEntry("80s & 90s Music", "eighties"))
+		if config.mediaportal.showGEOde.value:
+			self.funsport.append(self.hauptListEntry("GEO.de", "geo_de"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1095,6 +1100,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(movie25GenreScreen)
 		elif auswahl == "80s & 90s Music":
 			self.session.open(eightiesGenreScreen)
+		elif auswahl == "GEO.de":
+			self.session.open(GEOdeGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1645,6 +1652,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("80s & 90s Music", "eighties", "Fun"))
 		if config.mediaportal.showTeledunet.value:
 			self.plugin_liste.append(("Teledunet", "teledunet", "Fun"))
+		if config.mediaportal.showGEOde.value:
+			self.plugin_liste.append(("GEO.de", "geo_de", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2183,6 +2192,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Teledunet":
 			self.hit_plugin("Teledunet")
 			self.session.open(teleGenreScreen)
+		elif auswahl == "GEO.de":
+			self.hit_plugin("GEOde")
+			self.session.open(GEOdeGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
