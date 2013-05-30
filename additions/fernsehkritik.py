@@ -150,7 +150,7 @@ class fernsehkritikFilmeListeScreen(Screen):
         getPage(self.streamLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.buildStreamLinks).addErrback(self.dataError)
 
     def buildStreamLinks(self, data):
-        #Streams Links ermitteln und an SimplePlayer Class �bergeben
+        #Streams Links ermitteln und an SimplePlayer Class uebergeben
         streamLinks = []
         rand = str(random.randint(1, 3))
         folgenNr = re.findall(r"\{ url: base \+ '(\d+(?:-\d+)?\.flv)' \}", data, re.S)
