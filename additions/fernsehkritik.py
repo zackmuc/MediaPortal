@@ -209,22 +209,7 @@ class fernsehkritiktvPlayer(SimplePlayer):
         SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
         
     def getVideo(self):
-        stvLink = self.playList[self.playIdx][2]
-        stvTitle = "%s%s" % (self.playList[self.playIdx][0], self.playList[self.playIdx][1])
+        stvLink = self.playList[self.playIdx][0]
+        stvTitle = "TV-Fernsehkritik"
         self.playStream(stvTitle, stvLink)
-
-    def openPlaylist(self):
-        self.session.openWithCallback(self.cb_Playlist, fernsehkritiktvPlaylist, self.playList, self.playIdx, listTitle=self.listTitle)
         
-class fernsehkritiktvPlaylist(SimplePlaylist):
-
-    def __init__(self, session, playList, playIdx, listTitle=None):
-
-        SimplePlaylist.__init__(self, session, playList, playIdx, listTitle)
-        
-    def playListEntry(self, entry):
-        return [entry,
-            (eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0]+entry[1])
-            ]     
- 
-                
