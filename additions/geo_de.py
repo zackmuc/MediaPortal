@@ -1,15 +1,15 @@
 ﻿#	-*-	coding:	utf-8	-*-
 
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer, SimplePlaylist
 
-STV_Version = "GEO.de v0.90"
+STV_Version = "GEO.de v0.91"
 
 STV_siteEncoding = 'utf-8'
 
 def GEOdeListEntry(entry):
 	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0] + entry[1])
 		] 
 		
 class GEOdeGenreScreen(Screen):
@@ -73,25 +73,25 @@ class GEOdeGenreScreen(Screen):
 	
 	def genreData(self, data):
 		print "genreData:"
-		stvDaten = re.findall('name:"(.*?)".*?mp3:"(.*?)".*?iption:"(.*?)".*?poster: "(.*?)"', data, re.S)
+		stvDaten = re.findall('id:"(.*?)".*?name:"(.*?)".*?mp3:"(.*?)".*?iption:"(.*?)".*?poster: "(.*?)"', data, re.S)
 		if stvDaten:
 			print "Podcasts found"
-			for (name, mp3, desc, img) in stvDaten:
-				self.filmliste.append((name, mp3, desc,img))
+			for (id, name, mp3, desc, img) in stvDaten:
+				self.filmliste.append(("%s. " % id, iso8859_Decode(name), mp3, iso8859_Decode(desc),img))
 			self.keyLocked = False
 		else:
-			self.filmliste.append(('Keine Podcasts gefunden !','','',''))
+			self.filmliste.append(('Keine Podcasts gefunden !','','','',''))
 		
 		self.chooseMenuList.setList(map(GEOdeListEntry, self.filmliste))
 		self.showInfos()
-
+	
 	def dataError(self, error):
 		print "dataError: ",error
 
 	def showInfos(self):
-		stvTitle = self['liste'].getCurrent()[0][0]
-		stvImage = self['liste'].getCurrent()[0][3]
-		stvDesc = self['liste'].getCurrent()[0][2]
+		stvTitle = self['liste'].getCurrent()[0][1]
+		stvImage = self['liste'].getCurrent()[0][4]
+		stvDesc = self['liste'].getCurrent()[0][3]
 		print stvImage
 		self['name'].setText(stvTitle)
 		self['handlung'].setText(stvDesc)
@@ -158,6 +158,20 @@ class GEOdePlayer(SimplePlayer):
 		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
 		
 	def getVideo(self):
-		stvLink = self.playList[self.playIdx][1]
-		stvTitle = "%d. %s" % (self.playIdx, self.playList[self.playIdx][0])
+		stvLink = self.playList[self.playIdx][2]
+		stvTitle = "%s%s" % (self.playList[self.playIdx][0], self.playList[self.playIdx][1])
 		self.playStream(stvTitle, stvLink)
+
+	def openPlaylist(self):
+		self.session.openWithCallback(self.cb_Playlist, GEOdePlaylist, self.playList, self.playIdx, listTitle=self.listTitle)
+		
+class GEOdePlaylist(SimplePlaylist):
+
+	def __init__(self, session, playList, playIdx, listTitle=None):
+
+		SimplePlaylist.__init__(self, session, playList, playIdx, listTitle)
+		
+	def playListEntry(self, entry):
+		return [entry,
+			(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0]+entry[1])
+			]	 

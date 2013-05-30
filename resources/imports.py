@@ -1,3 +1,5 @@
+﻿#	-*-	coding:	utf-8	-*-
+
 from Components.Button import Button
 from Components.Label import Label
 from Components.ConfigList import ConfigListScreen
@@ -116,3 +118,8 @@ def decodeHtml(text):
 	text = text.replace('&#8222;',',')
 	text = text.replace('&#8230;','...')
 	return text	
+
+def iso8859_Decode(txt):
+	txt = txt.replace('\xe4','ä').replace('\xf6','ö').replace('\xfc','ü').replace('\xdf','ß')
+	txt = txt.replace('\xc4','Ä').replace('\xd6','Ö').replace('\xdc','Ü')
+	return txt
