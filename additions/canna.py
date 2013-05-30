@@ -1,6 +1,6 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.yt_url import *
 import Plugins.Extensions.MediaPortal.resources.mechanize as mechanize
+import random
 
 def cannaGenreListEntry(entry):
 	return [entry,
@@ -66,7 +66,8 @@ class cannaGenreScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):	
-		self.genreliste = [('TOP100 Single Charts',"http://ua.canna.to/canna/single.php","1"),
+		self.genreliste = [('Playlist',"none","3"),
+							('TOP100 Single Charts',"http://ua.canna.to/canna/single.php","1"),
 							('Austria Single Charts',"http://ua.canna.to/canna/austria.php","1"),
 							('Black Charts Top 40',"http://ua.canna.to/canna/black.php","1"),
 							('US Billboard Country Charts Top 30',"http://ua.canna.to/canna/country.php","1"),
@@ -98,14 +99,214 @@ class cannaGenreScreen(Screen):
 		
 		if cannahdID == "1":
 			self.session.open(cannaMusicListeScreen, cannahdGenre, cannahdUrl)
-		else:
+		elif cannahdID == "2":
 			self.session.open(cannaJahreScreen, cannahdGenre, cannahdUrl)
-		
+		elif cannahdID == "3":
+			self.session.open(cannaPlaylist)
+			
 	def keyCancel(self):
 		self.session.nav.stopService()
 		self.session.nav.playService(self.lastservice)
 		self.playing = False
 		self.close()
+		
+class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
+
+	def __init__(self, session):
+		self.session = session
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/showSongstoAll.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/showSongstoAll.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		InfoBarBase.__init__(self)
+		InfoBarSeek.__init__(self)
+
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel,
+			"red": self.keyDel,
+			"yellow": self.keyPlaymode
+		}, -1)
+		
+		self.keyLocked = True
+		self.playmode = "Next"
+		self["title"] = Label("Canna.to - Playlist")
+		self["coverArt"] = Pixmap()
+		self["songtitle"] = Label ("")
+		self["artist"] = Label ("")
+		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
+
+		self.filmliste = []
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['streamlist'] = self.chooseMenuList
+
+		self.onLayoutFinish.append(self.loadPlaylist)		
+
+	def loadPlaylist(self):
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			
+		leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+		if not leer == 0:
+			self.filmliste = []
+			self.songs_read = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist" , "r")
+			for lines in sorted(self.songs_read.readlines()):
+				line = re.findall('"(.*?)" "(.*?)"', lines)
+				if line:
+					(read_song, read_url) = line[0]
+					print read_song, read_url
+					self.filmliste.append((decodeHtml(read_song),read_url))
+			self.chooseMenuList.setList(map(cannaListEntry, self.filmliste))
+			self.keyLocked = False
+			self.songs_read.close()	
+		else:
+			self.filmliste = []
+			self.filmliste.append(("No Songs added.","dump"))
+			self.chooseMenuList.setList(map(cannaListEntry, self.filmliste))
+
+	def keyPlaymode(self):
+		if self.playmode == "Next":
+			self.playmode = "Random"
+		elif self.playmode == "Random":
+			self.playmode = "Next"
+	
+		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
+		
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]
+		print cannaName, cannaUrl
+		
+		if re.match('.*?-', cannaName):
+			playinfos = cannaName.split(' - ')
+			if len(playinfos) == 2:
+				self["artist"].setText(playinfos[0])
+				self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if len(playinfos) == 2:
+					self["artist"].setText(playinfos[0])
+					self["songtitle"].setText(playinfos[1])
+		else:
+			self["artist"].setText(cannaName)
+			
+		stream_url = self.getDLurl(cannaUrl)
+		if stream_url:
+			print stream_url
+			sref = eServiceReference(0x1001, 0, stream_url)
+			self.session.nav.playService(sref)
+			self.playing = True
+
+	def keyDel(self):
+		if self.keyLocked:
+			return
+
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]
+		
+		print cannaName, cannaUrl
+		
+		writeTmp = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist.tmp","w")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+			readPlaylist = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist","r")
+			for rawData in readPlaylist.readlines():
+				data = re.findall('"(.*?)" "(.*?)"', rawData, re.S)
+				if data:
+					(read_name, read_url) = data[0]
+					if read_name != cannaName:
+						writeTmp.write('"%s" "%s"\n' % (read_name, read_url))
+			readPlaylist.close()
+			writeTmp.close()
+			shutil.move(config.mediaportal.watchlistpath.value+"mp_canna_playlist.tmp", config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			self.loadPlaylist()
+			
+	def doEofInternal(self, playing):
+		print "Play Next Song.."
+		
+		if self.playmode == "Next":
+			self['streamlist'].down()
+		else:
+			count = len(self.filmliste)-1
+			get_random = random.randint(0, int(count))
+			print "Got Random %s" % get_random
+			self['streamlist'].moveToIndex(get_random)
+		
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]
+		print cannaName, cannaUrl
+		playinfos = cannaName.split(' - ')
+		if playinfos:
+			self["artist"].setText(playinfos[0])
+			self["songtitle"].setText(playinfos[1])
+
+		stream_url = self.getDLurl(cannaUrl)
+		if stream_url:
+			print stream_url
+			sref = eServiceReference(0x1001, 0, stream_url)
+			self.session.nav.playService(sref)
+			self.playing = True
+
+	def lockShow(self):
+		pass
+		
+	def unlockShow(self):
+		pass
+		
+	def keyCancel(self):
+		self.close()
+		
+	def getDLurl(self, url):
+		try:
+			content = self.getUrl(url)
+			match = re.findall('flashvars.playlist = \'(.*?)\';', content)
+			if match:
+				for url in match:
+					url = 'http://ua.canna.to/canna/'+url
+					content = self.getUrl(url)
+					match = re.findall('<location>(.*?)</location>', content)
+					if match:
+						for url in match:
+							url = 'http://ua.canna.to/canna/'+url
+							req = mechanize.Request('http://ua.canna.to/canna/single.php')
+							response = mechanize.urlopen(req)
+							req = mechanize.Request(url)
+							req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+							response = mechanize.urlopen(req)
+							response.close()
+							code=response.info().getheader('Content-Location')
+							url='http://ua.canna.to/canna/avzt/'+code
+							print url
+							return url
+							
+		except urllib2.HTTPError, error:
+			print error
+			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
+			return False
+
+		except urllib2.URLError, error:
+			print error.reason
+			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
+			return False
+				
+	def getUrl(self, url):
+		req = mechanize.Request(url)
+		req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
+		response = mechanize.urlopen(req)
+		link = response.read()
+		response.close()
+		return link	
 		
 class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 	
@@ -130,7 +331,8 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
 			"ok"    : self.keyOK,
-			"cancel": self.keyCancel
+			"cancel": self.keyCancel,
+			"green": self.keyAdd
 		}, -1)
 		
 		self.keyLocked = True
@@ -206,17 +408,68 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		link = response.read()
 		response.close()
 		return link	
-		
+
+	def keyAdd(self):
+		if self.keyLocked:
+			return
+
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]		
+
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			
+		if not self.checkPlaylist(cannaName):
+			if fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+				writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist","a")
+				writePlaylist.write('"%s" "%s"\n' % (cannaName, cannaUrl))
+				writePlaylist.close()
+				message = self.session.open(MessageBox, _("added"), MessageBox.TYPE_INFO, timeout=2)			
+		else:
+			message = self.session.open(MessageBox, _("Song ist bereits vorhanden."), MessageBox.TYPE_INFO, timeout=2)
+			
+	def checkPlaylist(self, song):
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			return False
+		else:
+			leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			if not leer == 0:
+				self.dupelist = []
+				self.songs_read = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist" , "r")
+				for lines in sorted(self.songs_read.readlines()):
+					line = re.findall('"(.*?)" "(.*?)"', lines)
+					if line:
+						(read_song, read_url) = line[0]
+						self.dupelist.append((read_song))
+				self.songs_read.close()
+				
+				if song in self.dupelist:
+					return True
+				else:
+					return False
+			else:
+				return False
+			
 	def keyOK(self):
 		if self.keyLocked:
 			return
 		cannaName = self['streamlist'].getCurrent()[0][0]
 		cannaUrl = self['streamlist'].getCurrent()[0][1]
 		print cannaName, cannaUrl
-		playinfos = cannaName.split(' - ')
-		if playinfos:
-			self["artist"].setText(playinfos[0])
-			self["songtitle"].setText(playinfos[1])
+		
+		if re.match('.*?-', cannaName):
+			playinfos = cannaName.split(' - ')
+			if len(playinfos) == 2:
+				self["artist"].setText(playinfos[0])
+				self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if len(playinfos) == 2:
+					self["artist"].setText(playinfos[0])
+					self["songtitle"].setText(playinfos[1])
+		else:
+			self["artist"].setText(cannaName)
 
 		stream_url = self.getDLurl(cannaUrl)
 		if stream_url:
@@ -338,7 +591,8 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
 			"ok"    : self.keyOK,
-			"cancel": self.keyCancel
+			"cancel": self.keyCancel,
+			"green": self.keyAdd
 		}, -1)
 		
 		self.keyLocked = True
@@ -418,17 +672,68 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		link = response.read()
 		response.close()
 		return link	
-		
+
+	def keyAdd(self):
+		if self.keyLocked:
+			return
+
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]		
+
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			
+		if not self.checkPlaylist(cannaName):
+			if fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+				writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist","a")
+				writePlaylist.write('"%s" "%s"\n' % (cannaName, cannaUrl))
+				writePlaylist.close()
+				message = self.session.open(MessageBox, _("added"), MessageBox.TYPE_INFO, timeout=2)			
+		else:
+			message = self.session.open(MessageBox, _("Song ist bereits vorhanden."), MessageBox.TYPE_INFO, timeout=2)
+			
+	def checkPlaylist(self, song):
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_canna_playlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			return False
+		else:
+			leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_canna_playlist")
+			if not leer == 0:
+				self.dupelist = []
+				self.songs_read = open(config.mediaportal.watchlistpath.value+"mp_canna_playlist" , "r")
+				for lines in sorted(self.songs_read.readlines()):
+					line = re.findall('"(.*?)" "(.*?)"', lines)
+					if line:
+						(read_song, read_url) = line[0]
+						self.dupelist.append((read_song))
+				self.songs_read.close()
+				
+				if song in self.dupelist:
+					return True
+				else:
+					return False
+			else:
+				return False
+				
 	def keyOK(self):
 		if self.keyLocked:
 			return
 		cannaName = self['streamlist'].getCurrent()[0][0]
 		cannaUrl = self['streamlist'].getCurrent()[0][1]
 		print cannaName, cannaUrl
-		playinfos = cannaName.split(' - ')
-		if playinfos:
-			self["artist"].setText(playinfos[0])
-			self["songtitle"].setText(playinfos[1])
+
+		if re.match('.*?-', cannaName):
+			playinfos = cannaName.split(' - ')
+			if len(playinfos) == 2:
+				self["artist"].setText(playinfos[0])
+				self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if len(playinfos) == 2:
+					self["artist"].setText(playinfos[0])
+					self["songtitle"].setText(playinfos[1])
+		else:
+			self["artist"].setText(cannaName)
 
 		stream_url = self.getDLurl(cannaUrl)
 		if stream_url:
