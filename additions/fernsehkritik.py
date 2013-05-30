@@ -132,7 +132,7 @@ class fernsehkritikFilmeListeScreen(Screen):
         print 'Fehler lesen fernsehkritik.tv', error
         
     def loadPageData(self, data):
-        folgen = re.findall('<h2>\s*<a[^>]+href="(?:\.\.|)?/folge-(\d+)/?"[^>]*>\s*Folge (?:\d+) vom (\d{1,2}\. [\wä]+ \d{4})\s*</a>', data, re.S)
+        folgen = re.findall('<h2>\s*<a[^>]+href="(?:\.\.|)?/folge-(\d+)/?"[^>]*>\s*Folge (?:\d+) vom (\d{1,2}\. [\w]+ \d{4})\s*</a>', data, re.S)
         self.filmliste = []
         for folge, datum in folgen:
             fTitle = "Folge " + folge + " vom " + datum
@@ -150,7 +150,7 @@ class fernsehkritikFilmeListeScreen(Screen):
         getPage(self.streamLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.buildStreamLinks).addErrback(self.dataError)
 
     def buildStreamLinks(self, data):
-        #Streams Links ermitteln und an SimplePlayer Class übergeben
+        #Streams Links ermitteln und an SimplePlayer Class ï¿½bergeben
         streamLinks = []
         rand = str(random.randint(1, 3))
         folgenNr = re.findall(r"\{ url: base \+ '(\d+(?:-\d+)?\.flv)' \}", data, re.S)
@@ -204,7 +204,7 @@ class fernsehkritikFilmeListeScreen(Screen):
 class fernsehkritiktvPlayer(SimplePlayer):
 
     def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
-        print "Fernsehkritik Plaxer:"
+        print "Fernsehkritik Player:"
 
         SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
         
