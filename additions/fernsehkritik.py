@@ -155,7 +155,7 @@ class fernsehkritikFilmeListeScreen(Screen):
         rand = str(random.randint(1, 3))
         folgenNr = re.findall(r"\{ url: base \+ '(\d+(?:-\d+)?\.flv)' \}", data, re.S)
         for folgeNr in folgenNr:
-            url = "dl" + rand + ".fernsehkritik.tv/fernsehkritik" + folgeNr
+            url = "http://dl" + rand + ".fernsehkritik.tv/fernsehkritik" + folgeNr
             streamLinks.append(url)
         print streamLinks
         self.session.open(fernsehkritiktvPlayer,streamLinks,playIdx=0,playAll = True,
