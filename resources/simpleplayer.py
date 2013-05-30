@@ -84,6 +84,12 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		else:
 			self.playIdx = 0
 		self.playVideo()
+		
+	def seekFwd(self):
+		self.playNextStream()
+		
+	def seekBack(self):
+		self.playPrevStream()
 	
 	def leavePlayer(self):
 		print "exitPlayer:"
