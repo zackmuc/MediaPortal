@@ -19,7 +19,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
 		
-		self["actions"] = ActionMap(["WizardActions","EPGSelectActions",'MoviePlayerActions','MediaPlayerSeekActions','ColorActions','InfobarActions'],
+		self["actions"] = ActionMap(["WizardActions",'MediaPlayerSeekActions',"EPGSelectActions",'MoviePlayerActions','ColorActions','InfobarActions'],
 		{
 			"leavePlayer": self.leavePlayer,
 			"info":		self.openMediainfo,

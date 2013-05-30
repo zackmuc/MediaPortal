@@ -1,7 +1,7 @@
 ﻿from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer, SimplePlaylist
 
-STV_Version = "Science-Tv.com v0.92"
+STV_Version = "Science-Tv.com v0.93"
 
 STV_siteEncoding = 'utf-8'
 
@@ -52,7 +52,7 @@ class scienceTvGenreScreen(Screen):
 		self.onLayoutFinish.append(self.layoutFinished)
 		
 	def layoutFinished(self):
-		self.genreliste.append((1,'Aktuelles Programm', 'http://www.science-tv.com/c/mid,2668,aktuelles_Programm/'))
+		self.genreliste.append((1,'Aktuelles Programm', 'http://www.science-tv.com/c/mid,2668,aktuelles_Programm/?contentpart=prog_video'))
 		self.genreliste.append((2,'Filme auf Abruf', 'http://www.science-tv.com/c/mid,2671,Filme_auf_Abruf/'))
 		self.genreliste.append((3,'TV-Programmvorschau', 'http://www.science-tv.com/c/mid,2670,TV-Programmvorschau/'))
 		self.chooseMenuList.setList(map(scienceTvGenreListEntry, self.genreliste))
@@ -80,7 +80,7 @@ class scienceTvGenreScreen(Screen):
 			#getPage(stvLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
 			self.session.open(
 				ScienceTvPlayer2,
-				[(1,'Aktuelles Programm', 'http://www.science-tv.com/c/mid,2668,aktuelles_Programm/')],
+				[(1,'Aktuelles Programm', 'http://www.science-tv.com/c/mid,2668,aktuelles_Programm/?contentpart=prog_video')],
 				playIdx = 0,
 				playAll = True
 				)
@@ -279,7 +279,7 @@ class ScienceTvPlayer2(SimplePlayer):
 		getPage(stvLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		stvStream = re.findall('<video src="(.*?)"', data)
+		stvStream = re.findall('video src=&quot;(.*?)&quot;', data)
 		if stvStream:
 			print "S-TV stream found"
 			self.stvLink = stvStream[0]
