@@ -66,7 +66,6 @@ from additions.movie25 import *
 from additions.eighties import *
 from additions.teledunet import *
 from additions.geo_de import *
-from additions.fernsehkritik import *
 
 # kids
 from additions.kinderkino import *
@@ -146,7 +145,6 @@ config.mediaportal.showFilmOn = ConfigYesNo(default = True)
 config.mediaportal.showTvkino = ConfigYesNo(default = True)
 config.mediaportal.showSpobox = ConfigYesNo(default = True)
 config.mediaportal.showNetzKino = ConfigYesNo(default = True)
-config.mediaportal.showFernsehkritik = ConfigYesNo(default = True)
 # Kinder
 config.mediaportal.showKinderKino = ConfigYesNo(default = True)
 config.mediaportal.showtivi = ConfigYesNo(default = True)
@@ -365,7 +363,6 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige AutoBild:", config.mediaportal.showAutoBild))
 		self.configlist.append(getConfigListEntry("Zeige SportBild:", config.mediaportal.showSportBild))
 		self.configlist.append(getConfigListEntry("Zeige Moovizon:", config.mediaportal.showMoovizon))
-		self.configlist.append(getConfigListEntry("Zeige Fernsehkritik:", config.mediaportal.showFernsehkritik))
 		
 		# Kinder
 		self.configlist.append(getConfigListEntry("Zeige Tivi:", config.mediaportal.showtivi))
@@ -588,8 +585,6 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.mediatheken.append(self.hauptListEntry("SportBild", "sportbild"))
 		if config.mediaportal.showVutec.value:
 			self.mediatheken.append(self.hauptListEntry("Vutechtalk", "vutechtalk"))
-		if config.mediaportal.showFernsehkritik.value:
-			self.mediatheken.append(self.hauptListEntry("Fernsehkritik", "fernsehkritik"))
 
 		# Grauzone
 		if config.mediaportal.showSzeneStreams.value:
@@ -1111,9 +1106,7 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(GEOdeGenreScreen)
 		elif auswahl == "Teledunet":
 			self.session.open(teleGenreScreen)
-		elif auswahl == "Fernsehkritik":
-			self.session.open(fernsehkritikGenreScreen)
-					
+			
 		# mediatheken
 		elif auswahl == "VOXNOW":
 			self.session.open(VOXnowGenreScreen)
@@ -1639,8 +1632,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("DokuStream", "dokustream", "Mediathek"))
 		if config.mediaportal.showScienceTV.value:
 			self.plugin_liste.append(("ScienceTV", "sciencetv", "Mediathek"))
-		if config.mediaportal.showFernsehkritik.value:
-			self.plugin_liste.append(("Fernsehkritik", "fernsehkritik", "Mediathek"))
 		if config.mediaportal.showHoerspielHouse.value:
 			self.plugin_liste.append(("HörspielHouse", "hoerspielhouse", "Fun"))
 		if config.mediaportal.showHoerspielChannels.value:
@@ -2208,9 +2199,6 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "GEO.de":
 			self.hit_plugin("GEOde")
 			self.session.open(GEOdeGenreScreen)
-		elif auswahl == "Fernsehkritik":
-			self.hit_plugin("Fernsehkritik")
-			self.session.open(fernsehkritikGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
