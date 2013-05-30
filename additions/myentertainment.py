@@ -1,3 +1,5 @@
+﻿#	-*-	coding:	utf-8	-*-
+
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
 from Plugins.Extensions.MediaPortal.resources.decrypt import *
@@ -51,7 +53,7 @@ class showMEHDGenre(Screen):
 			("Drama", "http://my-entertainment.biz/forum/list.php?r=category/36-HD-Drama&page="),
 			("Fantasy", "http://my-entertainment.biz/forum/list.php?r=category/37-HD-Fantasy&page="),
 			("Horror", "http://my-entertainment.biz/forum/list.php?r=category/38-HD-Horror&page="),
-			("Komoedie", "http://my-entertainment.biz/forum/list.php?r=category/39-HD-Kom%F6die&page="),
+			("Komödie", "http://my-entertainment.biz/forum/list.php?r=category/39-HD-Kom%F6die&page="),
 			("Kriegsfilm", "http://my-entertainment.biz/forum/list.php?r=category/66-HD-Kriegsfilm&page="),
 			("Krimi", "http://my-entertainment.biz/forum/list.php?r=category/56-HD-Krimi&page="),
 			("Musik", "http://my-entertainment.biz/forum/list.php?r=category/63-HD-Musik&page="),
@@ -140,7 +142,7 @@ class MEHDFilmListeScreen(Screen):
 		if filme:
 			self.filmliste = []
 			for (url,name,image) in filme:
-				name = name.replace("HD: ","")
+				name = iso8859_Decode(name.replace("HD: ",""))
 				self.filmliste.append((decodeHtml(name), url, image))
 			self.chooseMenuList.setList(map(MEHDFilmListEntry, self.filmliste))
 			self.keyLocked = False
@@ -162,7 +164,7 @@ class MEHDFilmListeScreen(Screen):
 		handlung = re.findall('<div class="bbcode_quote_container"></div>(.*?)<', data, re.S)
 		if handlung:
 			#print handlung
-			handlung = re.sub(r"\s+", " ", handlung[0])
+			handlung = iso8859_Decode(re.sub(r"\s+", " ", handlung[0]))
 			self['handlung'].setText(decodeHtml(handlung))
 		else:
 			self['handlung'].setText("Keine infos gefunden.")
@@ -461,7 +463,7 @@ class enterSerienListScreen(Screen):
 		if self.folgenCol:
 			self.filmliste = []
 			for (url,name) in self.folgenCol:
-				self.filmliste.append((decodeHtml(name), url, self.folgenPic))
+				self.filmliste.append((decodeHtml(iso8859_Decode(name)), url, self.folgenPic))
 			self.chooseMenuList.setList(map(enterSerienListEntry, self.filmliste))
 			self.keyLocked = False
 			self.loadPic
