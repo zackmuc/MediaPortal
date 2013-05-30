@@ -180,7 +180,7 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		elif self.playmode == "Random":
 			self.playmode = "Next"
 	
-		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
+		self["album"].setText("Playlist      -      Playmode      %s" % self.playmode)
 		
 	def keyOK(self):
 		if self.keyLocked:
