@@ -14,7 +14,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	ALLOW_SUSPEND = True
 	
 	#prepared for MP infobar
-	skin = '\n\t\t<screen position="center,center" size="300,200" title="SimplePlayer">\n\t\t</screen>'
+	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
 	
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
 		Screen.__init__(self, session)
@@ -27,6 +27,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		{
 			"leavePlayer": self.leavePlayer,
 			"info":		self.openMediainfo,
+			"input_date_time": self.openMenu,
 			"up": 		self.openPlaylist,
 			"down":		self.playRandom,
 			"back":		self.leavePlayer,
@@ -46,13 +47,16 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 
-		self.randomPlay = config.mediaportal.sp_randomplay.value
+		self.randomPlay = False
+		self.playMode = ""
 		self.listTitle = listTitle
 		self.playAll = playAll
 		self.playList = playList
 		self.playIdx = playIdx
 		self.playLen = len(playList)
 		self.returning = False
+		
+		self.setPlaymode()
 		self.onClose.append(self.playExit)
 
 		self.onLayoutFinish.append(self.getVideo)
@@ -138,13 +142,25 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			if re.match('.*?http://', url, re.S):
 				self.session.open(mediaInfo, True)
 
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu)
+		
+	def cb_Menu(self, data):
+		pass
+		
 	def lockShow(self):
 		pass
 		
 	def unlockShow(self):
 		pass
 		
-				
+	def setPlaymode(self):
+		self.randomPlay = config.mediaportal.sp_randomplay.value
+		if self.randomPlay:
+			self.playMode = "Random"
+		else:
+			self.playMode = "Next"
+	
 class SimplePlaylist(Screen):
 
 	def __init__(self, session, playList, playIdx, listTitle=None):
@@ -209,3 +225,58 @@ class SimplePlaylist(Screen):
 	def ok(self):
 		idx = self['genreList'].getSelectedIndex()
 		self.close(idx)
+
+class SimpleConfig(ConfigListScreen, Screen):
+	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player Konfiguration">\n\t\t\t<widget name="config" position="10,10" size="290,190" scrollbarMode="showOnDemand" />\n\t\t</screen>'
+	
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.session = session
+		self.list = []
+		self.list.append(getConfigListEntry('Random Play', config.mediaportal.sp_randomplay))
+		ConfigListScreen.__init__(self, self.list)
+		self['setupActions'] = ActionMap(['SetupActions'],
+		{
+			'ok': 		self.save,
+			'cancel': 	self.keyCancel
+		},-2)
+		
+	def save(self):
+		for x in self['config'].list:
+			x[1].save()
+	
+		self.close()
+	
+	def keyCancel(self):
+		for x in self['config'].list:
+			x[1].cancel()
+	
+		self.close()
+
+class SimplePlayerMenu(Screen):
+	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player Menü">\n\t\t\t<widget name="menu" position="10,10" size="290,190" scrollbarMode="showOnDemand" />\n\t\t</screen>'
+	
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.session = session
+		self['setupActions'] = ActionMap(['SetupActions'],
+		{
+			'ok': 		self.keyOk,
+			'cancel':	self.keyCancel
+		}, -2)
+
+		self.liste = []
+		self.liste.append(('Konfiguration', 1))
+		self['menu'] = MenuList(self.liste)
+		
+	def openConfig(self):
+		self.session.open(SimpleConfig)
+		self.close([(1, None)])
+		
+	def keyOk(self):
+		choice = self['menu'].l.getCurrentSelection()[1]
+		if choice == 1:
+			self.openConfig()
+		
+	def keyCancel(self):
+		self.close([])
