@@ -171,6 +171,12 @@ class eightiesMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		self['streamlist'].down()
 		self.keyOK()
 
+	def seekFwd(self):
+		self['streamlist'].pageDown()
+
+	def seekBack(self):
+		self['streamlist'].pageUp()
+
 	def lockShow(self):
 		pass
 		
