@@ -41,8 +41,6 @@ class cannaGenreScreen(Screen):
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"red": self.keyCancel,
-			"seekbarRight": self.keyRight,
-			"seekbarLeft": self.keyLeft
 		}, -1)
 		
 		self.lastservice = session.nav.getCurrentlyPlayingServiceReference()
@@ -91,10 +89,10 @@ class cannaGenreScreen(Screen):
 		self.chooseMenuList.setList(map(cannaGenreListEntry, self.genreliste))
 		self.keyLocked = False
 
-	def keyRight(self):
+	def seekFwd(self):
 		self['genreList'].pageDown()
 
-	def keyLeft(self):
+	def seekBack(self):
 		self['genreList'].pageUp()
 		
 	def keyOK(self):
@@ -142,8 +140,6 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 			"cancel": self.keyCancel,
 			"red": self.keyDel,
 			"yellow": self.keyPlaymode,
-			"seekbarRight": self.keyRight,
-			"seekbarLeft": self.keyLeft
 		}, -1)
 		
 		self.keyLocked = True
@@ -277,10 +273,10 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 	def keyCancel(self):
 		self.close()
 		
-	def keyRight(self):
+	def seekFwd(self):
 		self['streamlist'].pageDown()
 
-	def keyLeft(self):
+	def seekBack(self):
 		self['streamlist'].pageUp()
 
 	def getDLurl(self, url):
@@ -349,8 +345,6 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"green": self.keyAdd,
-			"seekbarRight": self.keyRight,
-			"seekbarLeft": self.keyLeft
 		}, -1)
 		
 		self.keyLocked = True
@@ -496,10 +490,10 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 			self.session.nav.playService(sref)
 			self.playing = True
 
-	def keyRight(self):
+	def seekFwd(self):
 		self['streamlist'].pageDown()
 
-	def keyLeft(self):
+	def seekBack(self):
 		self['streamlist'].pageUp()
 		
 	def doEofInternal(self, playing):
@@ -541,8 +535,6 @@ class cannaJahreScreen(Screen):
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"red": self.keyCancel,
-			"seekbarRight": self.keyRight,
-			"seekbarLeft": self.keyLeft
 		}, -1)
 			
 		self.keyLocked = True
@@ -583,10 +575,10 @@ class cannaJahreScreen(Screen):
 	def dataError(self, error):
 		print error
 
-	def keyRight(self):
+	def seekFwd(self):
 		self['genreList'].pageDown()
 
-	def keyLeft(self):
+	def seekBack(self):
 		self['genreList'].pageUp()
 		
 	def keyOK(self):
@@ -625,8 +617,6 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"green": self.keyAdd,
-			"seekbarRight": self.keyRight,
-			"seekbarLeft": self.keyLeft
 		}, -1)
 		
 		self.keyLocked = True
@@ -776,10 +766,10 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 			self.session.nav.playService(sref)
 			self.playing = True
 
-	def keyRight(self):
+	def seekFwd(self):
 		self['streamlist'].pageDown()
 
-	def keyLeft(self):
+	def seekBack(self):
 		self['streamlist'].pageUp()
 		
 	def doEofInternal(self, playing):
