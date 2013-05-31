@@ -248,6 +248,9 @@ config.mediaportal.showyouporn = ConfigYesNo(default = False)
 #fake entry fuer die kategorien
 config.mediaportal.fake_entry = NoSave(ConfigNothing())
 
+# Konfiguration erfolgt in SimplePlayer
+config.mediaportal.sp_randomplay = ConfigYesNo(default = False)
+
 class hauptScreenSetup(Screen, ConfigListScreen):
 
 	def __init__(self, session):

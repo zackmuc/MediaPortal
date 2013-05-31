@@ -1,5 +1,6 @@
 #	-*-	coding:	utf-8	-*-
 
+import random
 from Screens.InfoBarGenerics import *
 from Plugins.Extensions.MediaPortal.resources.imports import *
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
@@ -11,6 +12,9 @@ else:
 class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
+	
+	#prepared for MP infobar
+	skin = '\n\t\t<screen position="center,center" size="300,200" title="SimplePlayer">\n\t\t</screen>'
 	
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
 		Screen.__init__(self, session)
@@ -24,6 +28,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			"leavePlayer": self.leavePlayer,
 			"info":		self.openMediainfo,
 			"up": 		self.openPlaylist,
+			"down":		self.playRandom,
 			"back":		self.leavePlayer,
 			"left":		self.playPrevStream,
 			"right":	self.playNextStream
@@ -37,9 +42,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.allowPiP = False
 		InfoBarSeek.__init__(self)
 
+		#self.skinName = 'MediaPortal SimplePlayer'
 		self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 
+		self.randomPlay = config.mediaportal.sp_randomplay.value
 		self.listTitle = listTitle
 		self.playAll = playAll
 		self.playList = playList
@@ -84,7 +91,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		else:
 			self.playIdx = 0
 		self.playVideo()
-		
+
+	def playRandom(self):
+		print 'playRandom:'
+		if self.playLen > 1:
+			self.playIdx = random.randint(0, self.playLen-1)
+			self.playVideo()
+	
 	def seekFwd(self):
 		self.playNextStream()
 		
@@ -98,7 +111,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	def doEofInternal(self, playing):
 		print "doEofInt:"
 		if playing == True:
-			self.playNextStream()
+			if self.randomPlay:
+				self.playRandom()
+			else:
+				self.playNextStream()
 				
 	def playExit(self):
 		print "playExit:"
@@ -121,7 +137,14 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			url = self.session.nav.getCurrentlyPlayingServiceReference().getPath()
 			if re.match('.*?http://', url, re.S):
 				self.session.open(mediaInfo, True)
-	
+
+	def lockShow(self):
+		pass
+		
+	def unlockShow(self):
+		pass
+		
+				
 class SimplePlaylist(Screen):
 
 	def __init__(self, session, playList, playIdx, listTitle=None):
