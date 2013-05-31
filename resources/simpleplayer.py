@@ -146,7 +146,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu)
 		
 	def cb_Menu(self, data):
-		pass
+		print "cb_Menu:"
+		if data != []:
+			if data[0][0] == 1:
+				self.setPlaymode()
 		
 	def lockShow(self):
 		pass
@@ -155,6 +158,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		pass
 		
 	def setPlaymode(self):
+		print "setPlaymode:"
 		self.randomPlay = config.mediaportal.sp_randomplay.value
 		if self.randomPlay:
 			self.playMode = "Random"
