@@ -40,7 +40,7 @@ class cannaGenreScreen(Screen):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"red": self.keyCancel,
+			"red": self.keyCancel
 		}, -1)
 		
 		self.lastservice = session.nav.getCurrentlyPlayingServiceReference()
@@ -139,7 +139,7 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"red": self.keyDel,
-			"yellow": self.keyPlaymode,
+			"yellow": self.keyPlaymode
 		}, -1)
 		
 		self.keyLocked = True
@@ -344,7 +344,7 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"green": self.keyAdd,
+			"green": self.keyAdd
 		}, -1)
 		
 		self.keyLocked = True
@@ -534,7 +534,7 @@ class cannaJahreScreen(Screen):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"red": self.keyCancel,
+			"red": self.keyCancel
 		}, -1)
 			
 		self.keyLocked = True
@@ -616,7 +616,7 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"green": self.keyAdd,
+			"green": self.keyAdd
 		}, -1)
 		
 		self.keyLocked = True
