@@ -126,7 +126,7 @@ class kinokisteKinoScreen(Screen):
 		self['name'].setText(kkTitle)
 		kkUrl = self['streamlist'].getCurrent()[0][1]
 		kkImage = self['streamlist'].getCurrent()[0][2]
-		kkImageUrl = "http://kkiste.to%s" % kkImage
+		kkImageUrl = "%s" % kkImage
 		print kkImageUrl.replace('_170_120','_145_215')
 		downloadPage(kkImageUrl.replace('_170_120','_145_215'), "/tmp/kkIcon.jpg").addCallback(self.kkCoverShow)
 		getPage(kkUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getDescription).addErrback(self.dataError)
