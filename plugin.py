@@ -67,6 +67,7 @@ from additions.eighties import *
 from additions.teledunet import *
 from additions.geo_de import *
 from additions.deluxemusic import *
+from additions.nuna import *
 
 # kids
 from additions.kinderkino import *
@@ -203,6 +204,7 @@ config.mediaportal.showEighties = ConfigYesNo(default = True)
 config.mediaportal.showTeledunet = ConfigYesNo(default = True)
 config.mediaportal.showGEOde = ConfigYesNo(default = True)
 config.mediaportal.showDeluxemusic = ConfigYesNo(default = True)
+config.mediaportal.showNuna = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -342,6 +344,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Teledunet:", config.mediaportal.showTeledunet))
 		self.configlist.append(getConfigListEntry("Zeige GEOde:", config.mediaportal.showGEOde))
 		self.configlist.append(getConfigListEntry("Zeige Deluxemusic:", config.mediaportal.showDeluxemusic))
+		self.configlist.append(getConfigListEntry("Zeige Nuna:", config.mediaportal.showNuna))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -677,6 +680,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("GEO.de", "geo_de"))
 		if config.mediaportal.showTeledunet.value:
 			self.funsport.append(self.hauptListEntry("Teledunet", "teledunet"))
+		if config.mediaportal.showDeluxemusic.value:
+			self.funsport.append(self.hauptListEntry("Deluxemusic", "deluxemusic"))
+		if config.mediaportal.showNuna.value:
+			self.funsport.append(self.hauptListEntry("Nuna", "nuna"))
 		
 		# porn
 		if config.mediaportal.show4tube.value:
@@ -1112,6 +1119,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(GEOdeGenreScreen)
 		elif auswahl == "Teledunet":
 			self.session.open(teleGenreScreen)
+		elif auswahl == "Deluxemusic":
+			self.session.open(deluxemusicGenreScreen)
+		elif auswahl == "Nuna":
+			self.session.open(nunaGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1666,6 +1677,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("GEO.de", "geo_de", "Fun"))
 		if config.mediaportal.showDeluxemusic.value:
 			self.plugin_liste.append(("Deluxemusic", "deluxemusic", "Fun"))
+		if config.mediaportal.showNuna.value:
+			self.plugin_liste.append(("Nuna", "nuna", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2210,6 +2223,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Deluxemusic":
 			self.hit_plugin("Deluxemusic")
 			self.session.open(deluxemusicGenreScreen)
+		elif auswahl == "Nuna":
+			self.hit_plugin("Nuna")
+			self.session.open(nunaGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
