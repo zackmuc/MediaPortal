@@ -4,7 +4,7 @@ import random
 
 def cannaGenreListEntry(entry):
 	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+		(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 800, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
 		]
 		
 def cannaListEntry(entry):
@@ -197,14 +197,16 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		
 		if re.match('.*?-', cannaName):
 			playinfos = cannaName.split(' - ')
-			if len(playinfos) == 2:
-				self["artist"].setText(playinfos[0])
-				self["songtitle"].setText(playinfos[1])
-			else:
-				playinfos = cannaName.split('-')
+			if playinfos:
 				if len(playinfos) == 2:
 					self["artist"].setText(playinfos[0])
 					self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if playinfos:
+					if len(playinfos) == 2:
+						self["artist"].setText(playinfos[0])
+						self["songtitle"].setText(playinfos[1])
 		else:
 			self["artist"].setText(cannaName)
 			
@@ -252,10 +254,21 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		cannaName = self['streamlist'].getCurrent()[0][0]
 		cannaUrl = self['streamlist'].getCurrent()[0][1]
 		print cannaName, cannaUrl
-		playinfos = cannaName.split(' - ')
-		if playinfos:
-			self["artist"].setText(playinfos[0])
-			self["songtitle"].setText(playinfos[1])
+		
+		if re.match('.*?-', cannaName):
+			playinfos = cannaName.split(' - ')
+			if playinfos:
+				if len(playinfos) == 2:
+					self["artist"].setText(playinfos[0])
+					self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if playinfos:
+					if len(playinfos) == 2:
+						self["artist"].setText(playinfos[0])
+						self["songtitle"].setText(playinfos[1])
+		else:
+			self["artist"].setText(cannaName)
 
 		stream_url = self.getDLurl(cannaUrl)
 		if stream_url:
@@ -344,15 +357,17 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"green": self.keyAdd
+			"green": self.keyAdd,
+			"yellow": self.keyPlaymode
 		}, -1)
 		
 		self.keyLocked = True
+		self.playmode = "Random"
 		self["title"] = Label("Canna.to - %s" % self.genreName)
 		self["coverArt"] = Pixmap()
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
-		self["album"] = Label ("%s" % self.genreName)
+		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
 
 		self.filmliste = []
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
@@ -462,7 +477,15 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 					return False
 			else:
 				return False
-			
+
+	def keyPlaymode(self):
+		if self.playmode == "Next":
+			self.playmode = "Random"
+		elif self.playmode == "Random":
+			self.playmode = "Next"
+	
+		self["album"].setText("Playlist      -      Playmode      %s" % self.playmode)
+		
 	def keyOK(self):
 		if self.keyLocked:
 			return
@@ -472,14 +495,16 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		
 		if re.match('.*?-', cannaName):
 			playinfos = cannaName.split(' - ')
-			if len(playinfos) == 2:
-				self["artist"].setText(playinfos[0])
-				self["songtitle"].setText(playinfos[1])
-			else:
-				playinfos = cannaName.split('-')
+			if playinfos:
 				if len(playinfos) == 2:
 					self["artist"].setText(playinfos[0])
 					self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if playinfos:
+					if len(playinfos) == 2:
+						self["artist"].setText(playinfos[0])
+						self["songtitle"].setText(playinfos[1])
 		else:
 			self["artist"].setText(cannaName)
 
@@ -495,11 +520,43 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 
 	def seekBack(self):
 		self['streamlist'].pageUp()
-		
+
 	def doEofInternal(self, playing):
 		print "Play Next Song.."
-		self['streamlist'].down()
-		self.keyOK()
+		
+		if self.playmode == "Next":
+			self['streamlist'].down()
+		else:
+			count = len(self.filmliste)-1
+			get_random = random.randint(0, int(count))
+			print "Got Random %s" % get_random
+			self['streamlist'].moveToIndex(get_random)
+		
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]
+		print cannaName, cannaUrl
+
+		if re.match('.*?-', cannaName):
+			playinfos = cannaName.split(' - ')
+			if playinfos:
+				if len(playinfos) == 2:
+					self["artist"].setText(playinfos[0])
+					self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if playinfos:
+					if len(playinfos) == 2:
+						self["artist"].setText(playinfos[0])
+						self["songtitle"].setText(playinfos[1])
+		else:
+			self["artist"].setText(cannaName)
+
+		stream_url = self.getDLurl(cannaUrl)
+		if stream_url:
+			print stream_url
+			sref = eServiceReference(0x1001, 0, stream_url)
+			self.session.nav.playService(sref)
+			self.playing = True
 
 	def lockShow(self):
 		pass
@@ -616,15 +673,17 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"green": self.keyAdd
+			"green": self.keyAdd,
+			"yellow": self.keyPlaymode
 		}, -1)
 		
 		self.keyLocked = True
+		self.playmode = "Next"
 		self["title"] = Label("Canna.to - %s" % self.genreName)
 		self["coverArt"] = Pixmap()
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
-		self["album"] = Label ("%s" % self.genreName)
+		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
 
 		self.filmliste = []
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
@@ -738,7 +797,15 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 					return False
 			else:
 				return False
-				
+
+	def keyPlaymode(self):
+		if self.playmode == "Next":
+			self.playmode = "Random"
+		elif self.playmode == "Random":
+			self.playmode = "Next"
+	
+		self["album"].setText("Playlist      -      Playmode      %s" % self.playmode)
+		
 	def keyOK(self):
 		if self.keyLocked:
 			return
@@ -748,14 +815,16 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 
 		if re.match('.*?-', cannaName):
 			playinfos = cannaName.split(' - ')
-			if len(playinfos) == 2:
-				self["artist"].setText(playinfos[0])
-				self["songtitle"].setText(playinfos[1])
-			else:
-				playinfos = cannaName.split('-')
+			if playinfos:
 				if len(playinfos) == 2:
 					self["artist"].setText(playinfos[0])
 					self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if playinfos:
+					if len(playinfos) == 2:
+						self["artist"].setText(playinfos[0])
+						self["songtitle"].setText(playinfos[1])
 		else:
 			self["artist"].setText(cannaName)
 
@@ -774,8 +843,40 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		
 	def doEofInternal(self, playing):
 		print "Play Next Song.."
-		self['streamlist'].down()
-		self.keyOK()
+		
+		if self.playmode == "Next":
+			self['streamlist'].down()
+		else:
+			count = len(self.filmliste)-1
+			get_random = random.randint(0, int(count))
+			print "Got Random %s" % get_random
+			self['streamlist'].moveToIndex(get_random)
+		
+		cannaName = self['streamlist'].getCurrent()[0][0]
+		cannaUrl = self['streamlist'].getCurrent()[0][1]
+		print cannaName, cannaUrl
+
+		if re.match('.*?-', cannaName):
+			playinfos = cannaName.split(' - ')
+			if playinfos:
+				if len(playinfos) == 2:
+					self["artist"].setText(playinfos[0])
+					self["songtitle"].setText(playinfos[1])
+			else:
+				playinfos = cannaName.split('-')
+				if playinfos:
+					if len(playinfos) == 2:
+						self["artist"].setText(playinfos[0])
+						self["songtitle"].setText(playinfos[1])
+		else:
+			self["artist"].setText(cannaName)
+
+		stream_url = self.getDLurl(cannaUrl)
+		if stream_url:
+			print stream_url
+			sref = eServiceReference(0x1001, 0, stream_url)
+			self.session.nav.playService(sref)
+			self.playing = True
 
 	def lockShow(self):
 		pass
