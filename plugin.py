@@ -66,6 +66,7 @@ from additions.movie25 import *
 from additions.eighties import *
 from additions.teledunet import *
 from additions.geo_de import *
+from additions.deluxemusic import *
 
 # kids
 from additions.kinderkino import *
@@ -201,6 +202,7 @@ config.mediaportal.showMovie25 = ConfigYesNo(default = True)
 config.mediaportal.showEighties = ConfigYesNo(default = True)
 config.mediaportal.showTeledunet = ConfigYesNo(default = True)
 config.mediaportal.showGEOde = ConfigYesNo(default = True)
+config.mediaportal.showDeluxemusic = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -339,6 +341,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige 80s & 90s Music:", config.mediaportal.showEighties))
 		self.configlist.append(getConfigListEntry("Zeige Teledunet:", config.mediaportal.showTeledunet))
 		self.configlist.append(getConfigListEntry("Zeige GEOde:", config.mediaportal.showGEOde))
+		self.configlist.append(getConfigListEntry("Zeige Deluxemusic:", config.mediaportal.showDeluxemusic))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -1661,6 +1664,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Teledunet", "teledunet", "Fun"))
 		if config.mediaportal.showGEOde.value:
 			self.plugin_liste.append(("GEO.de", "geo_de", "Fun"))
+		if config.mediaportal.showDeluxemusic.value:
+			self.plugin_liste.append(("Deluxemusic", "deluxemusic", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2202,6 +2207,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "GEO.de":
 			self.hit_plugin("GEOde")
 			self.session.open(GEOdeGenreScreen)
+		elif auswahl == "Deluxemusic":
+			self.hit_plugin("Deluxemusic")
+			self.session.open(deluxemusicGenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
