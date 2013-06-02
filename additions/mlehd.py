@@ -335,8 +335,8 @@ class mlehdFilmAuswahlScreen(Screen):
 		self.part = self['liste'].getCurrent()[0][0]
 		link = self['liste'].getCurrent()[0][1]
 		
-		if re.match('.*?mightyupload.com/embed', link, re.S)
-			get_stream_link(self.session).check_link(link[0], self.got_link, False)
+		if re.match('.*?mightyupload.com/embed', link, re.S):
+			get_stream_link(self.session).check_link(link, self.got_link, False)
 		else:
 			getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStream).addErrback(self.dataError)
 

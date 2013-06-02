@@ -1542,6 +1542,12 @@ class m4kStreamListeScreen(Screen):
 				print link[0]
 				get_stream_link(self.session).check_link(link[0], self.got_link, False)
 				
+			link = re.findall('<iframe width=".*?" height=".*?" frameborder=".*?" src="(.*?)" scrolling="no"></iframe>', data, re.S)
+			if link:
+				link_found = True
+				print link[0]
+				get_stream_link(self.session).check_link(link[0], self.got_link, False)
+				
 			if not link_found:
 				message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
 			

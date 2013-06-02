@@ -725,7 +725,7 @@ class get_stream_link:
 			self._callback(stream_url[0])
 		else:
 			#re.findall("'(http://.*?primeshare.tv.*?)'", url)
-			stream_url = re.findall("url: '(http://.*?primeshare.tv.*?)'", data, re.S)
+			stream_url = re.findall("provider: 'stream'.*?url: '(http://.*?primeshare.tv.*?)'", data, re.S)
 			if stream_url:
 				self._callback(stream_url[0])
 			else:
@@ -1088,31 +1088,43 @@ class get_stream_link:
 			self.stream_not_found()
 			
 	def filenuke(self, data, url):
-		#print "drin 2"
+		print "drin "
 		id = re.findall('<input type="hidden" name="id".*?value="(.*?)">', data)
 		fname = re.findall('<input type="hidden" name="fname".*?alue="(.*?)">', data)
-		post_data = urllib.urlencode({'op': 'download1', 'usr_login': '', 'id': id[0], 'fname': fname[0], 'referer': '', 'method_free': 'Kostenlos'})
+		post_data = urllib.urlencode({'op': 'download1', 'usr_login': '', 'id': id[0], 'fname': fname[0], 'referer': '', 'method_free': 'free'})
 		#print post_data
 		getPage(url, method='POST', postdata = post_data, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.filenuke_data).addErrback(self.errorload)
 
 	def filenuke_data(self, data):
-		#print "drin"
+		print "drin2"
 		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
 		if get_packedjava:
-			#print get_packedjava
+			print get_packedjava
 			sJavascript = get_packedjava[1]
 			sUnpacked = cJsUnpacker().unpackByString(sJavascript)
 			if sUnpacked:
-				stream_url = re.findall("'file','(.*?)'", sUnpacked)
-				if stream_url:
-					print stream_url[0]
-					self._callback(stream_url[0])		
-				else:
-					self.stream_not_found()
+				print "unpacked"
+				print sUnpacked
+				if re.match('.*?type="video/divx', sUnpacked):
+					print "DDIIIIIIIIIVVVXXX"
+					stream_url = re.findall('type="video/divx"src="(.*?)"', sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
+					else:
+						self.stream_not_found()
+				elif re.match(".*?file", sUnpacked):
+					print "FFFFFFFFLLLLLLLLLLLVVVVVVVV"
+					stream_url = re.findall("file','(.*?)'", sUnpacked)
+					if stream_url:
+						print stream_url[0]
+						self._callback(stream_url[0])
+					else:
+						self.stream_not_found()
 			else:
 				self.stream_not_found()
 		else:
-			self.stream_not_found()		
+			self.stream_not_found()
 		
 	def streamPutlockerSockshare(self, data, url, provider):
 		if re.match('.*?File Does not Exist', data, re.S):
