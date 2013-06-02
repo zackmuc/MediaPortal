@@ -33,7 +33,7 @@ from additions.nhl import *
 from additions.spox import *
 from additions.songsto import *
 from additions.myentertainment import *
-from additions.movie2k import *
+from additions.movie4k import *
 from additions.iStreamws import *
 from additions.mahlzeittv import *
 from additions.appletrailers import *
@@ -167,8 +167,8 @@ config.mediaportal.showNhl = ConfigYesNo(default = True)
 config.mediaportal.showSongsto = ConfigYesNo(default = True)
 config.mediaportal.showMEHD = ConfigYesNo(default = True)
 config.mediaportal.showIStream = ConfigYesNo(default = True)
-config.mediaportal.showM2k = ConfigYesNo(default = True)
-config.mediaportal.showM2kWatchlist = ConfigYesNo(default = False)
+config.mediaportal.showM4k = ConfigYesNo(default = True)
+config.mediaportal.showM4kWatchlist = ConfigYesNo(default = False)
 config.mediaportal.showKinoxWatchlist = ConfigYesNo(default = False)
 config.mediaportal.show4Players = ConfigYesNo(default = True)
 config.mediaportal.showGIGA = ConfigYesNo(default = True)
@@ -231,7 +231,7 @@ config.mediaportal.showhdporn = ConfigYesNo(default = False)
 config.mediaportal.showhotshame = ConfigYesNo(default = False)
 config.mediaportal.showmegaskanks = ConfigYesNo(default = False)
 config.mediaportal.showIStreamPorn = ConfigYesNo(default = False)
-config.mediaportal.showM2kPorn = ConfigYesNo(default = False)
+config.mediaportal.showM4kPorn = ConfigYesNo(default = False)
 config.mediaportal.showpinkrod = ConfigYesNo(default = False)
 config.mediaportal.showplayporn = ConfigYesNo(default = False)
 config.mediaportal.showpornostreams = ConfigYesNo(default = False)
@@ -301,7 +301,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Stream-Oase:", config.mediaportal.showStreamOase))
 		self.configlist.append(getConfigListEntry("Zeige Burning-Series:", config.mediaportal.showBs))
 		self.configlist.append(getConfigListEntry("Zeige Kinox:", config.mediaportal.showKinox))
-		self.configlist.append(getConfigListEntry("Zeige Movie2k:", config.mediaportal.showM2k))
+		self.configlist.append(getConfigListEntry("Zeige Movie4k:", config.mediaportal.showM4k))
 		self.configlist.append(getConfigListEntry("Zeige Cinestream:", config.mediaportal.showCinestream))
 		self.configlist.append(getConfigListEntry("Zeige MLE-HD:", config.mediaportal.showmlehd))
 		self.configlist.append(getConfigListEntry("Zeige 1channel:", config.mediaportal.show1channel))
@@ -310,7 +310,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		
 		self.configlist.append(getConfigListEntry("----- Watchlist -----", config.mediaportal.fake_entry))
 		self.configlist.append(getConfigListEntry("Zeige Kinox Watchlist:", config.mediaportal.showKinoxWatchlist))
-		self.configlist.append(getConfigListEntry("Zeige Movie2k Watchlist:", config.mediaportal.showM2kWatchlist))
+		self.configlist.append(getConfigListEntry("Zeige Movie4k Watchlist:", config.mediaportal.showM4kWatchlist))
 		
 		### Sport
 		self.configlist.append(getConfigListEntry("----- Sport -----", config.mediaportal.fake_entry))
@@ -401,7 +401,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige hotshame:", config.mediaportal.showhotshame))
 		self.configlist.append(getConfigListEntry("Zeige MegaSkanks:", config.mediaportal.showmegaskanks))
 		self.configlist.append(getConfigListEntry("Zeige IStream-XXX:", config.mediaportal.showIStreamPorn))
-		self.configlist.append(getConfigListEntry("Zeige Movie2k-XXX:", config.mediaportal.showM2kPorn))
+		self.configlist.append(getConfigListEntry("Zeige Movie4k-XXX:", config.mediaportal.showM4kPorn))
 		self.configlist.append(getConfigListEntry("Zeige Pinkrod:", config.mediaportal.showpinkrod))
 		self.configlist.append(getConfigListEntry("Zeige PlayPorn:", config.mediaportal.showplayporn))
 		self.configlist.append(getConfigListEntry("Zeige PornoStreams:", config.mediaportal.showpornostreams))
@@ -604,8 +604,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("StreamOase", "streamoase"))
 		if config.mediaportal.showMEHD.value:
 			self.grauzone.append(self.hauptListEntry("My-Entertainment", "mehd"))
-		if config.mediaportal.showM2k.value:
-			self.grauzone.append(self.hauptListEntry("Movie2k", "movie2k"))
+		if config.mediaportal.showM4k.value:
+			self.grauzone.append(self.hauptListEntry("Movie4k", "movie4k"))
 		if config.mediaportal.showKinox.value:
 			self.grauzone.append(self.hauptListEntry("Kinox", "kinox"))
 		if config.mediaportal.showCinestream.value:
@@ -620,8 +620,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.grauzone.append(self.hauptListEntry("Baskino", "baskino"))
 		if config.mediaportal.show1channel.value:
 			self.grauzone.append(self.hauptListEntry("1channel", "1channel"))
-		if config.mediaportal.showM2kWatchlist.value:
-			self.grauzone.append(self.hauptListEntry("Movie2k Watchlist", "movie2kwatchlist"))
+		if config.mediaportal.showM4kWatchlist.value:
+			self.grauzone.append(self.hauptListEntry("Movie4k Watchlist", "movie4kwatchlist"))
 		if config.mediaportal.showKinoxWatchlist.value:
 			self.grauzone.append(self.hauptListEntry("Kinox Watchlist", "kinoxwatchlist"))
 		if config.mediaportal.showDdlme.value:
@@ -714,8 +714,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.porn.append(self.hauptListEntry("MegaSkanks", "megaskanks"))
 		if config.mediaportal.showIStreamPorn.value:
 			self.porn.append(self.hauptListEntry("IStream-XXX", "istreamporn"))
-		if config.mediaportal.showM2kPorn.value:
-			self.porn.append(self.hauptListEntry("Movie2k-XXX", "movie2kporn"))
+		if config.mediaportal.showM4kPorn.value:
+			self.porn.append(self.hauptListEntry("Movie4k-XXX", "movie4kporn"))
 		if config.mediaportal.showpinkrod.value:
 			self.porn.append(self.hauptListEntry("Pinkrod", "pinkrod"))
 		if config.mediaportal.showplayporn.value:
@@ -1057,10 +1057,10 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(showMEHDGenre)
 		elif auswahl == "Songs.to":
 			self.session.open(showSongstoGenre)
-		elif auswahl == "Movie2k":
-			self.session.open(m2kGenreScreen, "default")
-		elif auswahl == "Movie2k Watchlist":
-			self.session.open(m2kWatchlist)
+		elif auswahl == "Movie4k":
+			self.session.open(m4kGenreScreen, "default")
+		elif auswahl == "Movie4k Watchlist":
+			self.session.open(m4kWatchlist)
 		elif auswahl == "IStream":
 			self.session.open(showIStreamGenre, "default")
 		elif auswahl == "mahlzeit.tv":
@@ -1216,11 +1216,11 @@ class haupt_Screen(Screen, ConfigListScreen):
 				self.session.openWithCallback(self.pinistreamporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
 				self.session.open(showIStreamGenre, "porn")
-		elif auswahl == "Movie2k-XXX":
+		elif auswahl == "Movie4k-XXX":
 			if config.mediaportal.pornpin.value:
-				self.session.openWithCallback(self.pinmovie2kporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+				self.session.openWithCallback(self.pinmovie4kporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
-				self.session.open(m2kGenreScreen, "porn")
+				self.session.open(m4kGenreScreen, "porn")
 		elif auswahl == "Pinkrod":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinpinkrod, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -1354,9 +1354,9 @@ class haupt_Screen(Screen, ConfigListScreen):
 		if pincode:
 			self.session.open(megaskanksGenreScreen)
 
-	def pinmovie2kporn(self, pincode):
+	def pinmovie4kporn(self, pincode):
 		if pincode:
-			self.session.open(m2kGenreScreen, "porn")
+			self.session.open(m4kGenreScreen, "porn")
 
 	def pinistreamporn(self, pincode):
 		if pincode:
@@ -1566,8 +1566,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		# Grauzone
 		if config.mediaportal.showMEHD.value:
 			self.plugin_liste.append(("My-Entertainment", "mehd", "Grauzone"))
-		if config.mediaportal.showM2k.value:
-			self.plugin_liste.append(("Movie2k", "movie2k", "Grauzone"))
+		if config.mediaportal.showM4k.value:
+			self.plugin_liste.append(("Movie4k", "movie4k", "Grauzone"))
 		if config.mediaportal.showIStream.value:
 			self.plugin_liste.append(("IStream", "istream", "Grauzone"))
 		if config.mediaportal.showSzeneStreams.value:
@@ -1578,8 +1578,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("ddl.me", "ddl_me", "Grauzone"))
 			
 		# Watchlisten - Grauzone
-		if config.mediaportal.showM2kWatchlist.value:
-			self.plugin_liste.append(("Movie2k Watchlist", "movie2kwatchlist", "Grauzone"))
+		if config.mediaportal.showM4kWatchlist.value:
+			self.plugin_liste.append(("Movie4k Watchlist", "movie4kwatchlist", "Grauzone"))
 		if config.mediaportal.showKinoxWatchlist.value:
 			self.plugin_liste.append(("Kinox Watchlist", "kinoxwatchlist", "Grauzone"))
 		if config.mediaportal.showMovie25.value:
@@ -1727,8 +1727,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("MegaSkanks", "megaskanks", "Porn"))
 		if config.mediaportal.showIStreamPorn.value:
 			self.plugin_liste.append(("IStream-XXX", "istreamporn", "Porn"))
-		if config.mediaportal.showM2kPorn.value:
-			self.plugin_liste.append(("Movie2k-XXX", "movie2kporn", "Porn"))
+		if config.mediaportal.showM4kPorn.value:
+			self.plugin_liste.append(("Movie4k-XXX", "movie4kporn", "Porn"))
 		if config.mediaportal.showpinkrod.value:
 			self.plugin_liste.append(("Pinkrod", "pinkrod", "Porn"))
 		if config.mediaportal.showplayporn.value:
@@ -2124,12 +2124,12 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Songs.to":
 			self.hit_plugin("Songs.to")
 			self.session.open(showSongstoGenre)
-		elif auswahl == "Movie2k":
-			self.hit_plugin("Movie2k")
-			self.session.open(m2kGenreScreen, "default")
-		elif auswahl == "Movie2k Watchlist":
-			self.hit_plugin("Movie2k Watchlist")
-			self.session.open(m2kWatchlist)
+		elif auswahl == "Movie4k":
+			self.hit_plugin("Movie4k")
+			self.session.open(m4kGenreScreen, "default")
+		elif auswahl == "Movie4k Watchlist":
+			self.hit_plugin("Movie4k Watchlist")
+			self.session.open(m4kWatchlist)
 		elif auswahl == "IStream":
 			self.hit_plugin("IStream")
 			self.session.open(showIStreamGenre, "default")
@@ -2341,12 +2341,12 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			else:
 				self.hit_plugin("IStream-XXX")
 				self.session.open(showIStreamGenre, "porn")
-		elif auswahl == "Movie2k-XXX":
+		elif auswahl == "Movie4k-XXX":
 			if config.mediaportal.pornpin.value:
-				self.session.openWithCallback(self.pinmovie2kporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+				self.session.openWithCallback(self.pinmovie4kporn, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 			else:
-				self.hit_plugin("Movie2k-XXX")
-				self.session.open(m2kGenreScreen, "porn")
+				self.hit_plugin("Movie4k-XXX")
+				self.session.open(m4kGenreScreen, "porn")
 		elif auswahl == "Pinkrod":
 			if config.mediaportal.pornpin.value:
 				self.session.openWithCallback(self.pinpinkrod, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -2514,10 +2514,10 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.hit_plugin("IStream-XXX")
 			self.session.open(showIStreamGenre, "porn")
 
-	def pinmovie2kporn(self, pincode):
+	def pinmovie4kporn(self, pincode):
 		if pincode:
-			self.hit_plugin("Movie2k-XXX")
-			self.session.open(m2kGenreScreen, "porn")
+			self.hit_plugin("Movie4k-XXX")
+			self.session.open(m4kGenreScreen, "porn")
 			
 	def pinpinkrod(self, pincode):
 		if pincode:

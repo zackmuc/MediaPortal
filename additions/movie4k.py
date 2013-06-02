@@ -7,17 +7,17 @@ if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/TMDb/plugin.pyo'):
 else:
     TMDbPresent = False
 
-def m2kGenreListEntry(entry):
+def m4kGenreListEntry(entry):
 	return [entry,
 		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 900, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
 		]
 
-def m2kLetterEntry(entry):
+def m4kLetterEntry(entry):
 	return [entry,
 		(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 830, 25, 0, RT_HALIGN_CENTER, entry)
 		]
 
-def m2kFilmListEntry2(entry):
+def m4kFilmListEntry2(entry):
 	png = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/%s.png" % entry[2]
 	if fileExists(png):
 		flag = LoadPixmap(png)	
@@ -30,12 +30,12 @@ def m2kFilmListEntry2(entry):
 			(eListboxPythonMultiContent.TYPE_TEXT, 30, 0, 880, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
 			]
 		
-def m2kSerienABCEntry(entry):
+def m4kSerienABCEntry(entry):
 	flag_name = False
 
-	if entry[2] == "http://img.movie2k.to/img/us_flag_small.png":
+	if entry[2] == "http://img.movie4k.to/img/us_flag_small.png":
 		flag_name = "2.png"
-	elif entry[2] == "http://img.movie2k.to/img/us_ger_small.png":
+	elif entry[2] == "http://img.movie4k.to/img/us_ger_small.png":
 		flag_name = "1.png"
 
 	if flag_name:
@@ -50,16 +50,16 @@ def m2kSerienABCEntry(entry):
 			(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 900, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
 			]
 
-def m2kSerienABCStaffelnEntry(entry):
+def m4kSerienABCStaffelnEntry(entry):
 	return [entry,
 		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 900, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
 		]
 
-def m2kFilmListEntry(entry):
+def m4kFilmListEntry(entry):
 	return [entry,
 		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 900, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
 		] 
-def m2kWatchSeriesListEntry(entry):
+def m4kWatchSeriesListEntry(entry):
 	if int(entry[4]) != 0:
 		new_eps = str(entry[4])
 	else:
@@ -79,14 +79,14 @@ def m2kWatchSeriesListEntry(entry):
 			(eListboxPythonMultiContent.TYPE_TEXT, 800, 0, 50, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, new_eps)
 			]
 
-class m2kGenreScreen(Screen):
+class m4kGenreScreen(Screen):
 	
 	def __init__(self, session, mode):
 		self.session = session
-		self.showM2kPorn = mode
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kGenreScreen.xml" % config.mediaportal.skin.value
+		self.showM4kPorn = mode
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kGenreScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kGenreScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kGenreScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -99,7 +99,7 @@ class m2kGenreScreen(Screen):
 			"cancel": self.keyCancel
 		}, -1)
 		
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Genre Auswahl")
 		self['coverArt'] = Pixmap()
 		
@@ -113,92 +113,92 @@ class m2kGenreScreen(Screen):
 		self.onLayoutFinish.append(self.layoutFinished)
 		
 	def layoutFinished(self):
-		if self.showM2kPorn == "porn":
-			self.genreliste.append(("Letzte Updates (XXX)", "http://www.movie2k.to/xxx-updates.html"))
-			self.genreliste.append(('Pornos', 'http://www.movie2k.to/genres-xxx.html'))
+		if self.showM4kPorn == "porn":
+			self.genreliste.append(("Letzte Updates (XXX)", "http://www.movie4k.to/xxx-updates.html"))
+			self.genreliste.append(('Pornos', 'http://www.movie4k.to/genres-xxx.html'))
 		else:
 			self.genreliste.append(("Watchlist", "Watchlist"))
-			self.genreliste.append(("Kinofilme", "http://www.movie2k.to/index.php?lang=de"))
-			self.genreliste.append(("Videofilme", "http://www.movie2k.to/index.php?lang=de"))
-			self.genreliste.append(("Neue Updates (Filme)", "http://www.movie2k.to/movies-updates-"))
-			self.genreliste.append(("Empfohlene Serien", "http://www.movie2k.to/tvshows_featured.php"))
-			self.genreliste.append(("Letzte Updates (Serien)", "http://www.movie2k.to/tvshows_featured.php"))
+			self.genreliste.append(("Kinofilme", "http://www.movie4k.to/index.php?lang=de"))
+			self.genreliste.append(("Videofilme", "http://www.movie4k.to/index.php?lang=de"))
+			self.genreliste.append(("Neue Updates (Filme)", "http://www.movie4k.to/movies-updates-"))
+			self.genreliste.append(("Empfohlene Serien", "http://www.movie4k.to/tvshows_featured.php"))
+			self.genreliste.append(("Letzte Updates (Serien)", "http://www.movie4k.to/tvshows_featured.php"))
 			self.genreliste.append(("Alle Filme A-Z", "FilmeAZ"))
 			self.genreliste.append(("Alle Serien A-Z", "SerienAZ"))
-			self.genreliste.append(("Suche", "http://www.movie2k.com/movies.php?list=search"))
-			self.genreliste.append(("Abenteuer", "http://movie2k.to/movies-genre-4-"))
-			self.genreliste.append(("Action", "http://movie2k.to/movies-genre-1-"))
-			self.genreliste.append(('Biografie', 'http://movie2k.to/movies-genre-6-'))
-			self.genreliste.append(('Bollywood', 'http://movie2k.to/movies-genre-27-'))
-			self.genreliste.append(('Dokumentation', 'http://movie2k.to/movies-genre-8-'))
-			self.genreliste.append(('Drama', 'http://movie2k.to/movies-genre-2-'))
-			self.genreliste.append(('Erwachsene', 'http://movie2k.to/movies-genre-58-'))
-			self.genreliste.append(('Familie', 'http://movie2k.to/movies-genre-9-'))
-			self.genreliste.append(('Fantasy', 'http://movie2k.to/movies-genre-10-'))
-			self.genreliste.append(('Film Noir', 'http://movie2k.to/movies-genre-60-'))
-			self.genreliste.append(('Game Show', 'http://movie2k.to/movies-genre-61-'))
-			self.genreliste.append(('History', 'http://movie2k.to/movies-genre-13-'))
-			self.genreliste.append(('Horror', 'http://movie2k.to/movies-genre-14-'))
-			self.genreliste.append(('Comedy', 'http://movie2k.to/movies-genre-3-'))
-			self.genreliste.append(('Kriegsfilme', 'http://movie2k.to/movies-genre-24-'))
-			self.genreliste.append(('Krimi', 'http://movie2k.to/movies-genre-7-'))
-			self.genreliste.append(('Kurzfilme', 'http://movie2k.to/movies-genre-55-'))
-			self.genreliste.append(('Musicals', 'http://movie2k.to/movies-genre-56-'))
-			self.genreliste.append(('Musik', 'http://movie2k.to/movies-genre-15-'))
-			self.genreliste.append(('Mystery', 'http://movie2k.to/movies-genre-17-'))
-			self.genreliste.append(('News', 'http://movie2k.to/movies-genre-62-'))
-			self.genreliste.append(('Reality TV', 'http://movie2k.to/movies-genre-59-'))
-			self.genreliste.append(('Romanzen', 'http://movie2k.to/movies-genre-20-'))
-			self.genreliste.append(('Sci-Fy', 'http://movie2k.to/movies-genre-21-'))
-			self.genreliste.append(('Andere', 'http://movie2k.to/movies-'))
-			self.genreliste.append(('Sport', 'http://movie2k.to/movies-'))
-			self.genreliste.append(('Talk Shows', 'http://movie2k.to/movies-genre-63-'))
-			self.genreliste.append(('Thriller', 'http://movie2k.to/movies-genre-23-'))
-			self.genreliste.append(('Animation', 'http://movie2k.to/movies-genre-5-'))
-			self.genreliste.append(('Western', 'http://movie2k.to/movies-genre-25-'))
-		self.chooseMenuList.setList(map(m2kGenreListEntry, self.genreliste))
+			self.genreliste.append(("Suche", "http://www.movie4k.com/movies.php?list=search"))
+			self.genreliste.append(("Abenteuer", "http://movie4k.to/movies-genre-4-"))
+			self.genreliste.append(("Action", "http://movie4k.to/movies-genre-1-"))
+			self.genreliste.append(('Biografie', 'http://movie4k.to/movies-genre-6-'))
+			self.genreliste.append(('Bollywood', 'http://movie4k.to/movies-genre-27-'))
+			self.genreliste.append(('Dokumentation', 'http://movie4k.to/movies-genre-8-'))
+			self.genreliste.append(('Drama', 'http://movie4k.to/movies-genre-2-'))
+			self.genreliste.append(('Erwachsene', 'http://movie4k.to/movies-genre-58-'))
+			self.genreliste.append(('Familie', 'http://movie4k.to/movies-genre-9-'))
+			self.genreliste.append(('Fantasy', 'http://movie4k.to/movies-genre-10-'))
+			self.genreliste.append(('Film Noir', 'http://movie4k.to/movies-genre-60-'))
+			self.genreliste.append(('Game Show', 'http://movie4k.to/movies-genre-61-'))
+			self.genreliste.append(('History', 'http://movie4k.to/movies-genre-13-'))
+			self.genreliste.append(('Horror', 'http://movie4k.to/movies-genre-14-'))
+			self.genreliste.append(('Comedy', 'http://movie4k.to/movies-genre-3-'))
+			self.genreliste.append(('Kriegsfilme', 'http://movie4k.to/movies-genre-24-'))
+			self.genreliste.append(('Krimi', 'http://movie4k.to/movies-genre-7-'))
+			self.genreliste.append(('Kurzfilme', 'http://movie4k.to/movies-genre-55-'))
+			self.genreliste.append(('Musicals', 'http://movie4k.to/movies-genre-56-'))
+			self.genreliste.append(('Musik', 'http://movie4k.to/movies-genre-15-'))
+			self.genreliste.append(('Mystery', 'http://movie4k.to/movies-genre-17-'))
+			self.genreliste.append(('News', 'http://movie4k.to/movies-genre-62-'))
+			self.genreliste.append(('Reality TV', 'http://movie4k.to/movies-genre-59-'))
+			self.genreliste.append(('Romanzen', 'http://movie4k.to/movies-genre-20-'))
+			self.genreliste.append(('Sci-Fy', 'http://movie4k.to/movies-genre-21-'))
+			self.genreliste.append(('Andere', 'http://movie4k.to/movies-'))
+			self.genreliste.append(('Sport', 'http://movie4k.to/movies-'))
+			self.genreliste.append(('Talk Shows', 'http://movie4k.to/movies-genre-63-'))
+			self.genreliste.append(('Thriller', 'http://movie4k.to/movies-genre-23-'))
+			self.genreliste.append(('Animation', 'http://movie4k.to/movies-genre-5-'))
+			self.genreliste.append(('Western', 'http://movie4k.to/movies-genre-25-'))
+		self.chooseMenuList.setList(map(m4kGenreListEntry, self.genreliste))
 
 	def keyOK(self):
 		streamGenreName = self['genreList'].getCurrent()[0][0]
 		streamGenreLink = self['genreList'].getCurrent()[0][1]
 		
 		if streamGenreName == "Watchlist":
-			self.session.open(m2kWatchlist)
+			self.session.open(m4kWatchlist)
 		elif streamGenreName == "Kinofilme":
-			self.session.open(m2kKinoFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kKinoFilmeListeScreen, streamGenreLink)
 		elif streamGenreName == "Videofilme":
-			self.session.open(m2kVideoFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kVideoFilmeListeScreen, streamGenreLink)
 		elif streamGenreName == "Letzte Updates (Filme)":
-			self.session.open(m2kupdateFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kupdateFilmeListeScreen, streamGenreLink)
 		elif streamGenreName == "Empfohlene Serien":
-			self.session.open(m2kTopSerienFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kTopSerienFilmeListeScreen, streamGenreLink)
 		elif streamGenreName == "Letzte Updates (Serien)":
-			self.session.open(m2kSerienUpdateFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kSerienUpdateFilmeListeScreen, streamGenreLink)
 		elif streamGenreName == "Alle Serien A-Z":
-			self.session.open(m2kSerienABCAuswahl, streamGenreLink)
+			self.session.open(m4kSerienABCAuswahl, streamGenreLink)
 		elif streamGenreName == "Alle Filme A-Z":
-			self.session.open(m2kSerienABCAuswahl, streamGenreLink)
-		elif streamGenreLink == 'http://www.movie2k.com/movies.php?list=search':
+			self.session.open(m4kSerienABCAuswahl, streamGenreLink)
+		elif streamGenreLink == 'http://www.movie4k.com/movies.php?list=search':
 			self.streamGenreLink = streamGenreLink
 			self.session.openWithCallback(self.searchCallback, VirtualKeyBoard, title = (_("Suchbegriff eingeben")), text = " ")
 		elif streamGenreName == "Letzte Updates (XXX)":
-			self.session.open(m2kXXXUpdateFilmeListeScreen, streamGenreLink, '')
+			self.session.open(m4kXXXUpdateFilmeListeScreen, streamGenreLink, '')
 		elif streamGenreName == "Pornos":
-			self.session.open(m2kKinoAlleFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kKinoAlleFilmeListeScreen, streamGenreLink)
 		else:
-			self.session.open(m2kKinoAlleFilmeListeScreen, streamGenreLink)
+			self.session.open(m4kKinoAlleFilmeListeScreen, streamGenreLink)
 			
 	def searchCallback(self, callbackStr):
 		if callbackStr is not None:
 			self.searchStr = callbackStr
 			url = self.streamGenreLink
 			self.searchData = self.searchStr
-			self.session.open(m2kSucheAlleFilmeListeScreen, url, self.searchData)
+			self.session.open(m4kSucheAlleFilmeListeScreen, url, self.searchData)
 			
 	def keyCancel(self):
 		self.close()
 		
-class m2kWatchlist(Screen):
+class m4kWatchlist(Screen):
 	
 	def __init__(self, session):
 		self.session = session
@@ -222,7 +222,7 @@ class m2kWatchlist(Screen):
 		}, -1)
 		
 		self['title'] = Label("Watchlist")
-		self['leftContentTitle'] = Label("Movie2k Watchlist")
+		self['leftContentTitle'] = Label("Movie4k Watchlist")
 		self['stationIcon'] = Pixmap()
 		self['handlung'] = Label("")
 		self['name'] = Label("")
@@ -238,8 +238,8 @@ class m2kWatchlist(Screen):
 
 	def loadPlaylist(self):
 		self.streamList = []
-		if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-			readStations = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist","r")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+			readStations = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist","r")
 			for rawData in readStations.readlines():
 				data = re.findall('"(.*?)" "(.*?)" "(.*?)" "(.*?)"', rawData, re.S)
 				if data:
@@ -247,7 +247,7 @@ class m2kWatchlist(Screen):
 					self.streamList.append((stationName, stationLink, stationLang, stationTotaleps, "0"))
 			print "Load Watchlist.."
 			self.streamList.sort()
-			self.streamMenuList.setList(map(m2kWatchSeriesListEntry, self.streamList))
+			self.streamMenuList.setList(map(m4kWatchSeriesListEntry, self.streamList))
 			readStations.close()
 			self.keyLocked = False
 			
@@ -255,11 +255,11 @@ class m2kWatchlist(Screen):
 		self.count = len(self.streamList)
 		self.counting = 0
 		
-		if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist.tmp"):
-			self.write_tmp = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist.tmp" , "a")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist.tmp"):
+			self.write_tmp = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist.tmp" , "a")
 			self.write_tmp.truncate(0)
 		else:
-			self.write_tmp = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist.tmp" , "a")
+			self.write_tmp = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist.tmp" , "a")
 					
 		if len(self.streamList) != 0:
 			self.keyLocked = True
@@ -295,14 +295,14 @@ class m2kWatchlist(Screen):
 		
 		self.streamList2.append((sname, surl, slang, str(stotaleps), str(new_eps)))
 		self.streamList2.sort()
-		self.streamMenuList.setList(map(m2kWatchSeriesListEntry, self.streamList2))
+		self.streamMenuList.setList(map(m4kWatchSeriesListEntry, self.streamList2))
 
 		print self.counting, self.count
 		if self.counting == self.count:
 			print "update done."
 			self['title'].setText("Update done.")
 			self.write_tmp.close()
-			shutil.move(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist.tmp", config.mediaportal.watchlistpath.value+"mp_m2k_watchlist")
+			shutil.move(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist.tmp", config.mediaportal.watchlistpath.value+"mp_m4k_watchlist")
 			self.keyLocked = False
 			
 		if last_new_ep:
@@ -326,7 +326,7 @@ class m2kWatchlist(Screen):
 		stream_name = self['streamlist'].getCurrent()[0][0]
 		url = self['streamlist'].getCurrent()[0][1]
 		print stream_name, url
-		self.session.open(m2kEpisodenListeScreen, url, stream_name)
+		self.session.open(m4kEpisodenListeScreen, url, stream_name)
 			
 	def keyDel(self):
 		exist = self['streamlist'].getCurrent()
@@ -335,9 +335,9 @@ class m2kWatchlist(Screen):
 		
 		selectedName = self['streamlist'].getCurrent()[0][0]
 
-		writeTmp = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist.tmp","w")
-		if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-			readStations = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist","r")
+		writeTmp = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist.tmp","w")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+			readStations = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist","r")
 			for rawData in readStations.readlines():
 				data = re.findall('"(.*?)" "(.*?)" "(.*?)" "(.*?)"', rawData, re.S)
 				if data:
@@ -346,21 +346,21 @@ class m2kWatchlist(Screen):
 						writeTmp.write('"%s" "%s" "%s" "%s"\n' % (stationName, stationLink, stationLang, stationTotaleps))
 			readStations.close()
 			writeTmp.close()
-			shutil.move(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist.tmp", config.mediaportal.watchlistpath.value+"mp_m2k_watchlist")
+			shutil.move(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist.tmp", config.mediaportal.watchlistpath.value+"mp_m4k_watchlist")
 			self.loadPlaylist()
 				
 	def keyCancel(self):
 		self.close()
 		
-class m2kSucheAlleFilmeListeScreen(Screen):
+class m4kSucheAlleFilmeListeScreen(Screen):
 	
 	def __init__(self, session, searchUrl, searchData):
 		self.session = session
 		self.searchUrl = searchUrl
 		self.searchData = searchData
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultPageListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultPageListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultPageListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultPageListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -381,7 +381,7 @@ class m2kSucheAlleFilmeListeScreen(Screen):
 			"red" : self.keyTMDbInfo
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Filme Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -408,10 +408,10 @@ class m2kSucheAlleFilmeListeScreen(Screen):
 		if kino:
 			self.filmliste = []
 			for image, teil_url, title in kino:
-				url = '%s%s' % ('http://www.movie2k.to/', teil_url)
+				url = '%s%s' % ('http://www.movie4k.to/', teil_url)
 				print title
 				self.filmliste.append((decodeHtml(title), url, image))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self['page'].setText(str(self.page))
 
@@ -461,7 +461,7 @@ class m2kSucheAlleFilmeListeScreen(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kStreamListeScreen, streamLink, streamName, "movie")
+		self.session.open(m4kStreamListeScreen, streamLink, streamName, "movie")
 
 	def keyTMDbInfo(self):
 		if TMDbPresent:
@@ -508,14 +508,14 @@ class m2kSucheAlleFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kKinoAlleFilmeListeScreen(Screen):
+class m4kKinoAlleFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultPageListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultPageListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultPageListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultPageListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -536,7 +536,7 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 			"red" : self.keyTMDbInfo
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Filme Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -553,7 +553,7 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 
 	def loadPage(self):
 		url = ''
-		if self.streamGenreLink == 'http://www.movie2k.to/genres-xxx.html':
+		if self.streamGenreLink == 'http://www.movie4k.to/genres-xxx.html':
 			url = str(self.streamGenreLink)
 			getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadXXXPageData).addErrback(self.dataError)
 		else:
@@ -569,10 +569,10 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 		if xxxGenre:
 			self.filmliste = []
 			for teil_url, title in xxxGenre:
-				url = '%s%s' % ('http://www.movie2k.to/', teil_url)
+				url = '%s%s' % ('http://www.movie4k.to/', teil_url)
 				title.replace("\t","")
 				self.filmliste.append((decodeHtml(title), url))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self['page'].setText(str(self.page))
 
@@ -582,10 +582,10 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 		if kino:
 			self.filmliste = []
 			for image, teil_url, title in kino:
-				url = '%s%s' % ('http://www.movie2k.to/', teil_url)
+				url = '%s%s' % ('http://www.movie4k.to/', teil_url)
 				print title
 				self.filmliste.append((decodeHtml(title), url, image))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self['page'].setText(str(self.page))
 			if self.XXX == False:
@@ -638,11 +638,11 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 		if self.XXX == False:
 			streamName = self['filmList'].getCurrent()[0][0]
 			streamLink = self['filmList'].getCurrent()[0][1]
-			self.session.open(m2kStreamListeScreen, streamLink, streamName, "movie")
+			self.session.open(m4kStreamListeScreen, streamLink, streamName, "movie")
 		else:
 			xxxGenreName = self['filmList'].getCurrent()[0][0]
 			xxxGenreLink = self['filmList'].getCurrent()[0][1]
-			self.session.open(m2kXXXUpdateFilmeListeScreen, xxxGenreLink, 'X')
+			self.session.open(m4kXXXUpdateFilmeListeScreen, xxxGenreLink, 'X')
 
 	def keyTMDbInfo(self):
 		if TMDbPresent:
@@ -695,14 +695,14 @@ class m2kKinoAlleFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kKinoFilmeListeScreen(Screen):
+class m4kKinoFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -720,7 +720,7 @@ class m2kKinoFilmeListeScreen(Screen):
 			"red" : self.keyTMDbInfo
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Filme Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -745,10 +745,10 @@ class m2kKinoFilmeListeScreen(Screen):
 		kino = re.findall('<div style="float:left"><a href="(.*?)" ><img src="(.*?)" border=0 style="width:105px;max-width:105px;max-height:160px;min-height:140px;" alt=".*?kostenlos" title="(.*?).kostenlos"></a>', data, re.S)
 		if kino:
 			for url,image,title in kino:
-				url = "%s%s" % ("http://www.movie2k.to/", url)
+				url = "%s%s" % ("http://www.movie4k.to/", url)
 				print title
 				self.filmliste.append((decodeHtml(title), url, image))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self.loadPic()
 
@@ -787,7 +787,7 @@ class m2kKinoFilmeListeScreen(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kStreamListeScreen, streamLink, streamName, "movie")
+		self.session.open(m4kStreamListeScreen, streamLink, streamName, "movie")
 
 	def keyTMDbInfo(self):
 		if TMDbPresent:
@@ -821,14 +821,14 @@ class m2kKinoFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kVideoFilmeListeScreen(Screen):
+class m4kVideoFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -846,7 +846,7 @@ class m2kVideoFilmeListeScreen(Screen):
 			"red" : self.keyTMDbInfo
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Filme Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -871,10 +871,10 @@ class m2kVideoFilmeListeScreen(Screen):
 		video = re.findall('<div style="float: left;"><a href="(.*?)" ><img src="(.*?)" alt=".*?" title="(.*?)" border="0" style="width:105px;max-width:105px;max-height:160px;min-height:140px;"></a>', data, re.S)
 		if video:
 			for url,image,title in video:
-				url = "%s%s" % ("http://www.movie2k.to/", url)
+				url = "%s%s" % ("http://www.movie4k.to/", url)
 				print title
 				self.filmliste.append((decodeHtml(title), url, image))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self.loadPic()
 
@@ -913,7 +913,7 @@ class m2kVideoFilmeListeScreen(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kStreamListeScreen, streamLink, streamName, "movie")
+		self.session.open(m4kStreamListeScreen, streamLink, streamName, "movie")
 
 	def keyTMDbInfo(self):
 		if TMDbPresent:
@@ -947,14 +947,14 @@ class m2kVideoFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kupdateFilmeListeScreen(Screen):
+class m4kupdateFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -972,7 +972,7 @@ class m2kupdateFilmeListeScreen(Screen):
 			"red" : self.keyTMDbInfo
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Filme Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -997,10 +997,10 @@ class m2kupdateFilmeListeScreen(Screen):
 		updates = re.findall('<td valign="top" height="100%"><a href="(.*?)" ><font color="#000000" size="-1"><strong>(.*?)</strong></font></a></td>', data, re.S)
 		if updates:
 			for url,title in updates:
-				url = "%s%s" % ("http://www.movie2k.to/", url)
+				url = "%s%s" % ("http://www.movie4k.to/", url)
 				print title
 				self.filmliste.append((decodeHtml(title), url))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self.loadPic()
 
@@ -1041,7 +1041,7 @@ class m2kupdateFilmeListeScreen(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kStreamListeScreen, streamLink, streamName, "movie")
+		self.session.open(m4kStreamListeScreen, streamLink, streamName, "movie")
 
 	def keyTMDbInfo(self):
 		if TMDbPresent:
@@ -1075,14 +1075,14 @@ class m2kupdateFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kTopSerienFilmeListeScreen(Screen):
+class m4kTopSerienFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kTopSerienFilmeListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kTopSerienFilmeListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kTopSerienFilmeListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kTopSerienFilmeListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -1100,7 +1100,7 @@ class m2kTopSerienFilmeListeScreen(Screen):
 			"green" : self.keyAdd
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Serien Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -1113,13 +1113,13 @@ class m2kTopSerienFilmeListeScreen(Screen):
 		self.chooseMenuList.l.setItemHeight(25)
 		self['filmList'] = self.chooseMenuList
 		
-		self.onLayoutFinish.append(self.m2kcookie)
+		self.onLayoutFinish.append(self.m4kcookie)
 
-	def m2kcookie(self):
-		url = "http://www.movie2k.to/index.php?lang=de"
-		getPage(url, agent=std_headers, cookies=self.keckse, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getm2kcookie).addErrback(self.dataError)
+	def m4kcookie(self):
+		url = "http://www.movie4k.to/index.php?lang=de"
+		getPage(url, agent=std_headers, cookies=self.keckse, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getm4kcookie).addErrback(self.dataError)
 		
-	def getm2kcookie(self, data):
+	def getm4kcookie(self, data):
 		self.loadPage()
 
 	def loadPage(self):
@@ -1130,13 +1130,13 @@ class m2kTopSerienFilmeListeScreen(Screen):
 
 	def loadPageData(self, data):
 		print "daten bekommen"
-		serien = re.findall('<div style="float:left"><a href="(.*?)"><img src="(.*?)" border=0 width=105 height=150 alt=".*?" title="(.*?)"></a>.*?<img src="http://img.movie2k.to/img/(.*?).png"', data, re.S)
+		serien = re.findall('<div style="float:left"><a href="(.*?)"><img src="(.*?)" border=0 width=105 height=150 alt=".*?" title="(.*?)"></a>.*?<img src="http://img.movie4k.to/img/(.*?).png"', data, re.S)
 		if serien:
 			for url,image,title,lang in serien:
-				url = "%s%s" % ("http://www.movie2k.to/", url)
+				url = "%s%s" % ("http://www.movie4k.to/", url)
 				print title
 				self.filmliste.append((decodeHtml(title), url, image, lang))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self.loadPic()
 
@@ -1176,7 +1176,7 @@ class m2kTopSerienFilmeListeScreen(Screen):
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
 		print streamName, streamLink
-		self.session.open(m2kEpisodenListeScreen, streamLink, streamName)
+		self.session.open(m4kEpisodenListeScreen, streamLink, streamName)
 
 	def keyAdd(self):
 		exist = self['filmList'].getCurrent()
@@ -1187,10 +1187,10 @@ class m2kTopSerienFilmeListeScreen(Screen):
 		self.mUrl = self['filmList'].getCurrent()[0][1]
 		self.mLang = self['filmList'].getCurrent()[0][3]
 		
-		if not fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m2k_watchlist")
-		if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-			writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist","a")
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m4k_watchlist")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+			writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist","a")
 			if self.mLang == "us_ger_small":
 				Lang = "de"
 			elif self.mLang == "us_flag_small":
@@ -1230,14 +1230,14 @@ class m2kTopSerienFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kSerienUpdateFilmeListeScreen(Screen):
+class m4kSerienUpdateFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kTopSerienFilmeListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kTopSerienFilmeListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kTopSerienFilmeListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kTopSerienFilmeListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -1255,7 +1255,7 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 			"green" : self.keyAdd
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Serien Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -1268,13 +1268,13 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 		self.chooseMenuList.l.setItemHeight(25)
 		self['filmList'] = self.chooseMenuList
 		
-		self.onLayoutFinish.append(self.m2kcookie)
+		self.onLayoutFinish.append(self.m4kcookie)
 
-	def m2kcookie(self):
-		url = "http://www.movie2k.to/index.php?lang=de"
-		getPage(url, agent=std_headers, cookies=self.keckse, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getm2kcookie).addErrback(self.dataError)
+	def m4kcookie(self):
+		url = "http://www.movie4k.to/index.php?lang=de"
+		getPage(url, agent=std_headers, cookies=self.keckse, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getm4kcookie).addErrback(self.dataError)
 		
-	def getm2kcookie(self, data):
+	def getm4kcookie(self, data):
 		self.loadPage()
 
 	def loadPage(self):
@@ -1288,9 +1288,9 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 		serien = re.findall('<td id="tdmovies"> <img style="vertical-align:top;".*?<a href="(.*?)">.*?<font color="#000000">(.*?)</font></a>', data, re.S)
 		if serien:
 			for url,title in serien:
-				url = "http://www.movie2k.to/"+url
+				url = "http://www.movie4k.to/"+url
 				self.filmliste.append((decodeHtml(title), url))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self.loadPic()
 
@@ -1339,7 +1339,7 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 			if cname:
 				streamName = cname[0]
 
-		self.session.open(m2kEpisodenListeScreen, streamLink, streamName)
+		self.session.open(m4kEpisodenListeScreen, streamLink, streamName)
 
 	def keyAdd(self):
 		exist = self['filmList'].getCurrent()
@@ -1354,10 +1354,10 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 			if cname:
 				mTitle = cname[0]
 				
-		if not fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m2k_watchlist")
-		if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-			writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist","a")
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m4k_watchlist")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+			writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist","a")
 			print mUrl, mTitle
 			writePlaylist.write('"%s" "%s" "%s" "0"\n' % (mTitle, mUrl, "de"))
 			writePlaylist.close()
@@ -1390,16 +1390,16 @@ class m2kSerienUpdateFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kStreamListeScreen(Screen):
+class m4kStreamListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink, streamName, which):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
 		self.streamName = streamName
 		self.which = which
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -1412,7 +1412,7 @@ class m2kStreamListeScreen(Screen):
 			"cancel": self.keyCancel
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Stream Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -1436,48 +1436,48 @@ class m2kStreamListeScreen(Screen):
 	def loadPageData(self, data):
 		print "daten bekommen"
 		if self.which == "movie":
-			hoster = re.findall('<tr id=.*?tablemoviesindex2.*?><td height=.*?20.*?width.*?"150.*?><a href.*?"(.*?.html).*?>(.*?).<.*?src.*?"http://img.movie2k.to/img/.*?\..*?> \&nbsp;(.*?)</a>.*?alt.*?"(Movie quality.*?)" title=', data, re.S)
+			hoster = re.findall('<tr id=.*?tablemoviesindex2.*?><td height=.*?20.*?width.*?"150.*?><a href.*?"(.*?.html).*?>(.*?).<.*?src.*?"http://img.movie4k.to/img/.*?\..*?> \&nbsp;(.*?)</a>.*?alt.*?"(Movie quality.*?)" title=', data, re.S)
 			if hoster:
 				for url,datum,hostername,quali in hoster:
-					url = "%s%s" % ("http://www.movie2k.to/", url)
+					url = "%s%s" % ("http://www.movie4k.to/", url)
 					print hostername, url
 					if re.match('.*?(putme|limevideo|stream2k|played|putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Zooupload|Wupfile|BitShare|Userporn)', hostername, re.S|re.I):
 						self.filmliste.append((url, datum, hostername, quali.replace('Movie quality ','').replace('\\','')))
 						
 				if len(self.filmliste) == 0:
 					self.filmliste.append(("nix", "No supported streams found."))
-					self.chooseMenuList.setList(map(self.m2kStream2ListEntry, self.filmliste))
+					self.chooseMenuList.setList(map(self.m4kStream2ListEntry, self.filmliste))
 					self.loadPic()
 				else:
-					self.chooseMenuList.setList(map(self.m2kStreamListEntry, self.filmliste))
+					self.chooseMenuList.setList(map(self.m4kStreamListEntry, self.filmliste))
 					self.keyLocked = False
 					self.loadPic()
 		else:
-			hoster = re.findall('"tablemoviesindex2.*?<a href.*?"(.*?.html).*?style.*?src.*?"http://img.movie2k.to/img/.*?.[gif|png].*?> \&nbsp;(.*?)</a></td></tr>', data, re.S)
+			hoster = re.findall('"tablemoviesindex2.*?<a href.*?"(.*?.html).*?style.*?src.*?"http://img.movie4k.to/img/.*?.[gif|png].*?> \&nbsp;(.*?)</a></td></tr>', data, re.S)
 			if hoster:
 				for url,hostername in hoster:
-					url = "%s%s" % ("http://www.movie2k.to/", url)		
+					url = "%s%s" % ("http://www.movie4k.to/", url)		
 					print hostername, url
 					if re.match('.*?(putme|limevideo|stream2k|played|putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Zooupload|Wupfile|BitShare|Userporn)', hostername, re.S|re.I):
 						self.filmliste.append((url, hostername))
 						
 				if len(self.filmliste) == 0:
 					self.filmliste.append(("nix", "No supported streams found."))
-					self.chooseMenuList.setList(map(self.m2kStream2ListEntry, self.filmliste))
+					self.chooseMenuList.setList(map(self.m4kStream2ListEntry, self.filmliste))
 					self.loadPic()
 				else:
-					self.chooseMenuList.setList(map(self.m2kStream2ListEntry, self.filmliste))
+					self.chooseMenuList.setList(map(self.m4kStream2ListEntry, self.filmliste))
 					self.keyLocked = False
 					self.loadPic()
 		
-	def m2kStreamListEntry(self, entry):
+	def m4kStreamListEntry(self, entry):
 		return [entry,
 			(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 200, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[1]),
 			(eListboxPythonMultiContent.TYPE_TEXT, 250, 0, 200, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[2]),
 			(eListboxPythonMultiContent.TYPE_TEXT, 450, 0, 430, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[3])
 			]
 			
-	def m2kStream2ListEntry(self, entry):
+	def m4kStream2ListEntry(self, entry):
 		return [entry,
 			(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 200, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[1])
 			]
@@ -1513,8 +1513,8 @@ class m2kStreamListeScreen(Screen):
 		getPage(streamLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.get_streamlink, streamLink).addErrback(self.dataError)
 		
 	def get_streamlink(self, data, streamLink):
-		if re.match('.*?(http://img.movie2k.to/img/parts/teil1_aktiv.png|http://img.movie2k.to/img/parts/teil1_inaktiv.png|http://img.movie2k.to/img/parts/part1_active.png|http://img.movie2k.to/img/parts/part1_inactive.png)', data, re.S):
-			self.session.open(m2kPartListeScreen, streamLink, self.streamName)
+		if re.match('.*?(http://img.movie4k.to/img/parts/teil1_aktiv.png|http://img.movie4k.to/img/parts/teil1_inaktiv.png|http://img.movie4k.to/img/parts/part1_active.png|http://img.movie4k.to/img/parts/part1_inactive.png)', data, re.S):
+			self.session.open(m4kPartListeScreen, streamLink, self.streamName)
 		else:
 			link_found = False
 		
@@ -1549,13 +1549,13 @@ class m2kStreamListeScreen(Screen):
 		if stream_url == None:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=3)
 		else:
-			if not fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watched"):
-				os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m2k_watched")
+			if not fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watched"):
+				os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m4k_watched")
 				
 			self.update_liste = []
-			leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_m2k_watched")
+			leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_m4k_watched")
 			if not leer == 0:
-				self.updates_read = open(config.mediaportal.watchlistpath.value+"mp_m2k_watched" , "r")
+				self.updates_read = open(config.mediaportal.watchlistpath.value+"mp_m4k_watched" , "r")
 				for lines in sorted(self.updates_read.readlines()):
 					line = re.findall('"(.*?)"', lines)
 					if line:
@@ -1563,7 +1563,7 @@ class m2kStreamListeScreen(Screen):
 						self.update_liste.append("%s" % (line[0]))
 				self.updates_read.close()
 				
-				updates_read2 = open(config.mediaportal.watchlistpath.value+"mp_m2k_watched" , "a")
+				updates_read2 = open(config.mediaportal.watchlistpath.value+"mp_m4k_watched" , "a")
 				check = ("%s" % self.streamName)
 				if not check in self.update_liste:
 					print "update add: %s" % (self.streamName)
@@ -1572,7 +1572,7 @@ class m2kStreamListeScreen(Screen):
 				else:
 					print "dupe %s" % (self.streamName)
 			else:
-				updates_read3 = open(config.mediaportal.watchlistpath.value+"mp_m2k_watched" , "a")
+				updates_read3 = open(config.mediaportal.watchlistpath.value+"mp_m4k_watched" , "a")
 				print "update add: %s" % (self.streamName)
 				updates_read3.write('"%s"\n' % (self.streamName))
 				updates_read3.close()
@@ -1584,15 +1584,15 @@ class m2kStreamListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kPartListeScreen(Screen):
+class m4kPartListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink, streamName):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
 		self.streamName = streamName
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -1605,7 +1605,7 @@ class m2kPartListeScreen(Screen):
 			"cancel": self.keyCancel
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Part Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -1623,16 +1623,16 @@ class m2kPartListeScreen(Screen):
 		id = re.findall('[film-|movie-](\d+)\.html', self.streamGenreLink, re.S)
 		if id:
 			print id
-			url1 = "%s%s%s" % ("http://www.movie2k.to/movie.php?id=", id[0], "&part=1")
-			url2 = "%s%s%s" % ("http://www.movie2k.to/movie.php?id=", id[0], "&part=2")
+			url1 = "%s%s%s" % ("http://www.movie4k.to/movie.php?id=", id[0], "&part=1")
+			url2 = "%s%s%s" % ("http://www.movie4k.to/movie.php?id=", id[0], "&part=2")
 			self.filmliste.append(("1", url1))
 			self.filmliste.append(("2", url2))
-			self.chooseMenuList.setList(map(self.m2kPartsListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(self.m4kPartsListEntry, self.filmliste))
 			self.keyLocked = False
 		else:
 			print "id fehler.."
 
-	def m2kPartsListEntry(self, entry):
+	def m4kPartsListEntry(self, entry):
 		part = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/teil%s.png" % entry[0]
 		return [entry,
 			(eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 396, 3, 108, 35, LoadPixmap(part))
@@ -1692,15 +1692,15 @@ class m2kPartListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kEpisodenListeScreen(Screen):
+class m4kEpisodenListeScreen(Screen):
 	
 	def __init__(self, session, streamGenreLink, streamName):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
 		self.streamName = streamName
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -1713,7 +1713,7 @@ class m2kEpisodenListeScreen(Screen):
 			"cancel": self.keyCancel
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Episoden Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -1737,12 +1737,12 @@ class m2kEpisodenListeScreen(Screen):
 	def loadPageData(self, data):
 		self.watched_liste = []
 		self.mark_last_watched = []
-		if not fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watched"):
-			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m2k_watched")
-		if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watched"):
-			leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_m2k_watched")
+		if not fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watched"):
+			os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m4k_watched")
+		if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watched"):
+			leer = os.path.getsize(config.mediaportal.watchlistpath.value+"mp_m4k_watched")
 			if not leer == 0:
-				self.updates_read = open(config.mediaportal.watchlistpath.value+"mp_m2k_watched" , "r")
+				self.updates_read = open(config.mediaportal.watchlistpath.value+"mp_m4k_watched" , "r")
 				for lines in sorted(self.updates_read.readlines()):
 					line = re.findall('"(.*?)"', lines)
 					if line:
@@ -1756,7 +1756,7 @@ class m2kEpisodenListeScreen(Screen):
 				episodes = re.findall('<OPTION value="(.*?)".*?>Episode.(.*?)</OPTION>', ep_data, re.S)
 				if episodes:
 					for url_to_streams, episode in episodes:
-						url_to_streams = "%s%s" % ("http://www.movie2k.to/", url_to_streams)
+						url_to_streams = "%s%s" % ("http://www.movie4k.to/", url_to_streams)
 						if int(staffel) < 10:
 							staffel3 = "S0"+str(staffel)
 						else:
@@ -1772,7 +1772,7 @@ class m2kEpisodenListeScreen(Screen):
 							self.mark_last_watched.append(staffel_episode)
 						else:
 							self.filmliste.append((staffel_episode,url_to_streams,False))
-			self.chooseMenuList.setList(map(self.m2kStreamListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(self.m4kStreamListEntry, self.filmliste))
 			
 			# jump to last watched episode
 			if len(self.mark_last_watched) != 0:
@@ -1795,7 +1795,7 @@ class m2kEpisodenListeScreen(Screen):
 			self.keyLocked = False
 			self.loadPic()
 			
-	def m2kStreamListEntry(self, entry):
+	def m4kStreamListEntry(self, entry):
 		if entry[2]:
 			png = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/images/watched.png"
 			watched = LoadPixmap(png)
@@ -1837,12 +1837,12 @@ class m2kEpisodenListeScreen(Screen):
 		streamEpisode = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
 		print streamEpisode, streamLink
-		self.session.open(m2kStreamListeScreen, streamLink, streamEpisode, "tv")
+		self.session.open(m4kStreamListeScreen, streamLink, streamEpisode, "tv")
 
 	def keyCancel(self):
 		self.close()
 
-class m2kXXXUpdateFilmeListeScreen(Screen):
+class m4kXXXUpdateFilmeListeScreen(Screen):
 	
 	def __init__(self, session, streamXXXLink, genre):
 		self.session = session
@@ -1850,9 +1850,9 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 		self.genre = False
 		if genre == 'X':
 			self.genre = True
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -1872,7 +1872,7 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 			"prevBouquet" : self.keyPageDown
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("XXX Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -1892,7 +1892,7 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 		print 'load xxx updates...'
 		print 'Link...', self.streamXXXLink
 		if self.genre == True:
-			shortUrl = re.findall('http://www.movie2k.to/xxx-genre-[0-9]*[0-9]*.*?',self.streamXXXLink)
+			shortUrl = re.findall('http://www.movie4k.to/xxx-genre-[0-9]*[0-9]*.*?',self.streamXXXLink)
 			shortUrlC = str(shortUrl[0])
 			url = shortUrlC + '-' + str(self.page) + '.html'
 			print url
@@ -1912,10 +1912,10 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 			serien = re.findall('<TD width="550" id="tdmovies">.*?<a href="(.*?)">(.*?)</a>', data, re.S)
 		if serien:
 			for url,title in serien:
-				url = "%s%s" % ("http://www.movie2k.to/", url)
+				url = "%s%s" % ("http://www.movie4k.to/", url)
 				title.replace("\t","")
 				self.filmliste.append((decodeHtml(title), url))
-			self.chooseMenuList.setList(map(m2kFilmListEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kFilmListEntry, self.filmliste))
 			self.keyLocked = False
 			self['page'].setText(str(self.page))
 			self.loadPic()
@@ -1966,7 +1966,7 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kStreamListeScreen, streamLink, streamName, "movie")
+		self.session.open(m4kStreamListeScreen, streamLink, streamName, "movie")
 		
 	def keyPageDown(self):
 		print "PageDown"
@@ -2010,14 +2010,14 @@ class m2kXXXUpdateFilmeListeScreen(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kSerienABCAuswahl(Screen):
+class m4kSerienABCAuswahl(Screen):
 	
-	def __init__(self, session, m2kGotLink):
-		self.m2kGotLink = m2kGotLink
+	def __init__(self, session, m4kGotLink):
+		self.m4kGotLink = m4kGotLink
 		self.session = session
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kAuswahl.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kAuswahl.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kAuswahl.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kAuswahl.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -2030,8 +2030,8 @@ class m2kSerienABCAuswahl(Screen):
 			"cancel": self.keyCancel
 		}, -1)
 		
-		self['title'] = Label("Movie2k.to")
-		if self.m2kGotLink == 'FilmeAZ':
+		self['title'] = Label("Movie4k.to")
+		if self.m4kGotLink == 'FilmeAZ':
 			self['leftContentTitle'] = Label("Filme A-Z")
 		else:
 			self['leftContentTitle'] = Label("Serien A-Z") 
@@ -2053,7 +2053,7 @@ class m2kSerienABCAuswahl(Screen):
 		abc = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","#"]
 		for letter in abc:
 			self.streamList.append((letter))
-		self.streamMenuList.setList(map(m2kLetterEntry, self.streamList))
+		self.streamMenuList.setList(map(m4kLetterEntry, self.streamList))
 		self.keyLocked = False
 					
 	def keyOK(self):
@@ -2064,24 +2064,24 @@ class m2kSerienABCAuswahl(Screen):
 		if auswahl == '#':
 			auswahl = '1'
 		print auswahl
-		if self.m2kGotLink == 'SerienAZ':
-			streamGenreLink = "http://www.movie2k.to/tvshows-all-%s.html" % auswahl
-			self.session.open(m2kSerienABCListe, streamGenreLink)
-		elif self.m2kGotLink == 'FilmeAZ':
-			streamGenreLink = 'http://www.movie2k.to/movies-all-%s-' % auswahl
-			self.session.open(m2kKinoAlleFilmeListeScreen, streamGenreLink)
+		if self.m4kGotLink == 'SerienAZ':
+			streamGenreLink = "http://www.movie4k.to/tvshows-all-%s.html" % auswahl
+			self.session.open(m4kSerienABCListe, streamGenreLink)
+		elif self.m4kGotLink == 'FilmeAZ':
+			streamGenreLink = 'http://www.movie4k.to/movies-all-%s-' % auswahl
+			self.session.open(m4kKinoAlleFilmeListeScreen, streamGenreLink)
 		
 	def keyCancel(self):
 		self.close()
 
-class m2kSerienABCListe(Screen):
+class m4kSerienABCListe(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kSerienABCListe.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kSerienABCListe.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kSerienABCListe.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kSerienABCListe.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -2099,7 +2099,7 @@ class m2kSerienABCListe(Screen):
 			"green" : self.keyAdd
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Serie Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -2125,9 +2125,9 @@ class m2kSerienABCListe(Screen):
 		if serien:
 			self.streamList = []
 			for urlPart, title, landImage in serien:
-				url = '%s%s' % ('http://www.movie2k.to/', urlPart)
+				url = '%s%s' % ('http://www.movie4k.to/', urlPart)
 				self.filmliste.append((decodeHtml(title), url, landImage))
-			self.chooseMenuList.setList(map(m2kSerienABCEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kSerienABCEntry, self.filmliste))
 			self.keyLocked = False
 			#self.loadPic()
 		else:
@@ -2160,7 +2160,7 @@ class m2kSerienABCListe(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kSerienABCListeStaffeln, streamLink)
+		self.session.open(m4kSerienABCListeStaffeln, streamLink)
 
 	def keyAdd(self):
 		exist = self['filmList'].getCurrent()
@@ -2170,7 +2170,7 @@ class m2kSerienABCListe(Screen):
 		self.mTitle = self['filmList'].getCurrent()[0][0]
 		self.mUrl = self['filmList'].getCurrent()[0][1]
 		self.mLang = self['filmList'].getCurrent()[0][2]
-		self.flag_stored = self.mLang.replace('http://img.movie2k.to/img/','').replace('.png','')
+		self.flag_stored = self.mLang.replace('http://img.movie4k.to/img/','').replace('.png','')
 		print self.flag_stored
 
 		getPage(self.mUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.get_final).addErrback(self.dataError)
@@ -2178,12 +2178,12 @@ class m2kSerienABCListe(Screen):
 	def get_final(self, data):
 		print "final"
 		season_link = False
-		series = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)">(.*?)\t.*?<TD id="tdmovies"><img border=0 src="http://img.movie2k.to/img/(.*?)\..*?"', data, re.S)
+		series = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)">(.*?)\t.*?<TD id="tdmovies"><img border=0 src="http://img.movie4k.to/img/(.*?)\..*?"', data, re.S)
 		if series:
 			for each in series:
 				(link, seriesname, flag) = each
 				if flag == self.flag_stored:
-					season_link = "http://www.movie2k.to/%s" % link
+					season_link = "http://www.movie4k.to/%s" % link
 		else:
 			message = self.session.open(MessageBox, _("No Link FOUND."), MessageBox.TYPE_INFO, timeout=3)
 			
@@ -2196,23 +2196,23 @@ class m2kSerienABCListe(Screen):
 			
 	def get_final2(self, data):
 		print "final2"
-		series = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)">(.*?)\t.*?<TD id="tdmovies"><img border=0 src="http://img.movie2k.to/img/(.*?)\..*?"', data, re.S)
+		series = re.findall('<TD id="tdmovies" width="538"><a href="(.*?)">(.*?)\t.*?<TD id="tdmovies"><img border=0 src="http://img.movie4k.to/img/(.*?)\..*?"', data, re.S)
 		if series:
 			for each in series:
 				(link, seriesname, flag) = each
 				if flag == self.flag_stored:
-					season_link = "http://www.movie2k.to/%s" % link
+					season_link = "http://www.movie4k.to/%s" % link
 		else:
 			message = self.session.open(MessageBox, _("No Link FOUND."), MessageBox.TYPE_INFO, timeout=3)
 
 		if season_link:
-			if not fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-				os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m2k_watchlist")
-			if fileExists(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist"):
-				writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_m2k_watchlist","a")
-				if self.mLang == "http://img.movie2k.to/img/us_ger_small.png":
+			if not fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+				os.system("touch "+config.mediaportal.watchlistpath.value+"mp_m4k_watchlist")
+			if fileExists(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist"):
+				writePlaylist = open(config.mediaportal.watchlistpath.value+"mp_m4k_watchlist","a")
+				if self.mLang == "http://img.movie4k.to/img/us_ger_small.png":
 					Lang = "de"
-				elif self.mLang == "http://img.movie2k.to/img/us_flag_small.png":
+				elif self.mLang == "http://img.movie4k.to/img/us_flag_small.png":
 					Lang = "en"
 				else:
 					Lang = ""
@@ -2251,14 +2251,14 @@ class m2kSerienABCListe(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kSerienABCListeStaffeln(Screen):
+class m4kSerienABCListeStaffeln(Screen):
 	
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -2275,7 +2275,7 @@ class m2kSerienABCListeStaffeln(Screen):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Staffel Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -2302,10 +2302,10 @@ class m2kSerienABCListeStaffeln(Screen):
 			print "staffeln parsen gefunden"
 			self.streamList = []
 			for urlPart, season in staffeln:
-				url = '%s%s' % ('http://www.movie2k.to/', urlPart)
+				url = '%s%s' % ('http://www.movie4k.to/', urlPart)
 				formatTitle = 'Season %s' % season
 				self.filmliste.append((decodeHtml(formatTitle), url))
-			self.chooseMenuList.setList(map(m2kSerienABCStaffelnEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kSerienABCStaffelnEntry, self.filmliste))
 			self.keyLocked = False
 		else:
 			print "parsen - Keine Daten gefunden"
@@ -2316,7 +2316,7 @@ class m2kSerienABCListeStaffeln(Screen):
 			return
 		streamName = self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kSerienABCListeStaffelnFilme, streamLink)
+		self.session.open(m4kSerienABCListeStaffelnFilme, streamLink)
 
 	def keyLeft(self):
 		if self.keyLocked:
@@ -2341,14 +2341,14 @@ class m2kSerienABCListeStaffeln(Screen):
 	def keyCancel(self):
 		self.close()
 
-class m2kSerienABCListeStaffelnFilme(Screen):
+class m4kSerienABCListeStaffelnFilme(Screen):
 
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m2kdefaultListeScreen.xml" % config.mediaportal.skin.value
+		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/m4kdefaultListeScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m2kdefaultListeScreen.xml"
+			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/m4kdefaultListeScreen.xml"
 		print path
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -2365,7 +2365,7 @@ class m2kSerienABCListeStaffelnFilme(Screen):
 			"left" : self.keyLeft
 		}, -1)
 
-		self['title'] = Label("movie2k.to")
+		self['title'] = Label("movie4k.to")
 		self['name'] = Label("Staffel Auswahl")
 		self['handlung'] = Label("")
 		self['coverArt'] = Pixmap()
@@ -2392,11 +2392,11 @@ class m2kSerienABCListeStaffelnFilme(Screen):
 			print "episode parsen gefunden"
 			self.streamList = []
 			for urlPart, title, season, episode in staffeln:
-				url = '%s%s' % ('http://www.movie2k.to/', urlPart)
+				url = '%s%s' % ('http://www.movie4k.to/', urlPart)
 				formatTitle = 'Season %s Episode %s' % (season, episode)
 				print url
 				self.filmliste.append((decodeHtml(formatTitle), url, title))
-			self.chooseMenuList.setList(map(m2kSerienABCStaffelnEntry, self.filmliste))
+			self.chooseMenuList.setList(map(m4kSerienABCStaffelnEntry, self.filmliste))
 			self.keyLocked = False
 		else:
 			print "parsen - Keine Daten gefunden"
@@ -2407,7 +2407,7 @@ class m2kSerienABCListeStaffelnFilme(Screen):
 			return
 		streamEpisode = self['filmList'].getCurrent()[0][2] + self['filmList'].getCurrent()[0][0]
 		streamLink = self['filmList'].getCurrent()[0][1]
-		self.session.open(m2kStreamListeScreen, streamLink, streamEpisode, "tv")
+		self.session.open(m4kStreamListeScreen, streamLink, streamEpisode, "tv")
 
 	def keyLeft(self):
 		if self.keyLocked:
