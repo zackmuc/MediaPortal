@@ -211,7 +211,7 @@ class nunaMusicListeScreen(Screen):
 	def loadPageData(self, data):
 		print "drin"
 		
-		vids = re.findall('href="(.*?)".*?<img alt="(.*?)" src="(.*?)" /> ', data, re.S)
+		vids = re.findall('li\s{0,1}>\s{0,1}<a\shref="(.*?)".*?<img\salt="(.*?)"\ssrc="(.*?)"\s/>', data, re.S)
 		if vids:
 			self.filmliste = []
 			for (link,title,image) in vids:
