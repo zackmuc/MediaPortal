@@ -228,6 +228,10 @@ class get_stream_link:
 			elif re.match('.*?vk.com', data, re.S):
 				link = data
 				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.vkme).addErrback(self.errorload)
+				
+			elif re.match('.*?mightyupload.com/embed', data, re.S):
+				link = data
+				getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.mightyupload).addErrback(self.errorload)
 					
 			else:
 				message = self.session.open(MessageBox, _("No supported Stream Hoster, try another one !"), MessageBox.TYPE_INFO, timeout=5)
@@ -242,6 +246,21 @@ class get_stream_link:
 		if self.showmsgbox:
 			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=5)
 
+			
+	def mightyupload(self, data):
+		get_packedjava = re.findall("<script type=.text.javascript.>eval.function(.*?)</script>", data, re.S|re.DOTALL)
+		if get_packedjava:
+			sUnpacked = cJsUnpacker().unpackByString(get_packedjava[1])
+		if sUnpacked:
+			stream_url = re.findall("'file','(.*?)'", sUnpacked)
+			if stream_url:
+				print stream_url[0]
+				self._callback(stream_url[0])
+			else:
+				self.stream_not_found()
+		else:
+			self.stream_not_found()
+			
 	def vkme(self, data):
 		print "vk.me.."
 		stream_urls = re.findall('url[0-9]+=(http://.*?.vk.me/.*?/videos/.*?[0-9]+.mp4)', data)

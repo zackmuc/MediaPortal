@@ -301,26 +301,53 @@ class mlehdFilmAuswahlScreen(Screen):
 		
 	def loadPageData(self, data):
 		print "drin"
-		movies = re.findall("file: '(.*?)\&sid", data, re.S)
-		if movies:
-			print movies
-			self.filmliste = []
-			count = 0
-			for url in movies:
-				count += 1
-				print url
-				part = "Film %s" % count
-				self.filmliste.append((part,url))
-			self.chooseMenuList.setList(map(mlehdGenreListEntry, self.filmliste))
-			self.keyLocked = False
+		if re.match('.*?mightyupload.com/embed', data, re.S):
+			streamhoster = re.findall('<iframe SRC="(.*?)"', data, re.S)
+			if streamhoster:
+				print streamhoster
+				self.filmliste = []
+				count = 0
+				for url in streamhoster:
+					count += 1
+					print url
+					part = "Film %s" % count
+					self.filmliste.append((part,url))
+				self.chooseMenuList.setList(map(mlehdGenreListEntry, self.filmliste))
+				self.keyLocked = False
+				
+		else:
+			movies = re.findall("file: '(.*?)\&sid", data, re.S)
+			if movies:
+				print movies
+				self.filmliste = []
+				count = 0
+				for url in movies:
+					count += 1
+					print url
+					part = "Film %s" % count
+					self.filmliste.append((part,url))
+				self.chooseMenuList.setList(map(mlehdGenreListEntry, self.filmliste))
+				self.keyLocked = False
 			
 	def keyOK(self):
 		if self.keyLocked:
 			return
 		self.part = self['liste'].getCurrent()[0][0]
 		link = self['liste'].getCurrent()[0][1]
-		getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStream).addErrback(self.dataError)
 		
+		if re.match('.*?mightyupload.com/embed', link, re.S)
+			get_stream_link(self.session).check_link(link[0], self.got_link, False)
+		else:
+			getPage(link, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStream).addErrback(self.dataError)
+
+	def got_link(self, stream_url):
+		if stream_url == None:
+			message = self.session.open(MessageBox, _("Stream not found, try another Stream Hoster."), MessageBox.TYPE_INFO, timeout=3)
+		else:
+			sref = eServiceReference(0x1001, 0, stream_url)
+			sref.setName(self.genreName+" "+self.part)
+			self.session.open(MoviePlayer, sref)
+			
 	def getStream(self, data):
 		stream_url = re.findall('<location>(http://.*?)</location>', data, re.S)
 		if stream_url:
