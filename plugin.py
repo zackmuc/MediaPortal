@@ -124,6 +124,7 @@ config.mediaportal.version = NoSave(ConfigText(default="431"))
 config.mediaportal.versiontext = NoSave(ConfigText(default="4.3.1"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
+config.mediaportal.showporn = ConfigYesNo(default = False)
 config.mediaportal.skin = ConfigSelection(default = "tec", choices = [("tec", _("tec")),("liquidblue", _("liquidblue")), ("original", _("original"))])
 config.mediaportal.ansicht = ConfigSelection(default = "liste", choices = [("liste", _("Liste")),("wall", _("Wall"))])
 config.mediaportal.selektor = ConfigSelection(default = "blue", choices = [("blue", _("blau")),("green", _(u"gr\xfcn")),("red", _("rot")),("turkis", _(u"t\xfcrkis"))])
@@ -281,6 +282,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Automatic Update Check:", config.mediaportal.autoupdate))
 		self.configlist.append(getConfigListEntry("Filter:", config.mediaportal.filter))
 		self.configlist.append(getConfigListEntry("Pincode:", config.mediaportal.pincode))
+		self.configlist.append(getConfigListEntry("XXX-Erweiterungen sichtbar:", config.mediaportal.showporn))
 		self.configlist.append(getConfigListEntry("XXX-Pincodeabfrage:", config.mediaportal.pornpin))
 		self.configlist.append(getConfigListEntry("Selektor-Farbe:", config.mediaportal.selektor))
 		self.configlist.append(getConfigListEntry("HauptScreen-Ansicht:", config.mediaportal.ansicht))
@@ -490,7 +492,7 @@ class haupt_Screen(Screen, ConfigListScreen):
 
 		registerFont("/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/resources/mediaportal.ttf", "mediaportal", 100, False)
 		
-		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "HelpActions"], {
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "HelpActions"], {
 			"ok"    : self.keyOK,
 			"up"    : self.keyUp,
 			"down"  : self.keyDown,
@@ -498,6 +500,7 @@ class haupt_Screen(Screen, ConfigListScreen):
 			"left"  : self.keyLeft,
 			"right" : self.keyRight,
 			"menu" : self.keySetup,
+			"info" : self.showPorn,
 			"displayHelp" : self.keyHelp
 		}, -1)
 
@@ -691,68 +694,69 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("Nuna", "nuna"))
 		
 		# porn
-		if config.mediaportal.show4tube.value:
-			self.porn.append(self.hauptListEntry("4Tube", "4tube"))
-		if config.mediaportal.showahme.value:
-			self.porn.append(self.hauptListEntry("Ah-Me", "ahme"))
-		if config.mediaportal.showamateurporn.value:
-			self.porn.append(self.hauptListEntry("AmateurPorn", "amateurporn"))
-		if config.mediaportal.showbeeg.value:
-			self.porn.append(self.hauptListEntry("beeg", "beeg"))
-		if config.mediaportal.showdrtuber.value:
-			self.porn.append(self.hauptListEntry("DrTuber", "drtuber"))
-		if config.mediaportal.showelladies.value:
-			self.porn.append(self.hauptListEntry("El-Ladies", "elladies"))
-		if config.mediaportal.showeporner.value:
-			self.porn.append(self.hauptListEntry("Eporner", "eporner"))
-		if config.mediaportal.showeroprofile.value:
-			self.porn.append(self.hauptListEntry("EroProfile", "eroprofile"))
-		if config.mediaportal.showextremetube.value:
-			self.porn.append(self.hauptListEntry("ExtremeTube", "extremetube"))
-		if config.mediaportal.showgstreaminxxx.value:
-			self.porn.append(self.hauptListEntry("G-Stream-XXX", "gstreaminxxx"))
-		if config.mediaportal.showhdporn.value:
-			self.porn.append(self.hauptListEntry("HDPorn", "hdporn"))
-		if config.mediaportal.showhotshame.value:
-			self.porn.append(self.hauptListEntry("hotshame", "hotshame"))
-		if config.mediaportal.showmegaskanks.value:
-			self.porn.append(self.hauptListEntry("MegaSkanks", "megaskanks"))
-		if config.mediaportal.showIStreamPorn.value:
-			self.porn.append(self.hauptListEntry("IStream-XXX", "istreamporn"))
-		if config.mediaportal.showM4kPorn.value:
-			self.porn.append(self.hauptListEntry("Movie4k-XXX", "movie4kporn"))
-		if config.mediaportal.showpinkrod.value:
-			self.porn.append(self.hauptListEntry("Pinkrod", "pinkrod"))
-		if config.mediaportal.showplayporn.value:
-			self.porn.append(self.hauptListEntry("PlayPorn", "playporn"))
-		if config.mediaportal.showpornostreams.value:
-			self.porn.append(self.hauptListEntry("PornoStreams", "pornostreams"))
-		if config.mediaportal.showpornerbros.value:
-			self.porn.append(self.hauptListEntry("PornerBros", "pornerbros"))
-		if config.mediaportal.showPornhub.value:
-			self.porn.append(self.hauptListEntry("Pornhub", "pornhub"))
-		if config.mediaportal.showpornrabbit.value:
-			self.porn.append(self.hauptListEntry("PornRabbit", "pornrabbit"))
-		if config.mediaportal.showrealgfporn.value:
-			self.porn.append(self.hauptListEntry("RealGFPorn", "realgfporn"))
-		if config.mediaportal.showredtube.value:
-			self.porn.append(self.hauptListEntry("RedTube", "redtube"))
-		if config.mediaportal.showsexxxhd.value:
-			self.porn.append(self.hauptListEntry("SeXXX-HD", "sexxxhd"))
-		if config.mediaportal.showsunporno.value:
-			self.porn.append(self.hauptListEntry("SunPorno", "sunporno"))
-		if config.mediaportal.showthenewporn.value:
-			self.porn.append(self.hauptListEntry("TheNewPorn", "thenewporn"))
-		if config.mediaportal.showupdatetube.value:
-			self.porn.append(self.hauptListEntry("UpdateTube", "updatetube"))
-		if config.mediaportal.showwetplace.value:
-			self.porn.append(self.hauptListEntry("WetPlace", "wetplace"))
-		if config.mediaportal.showXhamster.value:
-			self.porn.append(self.hauptListEntry("xHamster", "xhamster"))
-		if config.mediaportal.showxxxsave.value:
-			self.porn.append(self.hauptListEntry("XXXSaVe", "xxxsave"))
-		if config.mediaportal.showyouporn.value:
-			self.porn.append(self.hauptListEntry("YouPorn", "youporn"))
+		if config.mediaportal.showporn.value:
+			if config.mediaportal.show4tube.value:
+				self.porn.append(self.hauptListEntry("4Tube", "4tube"))
+			if config.mediaportal.showahme.value:
+				self.porn.append(self.hauptListEntry("Ah-Me", "ahme"))
+			if config.mediaportal.showamateurporn.value:
+				self.porn.append(self.hauptListEntry("AmateurPorn", "amateurporn"))
+			if config.mediaportal.showbeeg.value:
+				self.porn.append(self.hauptListEntry("beeg", "beeg"))
+			if config.mediaportal.showdrtuber.value:
+				self.porn.append(self.hauptListEntry("DrTuber", "drtuber"))
+			if config.mediaportal.showelladies.value:
+				self.porn.append(self.hauptListEntry("El-Ladies", "elladies"))
+			if config.mediaportal.showeporner.value:
+				self.porn.append(self.hauptListEntry("Eporner", "eporner"))
+			if config.mediaportal.showeroprofile.value:
+				self.porn.append(self.hauptListEntry("EroProfile", "eroprofile"))
+			if config.mediaportal.showextremetube.value:
+				self.porn.append(self.hauptListEntry("ExtremeTube", "extremetube"))
+			if config.mediaportal.showgstreaminxxx.value:
+				self.porn.append(self.hauptListEntry("G-Stream-XXX", "gstreaminxxx"))
+			if config.mediaportal.showhdporn.value:
+				self.porn.append(self.hauptListEntry("HDPorn", "hdporn"))
+			if config.mediaportal.showhotshame.value:
+				self.porn.append(self.hauptListEntry("hotshame", "hotshame"))
+			if config.mediaportal.showmegaskanks.value:
+				self.porn.append(self.hauptListEntry("MegaSkanks", "megaskanks"))
+			if config.mediaportal.showIStreamPorn.value:
+				self.porn.append(self.hauptListEntry("IStream-XXX", "istreamporn"))
+			if config.mediaportal.showM4kPorn.value:
+				self.porn.append(self.hauptListEntry("Movie4k-XXX", "movie4kporn"))
+			if config.mediaportal.showpinkrod.value:
+				self.porn.append(self.hauptListEntry("Pinkrod", "pinkrod"))
+			if config.mediaportal.showplayporn.value:
+				self.porn.append(self.hauptListEntry("PlayPorn", "playporn"))
+			if config.mediaportal.showpornostreams.value:
+				self.porn.append(self.hauptListEntry("PornoStreams", "pornostreams"))
+			if config.mediaportal.showpornerbros.value:
+				self.porn.append(self.hauptListEntry("PornerBros", "pornerbros"))
+			if config.mediaportal.showPornhub.value:
+				self.porn.append(self.hauptListEntry("Pornhub", "pornhub"))
+			if config.mediaportal.showpornrabbit.value:
+				self.porn.append(self.hauptListEntry("PornRabbit", "pornrabbit"))
+			if config.mediaportal.showrealgfporn.value:
+				self.porn.append(self.hauptListEntry("RealGFPorn", "realgfporn"))
+			if config.mediaportal.showredtube.value:
+				self.porn.append(self.hauptListEntry("RedTube", "redtube"))
+			if config.mediaportal.showsexxxhd.value:
+				self.porn.append(self.hauptListEntry("SeXXX-HD", "sexxxhd"))
+			if config.mediaportal.showsunporno.value:
+				self.porn.append(self.hauptListEntry("SunPorno", "sunporno"))
+			if config.mediaportal.showthenewporn.value:
+				self.porn.append(self.hauptListEntry("TheNewPorn", "thenewporn"))
+			if config.mediaportal.showupdatetube.value:
+				self.porn.append(self.hauptListEntry("UpdateTube", "updatetube"))
+			if config.mediaportal.showwetplace.value:
+				self.porn.append(self.hauptListEntry("WetPlace", "wetplace"))
+			if config.mediaportal.showXhamster.value:
+				self.porn.append(self.hauptListEntry("xHamster", "xhamster"))
+			if config.mediaportal.showxxxsave.value:
+				self.porn.append(self.hauptListEntry("XXXSaVe", "xxxsave"))
+			if config.mediaportal.showyouporn.value:
+				self.porn.append(self.hauptListEntry("YouPorn", "youporn"))
 		
 		if len(self.porn) < 1:
 			self['Porn'].hide()
@@ -783,6 +787,20 @@ class haupt_Screen(Screen, ConfigListScreen):
 		res.append(MultiContentEntryText(pos=(80, 10), size=(160, 40), font=0, text=name, flags=RT_HALIGN_LEFT))
 		return res
 	
+	def showPorn(self):
+		if config.mediaportal.showporn.value:
+			config.mediaportal.showporn.value = False
+			configfile.save()
+			self.restart()
+		else:
+			self.session.openWithCallback(self.showPornOK, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+
+	def showPornOK(self, pincode):
+		if pincode:
+			config.mediaportal.showporn.value = True
+			configfile.save()
+			self.restart()
+
 	def keySetup(self):
 		self.session.openWithCallback(self.pinok, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 	
@@ -1708,68 +1726,69 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("ORF TVthek", "orf", "Mediathek"))
 			
 		### porn
-		if config.mediaportal.show4tube.value:
-			self.plugin_liste.append(("4Tube", "4tube", "Porn"))
-		if config.mediaportal.showahme.value:
-			self.plugin_liste.append(("Ah-Me", "ahme", "Porn"))
-		if config.mediaportal.showamateurporn.value:
-			self.plugin_liste.append(("AmateurPorn", "amateurporn", "Porn"))
-		if config.mediaportal.showbeeg.value:
-			self.plugin_liste.append(("beeg", "beeg", "Porn"))
-		if config.mediaportal.showdrtuber.value:
-			self.plugin_liste.append(("DrTuber", "drtuber", "Porn"))
-		if config.mediaportal.showelladies.value:
-			self.plugin_liste.append(("El-Ladies", "elladies", "Porn"))
-		if config.mediaportal.showeporner.value:
-			self.plugin_liste.append(("Eporner", "eporner", "Porn"))
-		if config.mediaportal.showeroprofile.value:
-			self.plugin_liste.append(("EroProfile", "eroprofile", "Porn"))
-		if config.mediaportal.showextremetube.value:
-			self.plugin_liste.append(("ExtremeTube", "extremetube", "Porn"))
-		if config.mediaportal.showgstreaminxxx.value:
-			self.plugin_liste.append(("G-Stream-XXX", "gstreaminxxx", "Porn"))
-		if config.mediaportal.showhdporn.value:
-			self.plugin_liste.append(("HDPorn", "hdporn", "Porn"))
-		if config.mediaportal.showhotshame.value:
-			self.plugin_liste.append(("hotshame", "hotshame", "Porn"))
-		if config.mediaportal.showmegaskanks.value:
-			self.plugin_liste.append(("MegaSkanks", "megaskanks", "Porn"))
-		if config.mediaportal.showIStreamPorn.value:
-			self.plugin_liste.append(("IStream-XXX", "istreamporn", "Porn"))
-		if config.mediaportal.showM4kPorn.value:
-			self.plugin_liste.append(("Movie4k-XXX", "movie4kporn", "Porn"))
-		if config.mediaportal.showpinkrod.value:
-			self.plugin_liste.append(("Pinkrod", "pinkrod", "Porn"))
-		if config.mediaportal.showplayporn.value:
-			self.plugin_liste.append(("PlayPorn", "playporn", "Porn"))
-		if config.mediaportal.showpornostreams.value:
-			self.plugin_liste.append(("PornoStreams", "pornostreams", "Porn"))
-		if config.mediaportal.showpornerbros.value:
-			self.plugin_liste.append(("PornerBros", "pornerbros", "Porn"))
-		if config.mediaportal.showPornhub.value:
-			self.plugin_liste.append(("Pornhub", "pornhub", "Porn"))
-		if config.mediaportal.showpornrabbit.value:
-			self.plugin_liste.append(("PornRabbit", "pornrabbit", "Porn"))
-		if config.mediaportal.showrealgfporn.value:
-			self.plugin_liste.append(("RealGFPorn", "realgfporn", "Porn"))
-		if config.mediaportal.showredtube.value:
-			self.plugin_liste.append(("RedTube", "redtube", "Porn"))
-		if config.mediaportal.showsexxxhd.value:
-			self.plugin_liste.append(("SeXXX-HD", "sexxxhd", "Porn"))
-		if config.mediaportal.showsunporno.value:
-			self.plugin_liste.append(("SunPorno", "sunporno", "Porn"))
-		if config.mediaportal.showthenewporn.value:
-			self.plugin_liste.append(("TheNewPorn", "thenewporn", "Porn"))
-		if config.mediaportal.showupdatetube.value:
-			self.plugin_liste.append(("UpdateTube", "updatetube", "Porn"))
-		if config.mediaportal.showwetplace.value:
-			self.plugin_liste.append(("WetPlace", "wetplace", "Porn"))
-		if config.mediaportal.showXhamster.value:
-			self.plugin_liste.append(("xHamster", "xhamster", "Porn"))
-		if config.mediaportal.showxxxsave.value:
-			self.plugin_liste.append(("XXXSaVe", "xxxsave", "Porn"))
-		if config.mediaportal.showyouporn.value:
-			self.plugin_liste.append(("YouPorn", "youporn", "Porn"))
+		if config.mediaportal.showporn.value:
+			if config.mediaportal.show4tube.value:
+				self.plugin_liste.append(("4Tube", "4tube", "Porn"))
+			if config.mediaportal.showahme.value:
+				self.plugin_liste.append(("Ah-Me", "ahme", "Porn"))
+			if config.mediaportal.showamateurporn.value:
+				self.plugin_liste.append(("AmateurPorn", "amateurporn", "Porn"))
+			if config.mediaportal.showbeeg.value:
+				self.plugin_liste.append(("beeg", "beeg", "Porn"))
+			if config.mediaportal.showdrtuber.value:
+				self.plugin_liste.append(("DrTuber", "drtuber", "Porn"))
+			if config.mediaportal.showelladies.value:
+				self.plugin_liste.append(("El-Ladies", "elladies", "Porn"))
+			if config.mediaportal.showeporner.value:
+				self.plugin_liste.append(("Eporner", "eporner", "Porn"))
+			if config.mediaportal.showeroprofile.value:
+				self.plugin_liste.append(("EroProfile", "eroprofile", "Porn"))
+			if config.mediaportal.showextremetube.value:
+				self.plugin_liste.append(("ExtremeTube", "extremetube", "Porn"))
+			if config.mediaportal.showgstreaminxxx.value:
+				self.plugin_liste.append(("G-Stream-XXX", "gstreaminxxx", "Porn"))
+			if config.mediaportal.showhdporn.value:
+				self.plugin_liste.append(("HDPorn", "hdporn", "Porn"))
+			if config.mediaportal.showhotshame.value:
+				self.plugin_liste.append(("hotshame", "hotshame", "Porn"))
+			if config.mediaportal.showmegaskanks.value:
+				self.plugin_liste.append(("MegaSkanks", "megaskanks", "Porn"))
+			if config.mediaportal.showIStreamPorn.value:
+				self.plugin_liste.append(("IStream-XXX", "istreamporn", "Porn"))
+			if config.mediaportal.showM4kPorn.value:
+				self.plugin_liste.append(("Movie4k-XXX", "movie4kporn", "Porn"))
+			if config.mediaportal.showpinkrod.value:
+				self.plugin_liste.append(("Pinkrod", "pinkrod", "Porn"))
+			if config.mediaportal.showplayporn.value:
+				self.plugin_liste.append(("PlayPorn", "playporn", "Porn"))
+			if config.mediaportal.showpornostreams.value:
+				self.plugin_liste.append(("PornoStreams", "pornostreams", "Porn"))
+			if config.mediaportal.showpornerbros.value:
+				self.plugin_liste.append(("PornerBros", "pornerbros", "Porn"))
+			if config.mediaportal.showPornhub.value:
+				self.plugin_liste.append(("Pornhub", "pornhub", "Porn"))
+			if config.mediaportal.showpornrabbit.value:
+				self.plugin_liste.append(("PornRabbit", "pornrabbit", "Porn"))
+			if config.mediaportal.showrealgfporn.value:
+				self.plugin_liste.append(("RealGFPorn", "realgfporn", "Porn"))
+			if config.mediaportal.showredtube.value:
+				self.plugin_liste.append(("RedTube", "redtube", "Porn"))
+			if config.mediaportal.showsexxxhd.value:
+				self.plugin_liste.append(("SeXXX-HD", "sexxxhd", "Porn"))
+			if config.mediaportal.showsunporno.value:
+				self.plugin_liste.append(("SunPorno", "sunporno", "Porn"))
+			if config.mediaportal.showthenewporn.value:
+				self.plugin_liste.append(("TheNewPorn", "thenewporn", "Porn"))
+			if config.mediaportal.showupdatetube.value:
+				self.plugin_liste.append(("UpdateTube", "updatetube", "Porn"))
+			if config.mediaportal.showwetplace.value:
+				self.plugin_liste.append(("WetPlace", "wetplace", "Porn"))
+			if config.mediaportal.showXhamster.value:
+				self.plugin_liste.append(("xHamster", "xhamster", "Porn"))
+			if config.mediaportal.showxxxsave.value:
+				self.plugin_liste.append(("XXXSaVe", "xxxsave", "Porn"))
+			if config.mediaportal.showyouporn.value:
+				self.plugin_liste.append(("YouPorn", "youporn", "Porn"))
 
 		# Plugin Sortierung		
 		if config.mediaportal.sortplugins != "default":
@@ -1895,6 +1914,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			"nextBouquet" :	self.page_next,
 			"prevBouquet" :	self.page_back,
 			"menu" : self.keySetup,
+			"info" : self.showPorn,
 			"displayHelp" : self.keyHelp,
 			"blue" : self.chFilter,
 			"green" : self.chSort,
@@ -2761,6 +2781,18 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			configfile.save()
 			self.close(self.session, False)			
 		
+	def showPorn(self):
+		if config.mediaportal.showporn.value:
+			config.mediaportal.showporn.value = False
+			self.restartAndCheck()
+		else:
+			self.session.openWithCallback(self.showPornOK, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
+
+	def showPornOK(self, pincode):
+		if pincode:
+			config.mediaportal.showporn.value = True
+			self.restartAndCheck()
+
 	def keyCancel(self):
 		config.mediaportal.filter.save()
 		configfile.save()
