@@ -1,4 +1,5 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
 
 def putpattvGenreListEntry(entry):
 	return [entry,
@@ -296,6 +297,15 @@ class putpattvFilmScreen(Screen):
 	def keyOK(self):
 		if self.keyLocked:
 			return
+		self.session.open(
+			PutpatTvPlayer,
+			self.filmliste,
+			playIdx = self['genreList'].getSelectedIndex(),
+			playAll = True,
+			listTitle = self.catName
+			)
+			
+		"""
 		url = self['genreList'].getCurrent()[0][1]
 		if url != None:
 			self.keyLocked = False
@@ -304,7 +314,9 @@ class putpattvFilmScreen(Screen):
 			token = self['genreList'].getCurrent()[0][2]
 			url = 'http://www.putpat.tv/ws.xml?client=putpatplayer&partnerId=1&token=%s=&streamingMethod=http&method=Asset.getClipForToken' % token
 			getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getToken).addErrback(self.dataError)
-					
+		"""
+	
+	"""
 	def getToken(self, data):
 		phClip = re.findall('<medium>(.*?)</medium>', data, re.S)
 		if phClip:
@@ -318,6 +330,35 @@ class putpattvFilmScreen(Screen):
 		sref = eServiceReference(0x1001, 0, file)
 		sref.setName(xxxtitle)
 		self.session.open(MoviePlayer, sref)
-
+	"""
+	
 	def keyCancel(self):
 		self.close()
+
+class PutpatTvPlayer(SimplePlayer):
+
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
+		print "ScienceTvPlayer:"
+
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
+		
+	def getVideo(self):
+		url = self.playList[self.playIdx][1]
+		if url != None:
+			self.play(url)
+		else:
+			token = self.playList[self.playIdx][2]
+			url = 'http://www.putpat.tv/ws.xml?client=putpatplayer&partnerId=1&token=%s=&streamingMethod=http&method=Asset.getClipForToken' % token
+			getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getToken).addErrback(self.dataError)
+
+	def getToken(self, data):
+		phClip = re.findall('<medium>(.*?)</medium>', data, re.S)
+		if phClip:
+			for phUrl in phClip:
+				url = phUrl.replace('&amp;','&')
+				self.play(url)
+
+	def play(self,file):
+		xxxtitle = self.playList[self.playIdx][0]
+		self.playStream(xxxtitle, file)
+
