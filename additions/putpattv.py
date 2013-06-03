@@ -338,7 +338,7 @@ class putpattvFilmScreen(Screen):
 class PutpatTvPlayer(SimplePlayer):
 
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
-		print "ScienceTvPlayer:"
+		print "PutpatTvPlayer:"
 
 		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
 		
