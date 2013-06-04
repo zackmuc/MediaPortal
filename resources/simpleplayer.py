@@ -273,7 +273,10 @@ class SimplePlaylist(Screen):
 		self['title'] = Label("Playlist")
 		self['ContentTitle'] = Label("")
 		self['name'] = Label("")
-		self['F1'] = Label("Löschen")
+		if self.plType == 'global':
+			self['F1'] = Label("Löschen")
+		else:
+			self['F1'] = Label("")
 		self['F2'] = Label("")
 		self['F3'] = Label("")
 		self['F4'] = Label("")

@@ -66,7 +66,7 @@ class myvideoTop100GenreScreen(Screen):
 	def loadPage(self):	
 		self.genreliste = [('Top100 Single Charts',"http://www.myvideo.de/Top_100/Top_100_Single_Charts"),
 							('Top100 Pop',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Pop"),
-							('Top100 Pock',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Rock"),
+							('Top100 Rock',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Rock"),
 							('Top100 Rap & RnB',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Rap/R%26B"),
 							('Top100 Diverse',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Diverse")]
 							
@@ -158,7 +158,7 @@ class myvideoTop100SongListeScreen(Screen):
 		idx = self['genreList'].getSelectedIndex()
 
 		print idx, myvideoTop100Name, myvideoTop100Url
-		self.session.open(myvideoTop100Player, self.filmliste, int(idx) , True, None)
+		self.session.open(myvideoTop100Player, self.filmliste, int(idx) , True, self.genreName)
 		
 	def keyCancel(self):
 		self.close()
@@ -167,10 +167,9 @@ class myvideoTop100Player(SimplePlayer):
 
 	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None):
 		print "myvideoTop100Player:"
-		#self.genreVideos = genreVideos
-		self.playList = playList
-		self.playIdx = playIdx
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll)
+		print listTitle
+		
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
 		
 		self.GK = ('WXpnME1EZGhNRGhpTTJNM01XVmhOREU0WldNNVpHTTJOakpt'
 			'TW1FMU5tVTBNR05pWkRaa05XRXhNVFJoWVRVd1ptSXhaVEV3'
