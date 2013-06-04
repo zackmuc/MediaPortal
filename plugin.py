@@ -87,6 +87,7 @@ from additions.mediatheken.orf import *
 
 # music
 from additions.canna import *
+from additions.myvideoTop100 import *
 
 # porn
 from additions.porn.ahme import *
@@ -208,6 +209,7 @@ config.mediaportal.showGEOde = ConfigYesNo(default = True)
 config.mediaportal.showDeluxemusic = ConfigYesNo(default = True)
 config.mediaportal.showNuna = ConfigYesNo(default = True)
 config.mediaportal.showWatchseries = ConfigYesNo(default = True)
+config.mediaportal.showMyvideoTop100 = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -350,6 +352,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige GEOde:", config.mediaportal.showGEOde))
 		self.configlist.append(getConfigListEntry("Zeige Deluxemusic:", config.mediaportal.showDeluxemusic))
 		self.configlist.append(getConfigListEntry("Zeige Nuna:", config.mediaportal.showNuna))
+		self.configlist.append(getConfigListEntry("Zeige Myvideo Top 100:", config.mediaportal.showMyvideoTop100))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -692,6 +695,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("Deluxemusic", "deluxemusic"))
 		if config.mediaportal.showNuna.value:
 			self.funsport.append(self.hauptListEntry("Nuna", "nuna"))
+		if config.mediaportal.showMyvideoTop100.value:
+			self.funsport.append(self.hauptListEntry("Myvideo Top 100", "myvideotop100"))
 		
 		# porn
 		if config.mediaportal.showporn.value:
@@ -1148,6 +1153,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(nunaGenreScreen)
 		elif auswahl == "Watchseries":
 			self.session.open(watchseriesGenreScreen)
+		elif auswahl == "Myvideo Top 100":
+			self.session.open(myvideoTop100GenreScreen)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1706,6 +1713,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Deluxemusic", "deluxemusic", "Fun"))
 		if config.mediaportal.showNuna.value:
 			self.plugin_liste.append(("Nuna", "nuna", "Fun"))
+		if config.mediaportal.showMyvideoTop100.value:
+			self.plugin_liste.append(("Myvideo Top 100", "myvideotop100", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2258,7 +2267,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Watchseries":
 			self.hit_plugin("Watchseries")
 			self.session.open(watchseriesGenreScreen)
-			
+		elif auswahl == "Myvideo Top 100":
+			self.hit_plugin("Myvideo Top 100")
+			self.session.open(myvideoTop100GenreScreen)
 
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -2784,6 +2795,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 	def showPorn(self):
 		if config.mediaportal.showporn.value:
 			config.mediaportal.showporn.value = False
+			config.mediaportal.filter.value = "ALL"
 			self.restartAndCheck()
 		else:
 			self.session.openWithCallback(self.showPornOK, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
@@ -2791,6 +2803,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 	def showPornOK(self, pincode):
 		if pincode:
 			config.mediaportal.showporn.value = True
+			config.mediaportal.filter.value = "ALL"
 			self.restartAndCheck()
 
 	def keyCancel(self):
