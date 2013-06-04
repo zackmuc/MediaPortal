@@ -735,6 +735,7 @@ class m4kKinoFilmeListeScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 		
 	def loadPage(self):
+		print self.streamGenreLink
 		getPage(self.streamGenreLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
 
 	def dataError(self, error):
@@ -1428,10 +1429,15 @@ class m4kStreamListeScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):
-		getPage(self.streamGenreLink, agent=std_headers, cookies=self.keckse, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
+		print "link:", self.streamGenreLink
+		req = urllib2.Request(self.streamGenreLink)
+		res = urllib2.urlopen(req)
+		url = res.geturl()
+		print "link resolved:", url
+		getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
 		
 	def dataError(self, error):
-		print error
+		print "error:", error
 		
 	def loadPageData(self, data):
 		print "daten bekommen"
@@ -1483,7 +1489,10 @@ class m4kStreamListeScreen(Screen):
 			]
 
 	def loadPic(self):
-		getPage(self.streamGenreLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.showHandlung).addErrback(self.dataError)
+		req = urllib2.Request(self.streamGenreLink)
+		res = urllib2.urlopen(req)
+		url = res.geturl()
+		getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.showHandlung).addErrback(self.dataError)
 		
 	def showHandlung(self, data):
 		image = re.findall('<meta property="og:image" content="(.*?)"', data, re.S)
@@ -1510,7 +1519,11 @@ class m4kStreamListeScreen(Screen):
 			return
 		streamLink = self['filmList'].getCurrent()[0][0]
 		print self.streamName, streamLink
-		getPage(streamLink, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.get_streamlink, streamLink).addErrback(self.dataError)
+		req = urllib2.Request(streamLink)
+		res = urllib2.urlopen(req)
+		url = res.geturl()
+		print "link resolved:", url
+		getPage(url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.get_streamlink, url).addErrback(self.dataError)
 		
 	def get_streamlink(self, data, streamLink):
 		if re.match('.*?(http://img.movie4k.to/img/parts/teil1_aktiv.png|http://img.movie4k.to/img/parts/teil1_inaktiv.png|http://img.movie4k.to/img/parts/part1_active.png|http://img.movie4k.to/img/parts/part1_inactive.png)', data, re.S):
