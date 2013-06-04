@@ -191,6 +191,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				self.setPlaymode()
 			elif data[0] == 2:
 				url = self.session.nav.getCurrentlyPlayingServiceReference().getPath()
+				if re.match('.*?putpat.tv', url, re.I):
+					self.session.open(MessageBox, _("Fehler: URL ist nicht persistent !"), MessageBox.TYPE_INFO, timeout=5)
+					return
+					
 				self.pl_entry[1] = url
 				self.pl_name = data[1]
 				res = SimplePlaylistIO.addEntry(data[1], self.pl_entry)
@@ -219,6 +223,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 					self.playIdx = 0
 					self.playLen = len(self.playList)
 					self.playList2 = []
+				if self.playLen > 0:
 					self.openPlaylist()
 		
 	def lockShow(self):
