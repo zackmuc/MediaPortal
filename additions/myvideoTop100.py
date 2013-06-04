@@ -217,6 +217,6 @@ class myvideoTop100Player(SimplePlayer):
 			source =  unquote(source[0])
 			vorne = re.findall('(.*?)\.', source, re.S)
 			hinten = re.findall('\.(.*[a-zA-Z0-9])', source, re.S)
-			string23 = "/%s:%s" % (hinten[0], vorne[0])
+			string23 = "/%s playpath=%s" % (hinten[0], vorne[0])
 			link = "%s%s" % (url, string23)
 			self.playStream(self.myvideoTop100Name, link)
