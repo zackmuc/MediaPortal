@@ -1,4 +1,4 @@
-<!-- kxNeusteSerien -->
+<!-- kxNeuesteSerien -->
 		<screen name="Kinox.to" position="center,center" size="900,655" backgroundColor="#00060606" flags="wfNoBorder">
 			<eLabel position="0,0" size="900,60" backgroundColor="#00242424" />
 			<widget name="title" position="30,10" size="500,55" backgroundColor="#18101214" transparent="1" zPosition="1" font="mediaportal;24" valign="center" halign="left" />

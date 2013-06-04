@@ -44,7 +44,7 @@ class streamGenreScreen(Screen):
 		self.onLayoutFinish.append(self.layoutFinished)
 		
 	def layoutFinished(self):
-		self.genreliste.append(("Neusten", "http://streamjunkies.org"))
+		self.genreliste.append(("Neuesten", "http://streamjunkies.org"))
 		self.genreliste.append(("Kino", "http://streamjunkies.org/wp-content/themes/Streamjunkies/neu.php"))
 		self.genreliste.append(("Abenteuer", "http://streamjunkies.org/thema/abenteuer/"))
 		self.genreliste.append(("Action", "http://streamjunkies.org/thema/action/"))

@@ -57,7 +57,7 @@ class mlehdGenreScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):	
-		self.genreliste = [("Neusten", "http://www.mle-hd.se/page/"),
+		self.genreliste = [("Neuesten", "http://www.mle-hd.se/page/"),
 							("Abenteuer", "http://www.mle-hd.se/category/abenteuer/page/"),
 							("Action", "http://www.mle-hd.se/category/action/page/"),
 							("Animation-Zeichentrick", "http://www.mle-hd.se/category/animation-zeichentrick/page/"),
