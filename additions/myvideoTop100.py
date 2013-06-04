@@ -64,7 +64,7 @@ class myvideoTop100GenreScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 
 	def loadPage(self):	
-		self.genreliste = [('Top 100 Single charts',"http://www.myvideo.de/Top_100/Top_100_Single_Charts"),
+		self.genreliste = [('Top100 Single Charts',"http://www.myvideo.de/Top_100/Top_100_Single_Charts"),
 							('Top100 Pop',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Pop"),
 							('Top100 Pock',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Rock"),
 							('Top100 Rap & RnB',"http://www.myvideo.de/Musik/Musik_Charts/Top_100_Rap/R%26B"),
