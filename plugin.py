@@ -2795,16 +2795,16 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 	def showPorn(self):
 		if config.mediaportal.showporn.value:
 			config.mediaportal.showporn.value = False
-			config.mediaportal.filter.value = "ALL"
-			self.restartAndCheck()
+			if config.mediaportal.filter.value == "Porn":
+				self.chFilter()
+			self.restart()
 		else:
 			self.session.openWithCallback(self.showPornOK, PinInput, pinList = [(config.mediaportal.pincode.value)], triesEntry = self.getTriesEntry(), title = _("Please enter the correct pin code"), windowTitle = _("Enter pin code"))
 
 	def showPornOK(self, pincode):
 		if pincode:
 			config.mediaportal.showporn.value = True
-			config.mediaportal.filter.value = "ALL"
-			self.restartAndCheck()
+			self.restart()
 
 	def keyCancel(self):
 		config.mediaportal.filter.save()
