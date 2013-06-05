@@ -193,9 +193,7 @@ class wrestlingnetworkPlayer(SimplePlayer):
 
 	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None, cover=True):
 		print "wrestlingnetworkPlayer:"
-		self.playList = playList
-		self.playIdx = playIdx
-		self.cover = cover
+		
 		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, cover)
 
 		self.onLayoutFinish.append(self.getVideo)
