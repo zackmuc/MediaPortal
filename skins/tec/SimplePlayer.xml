@@ -3,7 +3,7 @@
   <widget source="session.CurrentService" render="Label" position="278,566" size="700,50" font="Regular; 24" valign="top" halign="center" noWrap="1" backgroundColor="#00000000" transparent="1">
     <convert type="ServiceName">Name</convert>
   </widget>
-  <widget source="session.CurrentService" render="Progress" position="280,624" size="695,12" pixmap="Elgato-HD.ME4VU/misc/prog.png" zPosition="3" transparent="1">
+  <widget source="session.CurrentService" render="Progress" position="280,624" size="695,12" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbar.png" zPosition="3" transparent="1">
   <convert type="ServicePosition">Position</convert>
 </widget>
   <widget source="session.CurrentService" render="PositionGauge" position="280,624" size="695,12" zPosition="3" transparent="1">
@@ -18,26 +18,26 @@
   <widget source="session.CurrentService" render="Label" position="876,645" size="100,30" font="Regular;22" halign="right" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Remaining,Negate</convert>
 </widget>
-  <widget name="Cover" position="95,565" size="120,125" zPosition="1" alphatest="on" transparent="1" />
+<!--  <widget name="Cover" position="95,565" size="120,125" zPosition="1" alphatest="on" transparent="1" /> -->
   <ePixmap position="94,603" size="120,50" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/mplogo.png" alphatest="blend" />
   <eLabel position="260,574" size="2,110" backgroundColor="#00808888" />
   <eLabel position="990,574" size="2,110" backgroundColor="#00808888" />
-  <ePixmap pixmap="Elgato-HD.ME4VU/icons/ico_dolby_off.png" position="1007,655" size="57,20" zPosition="1" alphatest="blend" />
-  <widget source="session.CurrentService" render="Pixmap" pixmap="Elgato-HD.ME4VU/icons/ico_dolby_on.png" position="1007,655" size="57,20" zPosition="2" alphatest="blend">
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_dolby_off.png" position="1007,655" size="57,20" zPosition="1" alphatest="blend" />
+  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_dolby_on.png" position="1007,655" size="57,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">IsMultichannel</convert>
     <convert type="ConditionalShowHide" />
   </widget>
-  <ePixmap pixmap="Elgato-HD.ME4VU/icons/ico_format_off.png" position="1100,655" size="36,20" zPosition="1" alphatest="blend" />
-  <widget source="session.CurrentService" render="Pixmap" pixmap="Elgato-HD.ME4VU/icons/ico_format_on.png" position="1100,655" size="36,20" zPosition="2" alphatest="blend">
+  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_format_off.png" position="1100,655" size="36,20" zPosition="1" alphatest="blend" />
+  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_format_on.png" position="1100,655" size="36,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">IsWidescreen</convert>
     <convert type="ConditionalShowHide" />
   </widget>
-  <widget source="session.CurrentService" render="Pixmap" pixmap="Elgato-HD.ME4VU/icons/ico_hd_off.png" position="1170,655" size="29,20" zPosition="1" alphatest="blend">
+  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_hd_off.png" position="1170,655" size="29,20" zPosition="1" alphatest="blend">
     <convert type="ServiceInfo">VideoWidth</convert>
     <convert type="ValueRange">0,720</convert>
     <convert type="ConditionalShowHide" />
   </widget>
-  <widget source="session.CurrentService" render="Pixmap" pixmap="Elgato-HD.ME4VU/icons/ico_hd_on.png" position="1170,655" size="29,20" zPosition="2" alphatest="blend">
+  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_hd_on.png" position="1170,655" size="29,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">VideoWidth</convert>
     <convert type="ValueRange">721,1980</convert>
     <convert type="ConditionalShowHide" />
