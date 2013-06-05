@@ -15,13 +15,18 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	
 	#prepared for MP infobar
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
-	
+
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local'):
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
 		self.session = session
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
+
+		path = "%s/tec/SimplePlayer.xml" % self.skin_path
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()	
 		
 		self["actions"] = ActionMap(["WizardActions",'MediaPlayerSeekActions',"EPGSelectActions",'MoviePlayerActions','ColorActions','InfobarActions'],
 		{
@@ -43,8 +48,8 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.allowPiP = False
 		InfoBarSeek.__init__(self)
 
-		#self.skinName = 'MediaPortal SimplePlayer'
-		self.skinName = 'MoviePlayer'
+		self.skinName = 'MediaPortal SimplePlayer'
+		#self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 
 		self.randomPlay = False
