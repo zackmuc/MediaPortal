@@ -70,7 +70,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		
 		# load default cover
 		self['Cover'] = Pixmap()
-		self.ShowCover()
+		#self.ShowCover()
 		
 		self.setPlaymode()
 		self.onClose.append(self.playExit)
