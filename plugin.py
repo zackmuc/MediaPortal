@@ -69,6 +69,7 @@ from additions.geo_de import *
 from additions.deluxemusic import *
 from additions.nuna import *
 from additions.watchseries import *
+from additions.wrestlingnetwork import *
 
 # kids
 from additions.kinderkino import *
@@ -210,6 +211,7 @@ config.mediaportal.showDeluxemusic = ConfigYesNo(default = True)
 config.mediaportal.showNuna = ConfigYesNo(default = True)
 config.mediaportal.showWatchseries = ConfigYesNo(default = True)
 config.mediaportal.showMyvideoTop100 = ConfigYesNo(default = True)
+config.mediaportal.showWrestlingnetwork = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -353,6 +355,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Deluxemusic:", config.mediaportal.showDeluxemusic))
 		self.configlist.append(getConfigListEntry("Zeige Nuna:", config.mediaportal.showNuna))
 		self.configlist.append(getConfigListEntry("Zeige Myvideo Top 100:", config.mediaportal.showMyvideoTop100))
+		self.configlist.append(getConfigListEntry("Zeige Wrestling Network:", config.mediaportal.showWrestlingnetwork))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -603,6 +606,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.mediatheken.append(self.hauptListEntry("SportBild", "sportbild"))
 		if config.mediaportal.showVutec.value:
 			self.mediatheken.append(self.hauptListEntry("Vutechtalk", "vutechtalk"))
+		if config.mediaportal.showWrestlingnetwork.value:
+			self.mediatheken.append(self.hauptListEntry("Wrestlingnetwork", "wrestlingnetwork"))
 
 		# Grauzone
 		if config.mediaportal.showSzeneStreams.value:
@@ -1177,6 +1182,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(cinestreamFilmListeScreen)
 		elif auswahl == "Moovizon":
 			self.session.open(moovizonGenreScreen)
+		elif auswahl == "Wrestlingnetwork":
+			self.session.open(wrestlingnetworkGenreScreen)
 		# porn
 		elif auswahl == "4Tube":
 			if config.mediaportal.pornpin.value:
@@ -1733,6 +1740,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("ZDF Mediathek", "zdf", "Mediathek"))
 		if config.mediaportal.showORF.value:
 			self.plugin_liste.append(("ORF TVthek", "orf", "Mediathek"))
+		if config.mediaportal.showWrestlingnetwork.value:
+			self.plugin_liste.append(("Wrestlingnetwork", "wrestlingnetwork", "Mediathek"))
 			
 		### porn
 		if config.mediaportal.showporn.value:
@@ -2299,6 +2308,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "KIKA+":
 			self.hit_plugin("KIKA+")
 			self.session.open(kikaGenreScreen)
+		elif auswahl == "Wrestlingnetwork":
+			self.hit_plugin("Wrestlingnetwork")
+			self.session.open(wrestlingnetworkGenreScreen)
 
 		# porn
 		elif auswahl == "4Tube":
