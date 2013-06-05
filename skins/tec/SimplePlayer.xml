@@ -18,7 +18,7 @@
   <widget source="session.CurrentService" render="Label" position="876,645" size="100,30" font="Regular;22" halign="right" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Remaining,Negate</convert>
 </widget>
-<!--  <widget name="Cover" position="95,565" size="120,125" zPosition="1" alphatest="on" transparent="1" /> -->
+  <widget name="Cover" position="95,565" size="120,125" zPosition="1" alphatest="on" transparent="1" /> -->
   <ePixmap position="94,603" size="120,50" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/mplogo.png" alphatest="blend" />
   <eLabel position="260,574" size="2,110" backgroundColor="#00808888" />
   <eLabel position="990,574" size="2,110" backgroundColor="#00808888" />

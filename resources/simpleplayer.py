@@ -53,6 +53,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		#self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 
+		# load default cover
+		self['Cover'] = Pixmap()
+		
 		self.randomPlay = False
 		self.playMode = ""
 		self.listTitle = listTitle
