@@ -14,6 +14,7 @@ class YoutubePlayer(SimplePlayer):
 		
 	def getVideo(self):
 		print "getVideo:"
+		self.videoPrio = int(config.mediaportal.youtubeprio.value)-1
 		dhTitle = self.playList[self.playIdx][self.title_inr]
 		dhVideoId = self.playList[self.playIdx][2]
 		print "Title: ",dhTitle
