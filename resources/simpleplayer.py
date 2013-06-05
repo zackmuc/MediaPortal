@@ -15,8 +15,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	
 	#prepared for MP infobar
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
-
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local'):
+	
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0):
+	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
 		self.session = session
@@ -64,6 +65,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.plType = plType
 		self.playList2 = []
 		self.pl_name = ''
+		self.title_inr = title_inr
 		
 		self.setPlaymode()
 		self.onClose.append(self.playExit)
@@ -159,9 +161,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	def openPlaylist(self):
 		if self.playLen > 0:
 			if self.plType == 'local':
-				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle)
+				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle, plType=self.plType, title_inr=self.title_inr)
 			else:
-				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=self.listTitle, plType=self.plType)
+				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0)
 		
 	def cb_Playlist(self, data):
 		if data[0] != -1:
@@ -247,7 +249,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 
 class SimplePlaylist(Screen):
 
-	def __init__(self, session, playList, playIdx, listTitle=None, plType='local'):
+	def __init__(self, session, playList, playIdx, listTitle=None, plType='local', title_inr=0):
 		self.session = session
 	
 		self.plugin_path = mp_globals.pluginPath
@@ -274,6 +276,7 @@ class SimplePlaylist(Screen):
 		self.playIdx = playIdx
 		self.listTitle = listTitle
 		self.plType = plType
+		self.title_inr = title_inr
 
 		self['title'] = Label("Playlist")
 		self['ContentTitle'] = Label("")
@@ -295,7 +298,7 @@ class SimplePlaylist(Screen):
 
 	def playListEntry(self, entry):
 		return [entry,
-			(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
+			(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[self.title_inr])
 			] 
 		
 	def showPlaylist(self):

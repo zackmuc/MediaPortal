@@ -3,8 +3,9 @@
 from os.path import exists
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.yt_url import *
+from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 
-USER_Version = "USER-Channels v0.94"
+USER_Version = "USER-Channels v0.95"
 
 USER_siteEncoding = 'utf-8'
 
@@ -438,6 +439,7 @@ class show_USER_ListScreen(Screen):
 	def keyOK(self):
 		if self.keyLocked:
 			return
+		"""
 		dhTitle = self['liste'].getCurrent()[0][1]
 		dhVideoId = self['liste'].getCurrent()[0][2]
 		print "Title: ",dhTitle
@@ -450,6 +452,17 @@ class show_USER_ListScreen(Screen):
 			sref = eServiceReference(0x1001, 0, dhLink)
 			sref.setName(dhTitle)
 			self.session.open(MoviePlayer, sref)
+		"""
+		self.session.open(
+			YoutubePlayer,
+			self.filmliste,
+			self['liste'].getSelectedIndex(),
+			playAll = True,
+			listTitle = self.genreName,
+			plType='local',
+			title_inr=1
+			)
+		
 
 	def keyCancel(self):
 		self.close()
