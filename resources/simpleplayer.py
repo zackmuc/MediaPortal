@@ -16,7 +16,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	#prepared for MP infobar
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False):
 	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
@@ -52,9 +52,6 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.skinName = 'MediaPortal SimplePlayer'
 		#self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
-
-		# load default cover
-		self['Cover'] = Pixmap()
 		
 		self.randomPlay = False
 		self.playMode = ""
@@ -69,6 +66,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playList2 = []
 		self.pl_name = ''
 		self.title_inr = title_inr
+		self.cover = cover
+		
+		# load default cover
+		self['Cover'] = Pixmap()
+		self.ShowCover()
 		
 		self.setPlaymode()
 		self.onClose.append(self.playExit)
@@ -235,7 +237,26 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 					self.playList2 = []
 				if self.playLen > 0:
 					self.openPlaylist()
-		
+
+	def ShowCover(self):
+		print "Simpler Player Load Cover:", self.cover
+		if self.cover:
+			if fileExists("/tmp/Icon.jpg"):
+				print "YEEEESSSSSS"
+				self['Cover'].instance.setPixmap(gPixmapPtr())
+				self.scale = AVSwitch().getFramebufferScale()
+				self.picload = ePicLoad()
+				size = self['Cover'].instance.size()
+				self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+				if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
+					ptr = self.picload.getData()
+					if ptr != None:
+						self['Cover'].instance.setPixmap(ptr)
+						self['Cover'].show()
+						del self.picload
+			else:
+				print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
+					
 	def lockShow(self):
 		pass
 		
