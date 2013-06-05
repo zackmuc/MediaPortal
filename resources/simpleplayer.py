@@ -363,6 +363,7 @@ class SimpleConfig(ConfigListScreen, Screen):
 		self.session = session
 		self.list = []
 		self.list.append(getConfigListEntry('Random Play', config.mediaportal.sp_randomplay))
+		self.list.append(getConfigListEntry('Youtube VideoPrio', config.mediaportal.youtubeprio))
 		ConfigListScreen.__init__(self, self.list)
 		self['setupActions'] = ActionMap(['SetupActions'],
 		{
