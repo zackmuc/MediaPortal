@@ -65,7 +65,7 @@ class wrestlingnetworkGenreScreen(Screen):
 							('RAW',"http://wrestling-network.net/category/wwe/wwe-raw/page/"),
 							('Smackdown',"http://wrestling-network.net/category/wwe/wwe-smackdown/page/"),
 							('NXT',"http://wrestling-network.net/category/wwe/wwe-nxt/page"),
-							('NTA',"http://wrestling-network.net/category/tna/page/"),
+							('TNA',"http://wrestling-network.net/category/tna/page/"),
 							('ROH',"http://wrestling-network.net/category/roh/page/")]
 							
 		self.chooseMenuList.setList(map(wrestlingnetworkGenreListEntry, self.genreliste))
