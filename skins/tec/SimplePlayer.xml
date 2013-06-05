@@ -6,7 +6,7 @@
   <widget source="session.CurrentService" render="Progress" position="280,624" size="695,12" pixmap="Elgato-HD.ME4VU/misc/prog.png" zPosition="3" transparent="1">
   <convert type="ServicePosition">Position</convert>
 </widget>
-  <widget source="session.CurrentService" render="EMCPositionGauge" position="280,624" size="695,12" zPosition="3" transparent="1">
+  <widget source="session.CurrentService" render="PositionGauge" position="280,624" size="695,12" zPosition="3" transparent="1">
   <convert type="ServicePosition">Gauge</convert>
 </widget>
   <widget source="session.CurrentService" render="Label" position="278,649" size="100,30" font="Regular;22" halign="left" backgroundColor="#00000000" transparent="1">
