@@ -1,5 +1,6 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
+from Plugins.Extensions.MediaPortal.resources.putpattvlink import PutpattvLink
 
 def putpattvGenreListEntry(entry):
 	return [entry,
@@ -339,26 +340,12 @@ class PutpatTvPlayer(SimplePlayer):
 
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
 		print "PutpatTvPlayer:"
-
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
+		
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, False, 'putpattv')
 		
 	def getVideo(self):
 		url = self.playList[self.playIdx][1]
-		if url != None:
-			self.play(url)
-		else:
-			token = self.playList[self.playIdx][2]
-			url = 'http://www.putpat.tv/ws.xml?client=putpatplayer&partnerId=1&token=%s=&streamingMethod=http&method=Asset.getClipForToken' % token
-			getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getToken).addErrback(self.dataError)
-
-	def getToken(self, data):
-		phClip = re.findall('<medium>(.*?)</medium>', data, re.S)
-		if phClip:
-			for phUrl in phClip:
-				url = phUrl.replace('&amp;','&')
-				self.play(url)
-
-	def play(self,file):
 		xxxtitle = self.playList[self.playIdx][0]
-		self.playStream(xxxtitle, file)
-
+		token = self.playList[self.playIdx][2]
+		PutpattvLink(self.session).getLink(self.playStream, self.dataError, xxxtitle, url, token)
+			

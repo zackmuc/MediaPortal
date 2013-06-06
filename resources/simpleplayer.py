@@ -3,6 +3,8 @@
 import random
 from Screens.InfoBarGenerics import *
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.youtubelink import YoutubeLink
+from Plugins.Extensions.MediaPortal.resources.putpattvlink import PutpattvLink
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
 	from Plugins.Extensions.mediainfo.plugin import mediaInfo
 	MediainfoPresent = True
@@ -16,7 +18,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	#prepared for MP infobar
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False, ltype=''):
 	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
@@ -61,12 +63,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playIdx = playIdx
 		self.playLen = len(playList)
 		self.returning = False
-		self.pl_entry = ['', '', '']
+		self.pl_entry = ['', '', '', '', '']
 		self.plType = plType
 		self.playList2 = []
 		self.pl_name = ''
 		self.title_inr = title_inr
 		self.cover = cover
+		self.ltype = ltype
 		
 		# load default cover
 		self['Cover'] = Pixmap()
@@ -94,13 +97,16 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		
 	def playStream(self, title, url, album='', artist=''):
 		print "playStream: ",title,url
+		if url == None:
+			return
 		sref = eServiceReference(0x1001, 0, url)
 		sref.setName(title)
 		pos = title.find('. ', 0, 5)
 		if pos > 0:
 			pos += 2
 			title = title[pos:]
-		self.pl_entry = [title, None, artist, album]
+			
+		self.pl_entry = [title, None, artist, album, self.ltype]
 		self.session.nav.stopService()
 		self.session.nav.playService(sref)
 
@@ -159,7 +165,16 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			url = self.playList2[self.playIdx][1]
 			album = self.playList2[self.playIdx][2]
 			artist = self.playList2[self.playIdx][3]
-			self.playStream(titel, url, album, artist)
+			if len(self.playList2[self.playIdx]) < 5:
+				ltype = ''
+			else:
+				ltype = self.playList2[self.playIdx][4]
+			if ltype == 'youtube':
+				YoutubeLink(self.session).getLink(self.playStream, titel, url)
+			elif ltype == 'putpattv':
+				PutpattvLink(self.session).getLink(self.playStream, titel, url, '')
+			else:
+				self.playStream(titel, url, album, artist)
 		else:
 			self.close()
 				
@@ -194,7 +209,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				self.session.open(mediaInfo, True)
 
 	def openMenu(self):
-		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu)
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, self.plType)
 		
 	def cb_Menu(self, data):
 		print "cb_Menu:"
@@ -202,10 +217,17 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			if data[0] == 1:
 				self.setPlaymode()
 			elif data[0] == 2:
+				if self.plType != 'local':
+					self.session.open(MessageBox, _("Fehler: Service darf nur von der lok. PL hinzugefügt werden"), MessageBox.TYPE_INFO, timeout=5)
 				url = self.session.nav.getCurrentlyPlayingServiceReference().getPath()
-				if re.match('.*?(putpat.tv|myvideo|youtube)', url, re.I):
+				if re.match('.*?(myvideo)', url, re.I):
 					self.session.open(MessageBox, _("Fehler: URL ist nicht persistent !"), MessageBox.TYPE_INFO, timeout=5)
 					return
+				
+				if self.pl_entry[4] == 'youtube':
+					url = self.playList[self.playIdx][2]
+				elif self.pl_entry[4] == 'putpattv':
+					url = self.playList[self.playIdx][1]
 					
 				self.pl_entry[1] = url
 				self.pl_name = data[1]
@@ -386,9 +408,10 @@ class SimpleConfig(ConfigListScreen, Screen):
 class SimplePlayerMenu(Screen):
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player Menü">\n\t\t\t<widget name="menu" position="10,10" size="290,190" scrollbarMode="showOnDemand" />\n\t\t</screen>'
 	
-	def __init__(self, session):
+	def __init__(self, session, pltype):
 		Screen.__init__(self, session)
 		self.session = session
+		self.pltype = pltype
 		self['setupActions'] = ActionMap(['SetupActions'],
 		{
 			'ok': 		self.keyOk,
@@ -397,9 +420,11 @@ class SimplePlayerMenu(Screen):
 
 		self.liste = []
 		self.liste.append(('Configuration', 1))
-		self.liste.append(('Add service to global playlist', 2))
-		self.liste.append(('Open global playlist', 3))
-		self.liste.append(('Open local playlist', 4))
+		if pltype == 'local':
+			self.liste.append(('Add service to global playlist', 2))
+			self.liste.append(('Open global playlist', 3))
+		else:
+			self.liste.append(('Open local playlist', 4))
 		self['menu'] = MenuList(self.liste)
 		
 	def openConfig(self):
@@ -442,7 +467,11 @@ class SimplePlaylistIO:
 		try:
 			f1 = open(pl_path, 'w')
 			while j < l:
-				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</\n' % (list[j][0], list[j][1], list[j][2], list[j][3])
+				if len(list[j]) < 5:
+					ltype = ''
+				else:
+					ltype = list[j][4]
+				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/>\n' % (list[j][0], list[j][1], list[j][2], list[j][3], ltype)
 				f1.write(wdat)
 				j += 1
 					
@@ -457,6 +486,7 @@ class SimplePlaylistIO:
 	def addEntry(pl_name, entry):
 		print "addEntry:"
 		
+		ltype = entry[4]
 		album = entry[3]
 		artist = entry[2]
 		url = entry[1]
@@ -485,7 +515,7 @@ class SimplePlaylistIO:
 			else:
 				f1 = open(pl_path, 'w')
 		
-			wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</\n' % (title, url, album, artist)
+			wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/>\n' % (title, url, album, artist, ltype)
 			f1.write(wdat)
 			f1.close()
 			return 1
@@ -518,14 +548,19 @@ class SimplePlaylistIO:
 					print "entry: ",entry
 					if entry == "":
 						break
-					m = re.search('<title>(.*?)</<url>(.*?)</<album>(.*?)</<artist>(.*?)</', entry) 
+					m = re.search('<title>(.*?)</<url>(.*?)</<album>(.*?)</<artist>(.*?)</', entry)
+					m2 = re.search('<ltype (.*?)/>', entry)
 					if m:
 						print "m:"
 						titel = m.group(1)
 						url = m.group(2)
 						album = m.group(3)
 						artist = m.group(4)
-						list.append((titel, url, album, artist))
+						if m2:
+							ltype = m2.group(1)
+						else:
+							ltype = ''
+						list.append((titel, url, album, artist, ltype))
 				
 				f1.close()
 			
