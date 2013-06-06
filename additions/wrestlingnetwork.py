@@ -168,7 +168,7 @@ class wrestlingnetworkSongListeScreen(Screen):
 		idx = self['liste'].getSelectedIndex()
 
 		print idx, wrestlingnetworkName, wrestlingnetworkUrl
-		self.session.open(wrestlingnetworkPlayer, self.filmliste, int(idx) , True, None, True)
+		self.session.open(wrestlingnetworkPlayer, self.filmliste, int(idx) , True, None, None)
 
 	def keyPageDown(self):
 		print "PageDown"
@@ -191,7 +191,7 @@ class wrestlingnetworkSongListeScreen(Screen):
 
 class wrestlingnetworkPlayer(SimplePlayer):
 
-	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None, cover=True):
+	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None, cover=None):
 		print "wrestlingnetworkPlayer:"
 		
 		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, cover)

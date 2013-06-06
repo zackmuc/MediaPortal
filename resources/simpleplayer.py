@@ -18,7 +18,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	#prepared for MP infobar
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False, ltype=''):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=None, ltype=''):
 	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
@@ -73,11 +73,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		
 		# load default cover
 		self['Cover'] = Pixmap()
-		#self.ShowCover()
 		
 		self.setPlaymode()
 		self.onClose.append(self.playExit)
-
+		self.onFirstExecBegin.append(self.getShowCover)
 		self.onLayoutFinish.append(self.getVideo)
 			
 	def playVideo(self):
@@ -260,24 +259,26 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				if self.playLen > 0:
 					self.openPlaylist()
 
-	def ShowCover(self):
+	def getShowCover(self):
 		print "Simpler Player Load Cover:", self.cover
-		if self.cover:
-			if fileExists("/tmp/Icon.jpg"):
-				print "YEEEESSSSSS"
-				self['Cover'].instance.setPixmap(gPixmapPtr())
-				self.scale = AVSwitch().getFramebufferScale()
-				self.picload = ePicLoad()
-				size = self['Cover'].instance.size()
-				self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
-				if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
-					ptr = self.picload.getData()
-					if ptr != None:
-						self['Cover'].instance.setPixmap(ptr)
-						self['Cover'].show()
-						del self.picload
-			else:
-				print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
+		if self.cover != None:
+			downloadPage(self.cover, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+	
+	def ShowCover(self, data):
+		if fileExists("/tmp/Icon.jpg"):
+			self['Cover'].instance.setPixmap(gPixmapPtr())
+			self.scale = AVSwitch().getFramebufferScale()
+			self.picload = ePicLoad()
+			size = self['Cover'].instance.size()
+			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
+				ptr = self.picload.getData()
+				if ptr != None:
+					self['Cover'].instance.setPixmap(ptr)
+					self['Cover'].show()
+					del self.picload
+		else:
+			print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
 					
 	def lockShow(self):
 		pass
