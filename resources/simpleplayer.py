@@ -203,7 +203,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				self.setPlaymode()
 			elif data[0] == 2:
 				url = self.session.nav.getCurrentlyPlayingServiceReference().getPath()
-				if re.match('.*?(putpat.tv|myvideo)', url, re.I):
+				if re.match('.*?(putpat.tv|myvideo|youtube)', url, re.I):
 					self.session.open(MessageBox, _("Fehler: URL ist nicht persistent !"), MessageBox.TYPE_INFO, timeout=5)
 					return
 					
