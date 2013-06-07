@@ -6,6 +6,7 @@ from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.youtubelink import YoutubeLink
 from Plugins.Extensions.MediaPortal.resources.putpattvlink import PutpattvLink
 from Plugins.Extensions.MediaPortal.resources.myvideolink import MyvideoLink
+from Plugins.Extensions.MediaPortal.resources.songstolink import SongstoLink
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
 	from Plugins.Extensions.mediainfo.plugin import mediaInfo
 	MediainfoPresent = True
@@ -95,7 +96,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		print error
 		self.playNextStream()
 		
-	def playStream(self, title, url, album='', artist=''):
+	def playStream(self, title, url=None, album='', artist=''):
 		print "playStream: ",title,url
 		if url == None:
 			return
@@ -161,22 +162,27 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	def getVideo2(self):
 		print "getVideo2:"
 		if self.playLen > 0:
-			titel = self.playList2[self.playIdx][0]
-			url = self.playList2[self.playIdx][1]
-			album = self.playList2[self.playIdx][2]
-			artist = self.playList2[self.playIdx][3]
-			if len(self.playList2[self.playIdx]) < 5:
+			titel = self.playList2[self.playIdx][1]
+			url = self.playList2[self.playIdx][2]
+			album = self.playList2[self.playIdx][3]
+			artist = self.playList2[self.playIdx][4]
+			if len(self.playList2[self.playIdx]) < 6:
 				ltype = ''
 			else:
-				ltype = self.playList2[self.playIdx][4]
+				ltype = self.playList2[self.playIdx][5]
+				
 			if ltype == 'youtube':
 				YoutubeLink(self.session).getLink(self.playStream, self.dataError, titel, url)
 			elif ltype == 'putpattv':
-				token = self.playList2[self.playIdx][5]
+				token = self.playList2[self.playIdx][6]
 				PutpattvLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
 			elif ltype == 'myvideo':
-				token = self.playList2[self.playIdx][5]
+				token = self.playList2[self.playIdx][6]
 				MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
+			elif ltype == 'songsto':
+				#print "songsto",titel,artist,album,token
+				token = self.playList2[self.playIdx][6]
+				SongstoLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, token)
 			else:
 				self.playStream(titel, url, album, artist)
 		else:
@@ -377,7 +383,7 @@ class SimplePlaylist(Screen):
 		if self.plType == 'global':
 			idx = self['genreList'].getSelectedIndex()
 			"""
-			del playList[idx:idx+1]
+			del playList[idx]
 			if len(self.playList) == 0:
 				self.close([0,'del',self.playList])
 			else:
@@ -436,9 +442,10 @@ class SimplePlayerMenu(Screen):
 
 		self.liste = []
 		self.liste.append(('Configuration', 1))
-		if pltype == 'local':
+		if pltype in ('local', 'extern') :
 			self.liste.append(('Add service to global playlist', 2))
-			self.liste.append(('Open global playlist', 3))
+			if pltype == 'local':
+				self.liste.append(('Open global playlist', 3))
 		else:
 			self.liste.append(('Open local playlist', 4))
 		self['menu'] = MenuList(self.liste)
@@ -480,14 +487,14 @@ class SimplePlaylistIO:
 		
 		l = len(list)
 		if idx in range(0, l):
-			del list[idx:idx+1]
+			del list[idx]
 			
 		j = 0
 		l = len(list)
 		try:
 			f1 = open(pl_path, 'w')
 			while j < l:
-				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/>\n' % (list[j][0], list[j][1], list[j][2], list[j][3], list[j][4], list[j][5])
+				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/>\n' % (list[j][1], list[j][2], list[j][3], list[j][4], list[j][5], list[j][6])
 				f1.write(wdat)
 				j += 1
 					
@@ -511,6 +518,7 @@ class SimplePlaylistIO:
 		url = entry[1]
 		title = entry[0].replace('\n\t', ' - ')
 		title = title.replace('\n', ' - ')
+		cmptup = (url, artist, title)
 
 		assert pl_name != None
 		
@@ -520,11 +528,11 @@ class SimplePlaylistIO:
 				f1 = open(pl_path, 'a+')
 				
 				data = f1.read()
-				m = re.findall('<url>(.*?)</', data)
+				m = re.findall('<title>(.*?)</<url>(.*?)</.*?<artist>(.*?)</', data)
 				if m:
 					found = False
-					for x in m:
-						if x == url:
+					for (t,u,a) in m:
+						if (u,a,t)  == cmptup:
 							found = True
 							break
 				
@@ -584,7 +592,7 @@ class SimplePlaylistIO:
 							token = m3.group(1)
 						else:
 							token = ''
-						list.append((titel, url, album, artist, ltype, token))
+						list.append(("%s - %s" % (artist, titel),titel, url, album, artist, ltype, token))
 				
 				f1.close()
 			

@@ -1,5 +1,7 @@
+﻿#	-*-	coding:	utf-8	-*-
+
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.decrypt import *
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayerMenu, SimplePlaylistIO
 
 def SongstoListEntry(entry):
 	return [entry,
@@ -93,7 +95,8 @@ class showSongstoAll(Screen, InfoBarBase, InfoBarSeek):
 		InfoBarBase.__init__(self)
 		InfoBarSeek.__init__(self)
 		
-		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions"], {
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"input_date_time" : self.openMenu,
 			"ok" : self.keyOK,
 			"cancel" : self.keyCancel,
 			"right" : self.keyRight,
@@ -177,6 +180,29 @@ class showSongstoAll(Screen, InfoBarBase, InfoBarSeek):
 			return
 		self['streamlist'].pageDown()
 		
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, 'extern')
+		
+	def cb_Menu(self, data):
+		print "cb_Menu:"
+		if data != []:
+			if data[0] == 2 and self.playing:
+				scArtist = self['streamlist'].getCurrent()[0][1]
+				scTitle = self['streamlist'].getCurrent()[0][0]
+				url = ''
+				ltype = 'songsto'
+				token = self['streamlist'].getCurrent()[0][4]
+				album = self['streamlist'].getCurrent()[0][2]
+				entry = [scTitle, url, scArtist, album, ltype, token]
+					
+				res = SimplePlaylistIO.addEntry(data[1], entry)
+				if res == 1:
+					self.session.open(MessageBox, _("Eintrag hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)
+				elif res == 0:
+					self.session.open(MessageBox, _("Eintrag schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBox, _("Fehler!"), MessageBox.TYPE_INFO, timeout=5)
+
 	def keyOK(self):
 		if self.keyLocked:
 			print self.keyLocked
@@ -233,7 +259,8 @@ class showSongstoTop(Screen, InfoBarBase, InfoBarSeek):
 		InfoBarSeek.__init__(self)
 		InfoBarBase.__init__(self)
 
-		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions"], {
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"input_date_time" : self.openMenu,
 			"ok" : self.keyOK,
 			"cancel" : self.keyCancel,
 			"right" : self.keyRight,
@@ -306,6 +333,29 @@ class showSongstoTop(Screen, InfoBarBase, InfoBarSeek):
 		
 	def unlockShow(self):
 		pass
+		
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, 'extern')
+		
+	def cb_Menu(self, data):
+		print "cb_Menu:"
+		if data != []:
+			if data[0] == 2 and self.playing:
+				scArtist = self['streamlist'].getCurrent()[0][0]
+				scTitle = self['streamlist'].getCurrent()[0][1]
+				url = ''
+				ltype = 'songsto'
+				token = ''
+				album = self["album"].getText()
+				entry = [scTitle, url, scArtist, album, ltype, token]
+					
+				res = SimplePlaylistIO.addEntry(data[1], entry)
+				if res == 1:
+					self.session.open(MessageBox, _("Eintrag hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)
+				elif res == 0:
+					self.session.open(MessageBox, _("Eintrag schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBox, _("Fehler!"), MessageBox.TYPE_INFO, timeout=5)
 
 	def keyLeft(self):
 		if self.keyLocked:
