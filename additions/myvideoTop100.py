@@ -1,8 +1,9 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
+from Plugins.Extensions.MediaPortal.resources.myvideolink import MyvideoLink
 from base64 import b64decode
 from binascii import unhexlify
-import hashlib, re, urllib, os, sha
+import hashlib, re, os, sha
 from urllib import unquote, urlencode
 from time import strptime, mktime
 
@@ -142,7 +143,10 @@ class myvideoTop100SongListeScreen(Screen):
 			#'Le Kid -- We are young', '9047978', 'http://img5.myvideo.de/web/138/movie35/35/thumbs/9047978_1.jpg', '03:28 min', '77'
 			for (title, id, image, min, place) in charts:
 				title = "%s. %s" % (place, decodeHtml(title))
+				"""
 				url = "http://www.myvideo.de/dynamic/get_player_video_xml.php?flash_playertype=D&ID=%s&_countlimit=4&autorun=yes" % id
+				"""
+				url = "http://www.myvideo.de/dynamic/get_player_video_xml.php?flash_playertype=D&ID=%s" % id
 				self.filmliste.append((title,url,id))
 			self.chooseMenuList.setList(map(myvideoTop100ListEntry, self.filmliste))
 			self.keyLocked = False
@@ -169,53 +173,14 @@ class myvideoTop100Player(SimplePlayer):
 		print "myvideoTop100Player:"
 		print listTitle
 		
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle)
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, None, 'myvideo')
 		
-		self.GK = ('WXpnME1EZGhNRGhpTTJNM01XVmhOREU0WldNNVpHTTJOakpt'
-			'TW1FMU5tVTBNR05pWkRaa05XRXhNVFJoWVRVd1ptSXhaVEV3'
-			'TnpsbA0KTVRkbU1tSTRNdz09')
-
 		self.onLayoutFinish.append(self.getVideo)
-
-	def __md5(self, s):
-		return hashlib.md5(s).hexdigest()
-
-	def __rc4crypt(self, data, key):
-		x = 0
-		box = range(256)
-		for i in range(256):
-			x = (x + box[i] + ord(key[i % len(key)])) % 256
-			box[i], box[x] = box[x], box[i]
-		x = 0
-		y = 0
-		out = []
-		for char in data:
-			x = (x + 1) % 256
-			y = (y + box[x]) % 256
-			box[x], box[y] = box[y], box[x]
-			out.append(chr(ord(char) ^ box[(box[x] + box[y]) % 256]))
-		return ''.join(out)
 		
 	def getVideo(self):
-		self.myvideoTop100Name = self.playList[self.playIdx][0]
-		myvideoTop100Url = self.playList[self.playIdx][1]
-		self.myvideoTop100token = self.playList[self.playIdx][2]
-		print self.myvideoTop100Name, myvideoTop100Url, self.myvideoTop100token
+		titel = self.playList[self.playIdx][self.title_inr]
+		url = self.playList[self.playIdx][1]
+		token = self.playList[self.playIdx][2]
+		print titel, url, token
 		
-		getPage(myvideoTop100Url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getStream).addErrback(self.dataError)
-		
-	def getStream(self, data):
-		data = data.replace("_encxml=","")
-		enc_data_b = unhexlify(data)
-		sk = self.__md5(b64decode(b64decode(self.GK)) + self.__md5(str(self.myvideoTop100token)))
-		dec_data = self.__rc4crypt(enc_data_b, sk)
-		if dec_data:
-			url = re.findall("connectionurl='(.*?)'", dec_data, re.S)
-			source = re.findall("source='(.*?)'", dec_data, re.S)
-			url =  unquote(url[0])
-			source =  unquote(source[0])
-			vorne = re.findall('(.*?)\.', source, re.S)
-			hinten = re.findall('\.(.*[a-zA-Z0-9])', source, re.S)
-			string23 = "/%s playpath=%s" % (hinten[0], vorne[0])
-			link = "%s%s" % (url, string23)
-			self.playStream(self.myvideoTop100Name, link)
+		MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)

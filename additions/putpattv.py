@@ -341,7 +341,7 @@ class PutpatTvPlayer(SimplePlayer):
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
 		print "PutpatTvPlayer:"
 		
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, False, 'putpattv')
+		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, None, 'putpattv')
 		
 	def getVideo(self):
 		url = self.playList[self.playIdx][1]

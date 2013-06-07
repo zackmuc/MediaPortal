@@ -5,6 +5,7 @@ from Screens.InfoBarGenerics import *
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.youtubelink import YoutubeLink
 from Plugins.Extensions.MediaPortal.resources.putpattvlink import PutpattvLink
+from Plugins.Extensions.MediaPortal.resources.myvideolink import MyvideoLink
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
 	from Plugins.Extensions.mediainfo.plugin import mediaInfo
 	MediainfoPresent = True
@@ -63,7 +64,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playIdx = playIdx
 		self.playLen = len(playList)
 		self.returning = False
-		self.pl_entry = ['', '', '', '', '']
+		self.pl_entry = ['', '', '', '', '', '']
 		self.plType = plType
 		self.playList2 = []
 		self.pl_name = ''
@@ -105,7 +106,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			pos += 2
 			title = title[pos:]
 			
-		self.pl_entry = [title, None, artist, album, self.ltype]
+		self.pl_entry = [title, None, artist, album, self.ltype, '']
 		self.session.nav.stopService()
 		self.session.nav.playService(sref)
 
@@ -169,9 +170,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			else:
 				ltype = self.playList2[self.playIdx][4]
 			if ltype == 'youtube':
-				YoutubeLink(self.session).getLink(self.playStream, titel, url)
+				YoutubeLink(self.session).getLink(self.playStream, self.dataError, titel, url)
 			elif ltype == 'putpattv':
-				PutpattvLink(self.session).getLink(self.playStream, titel, url, '')
+				token = self.playList2[self.playIdx][5]
+				PutpattvLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
+			elif ltype == 'myvideo':
+				token = self.playList2[self.playIdx][5]
+				MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
 			else:
 				self.playStream(titel, url, album, artist)
 		else:
@@ -190,12 +195,13 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			if self.plType == 'global':
 				if data[1] == 'del':
 					self.session.nav.stopService()
-					SimplePlaylistIO.delEntry(self.pl_name, self.playList2, self.playIdx)
+					self.playList2 = SimplePlaylistIO.delEntry(self.pl_name, self.playList2, self.playIdx)
 					self.playLen = len(self.playList2)
 					if self.playIdx >= self.playLen:
 						self.playIdx -= 1
 					if self.playIdx < 0:
 						self.close()
+					self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0)
 				else:
 					self.getVideo2()
 			else:
@@ -218,15 +224,24 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			elif data[0] == 2:
 				if self.plType != 'local':
 					self.session.open(MessageBox, _("Fehler: Service darf nur von der lok. PL hinzugefügt werden"), MessageBox.TYPE_INFO, timeout=5)
+					return
+					
 				url = self.session.nav.getCurrentlyPlayingServiceReference().getPath()
+				
+				"""
 				if re.match('.*?(myvideo)', url, re.I):
 					self.session.open(MessageBox, _("Fehler: URL ist nicht persistent !"), MessageBox.TYPE_INFO, timeout=5)
 					return
+				"""
 				
 				if self.pl_entry[4] == 'youtube':
 					url = self.playList[self.playIdx][2]
 				elif self.pl_entry[4] == 'putpattv':
 					url = self.playList[self.playIdx][1]
+					self.pl_entry[5] = self.playList[self.playIdx][2]
+				elif self.pl_entry[4] == 'myvideo':
+					url = self.playList[self.playIdx][1]
+					self.pl_entry[5] = self.playList[self.playIdx][2]
 					
 				self.pl_entry[1] = url
 				self.pl_name = data[1]
@@ -242,7 +257,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				self.pl_name = data[1]
 				pl_list = SimplePlaylistIO.getPL(data[1])
 				if pl_list != []:
-					self.session.nav.stopService()
+					#self.session.nav.stopService()
 					self.playList2 = pl_list
 					self.playIdx = 0
 					self.playLen = len(self.playList2)
@@ -459,34 +474,37 @@ class SimplePlaylistIO:
 		print "delEntry:"
 		
 		assert pl_name != None
-		assert list != [] and idx in range(0, len(list))
+		assert list != []
 		
 		pl_path = config.mediaportal.watchlistpath.value + pl_name
-		del list[idx:idx+1]
+		
 		l = len(list)
+		if idx in range(0, l):
+			del list[idx:idx+1]
+			
 		j = 0
+		l = len(list)
 		try:
 			f1 = open(pl_path, 'w')
 			while j < l:
-				if len(list[j]) < 5:
-					ltype = ''
-				else:
-					ltype = list[j][4]
-				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/>\n' % (list[j][0], list[j][1], list[j][2], list[j][3], ltype)
+				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/>\n' % (list[j][0], list[j][1], list[j][2], list[j][3], list[j][4], list[j][5])
 				f1.write(wdat)
 				j += 1
 					
 			f1.close()
+			return list
 			
 		except IOError, e:
 			print "Fehler:\n",e
 			print "eCode: ",e
 			f1.close()
+			return list
 	
 	@staticmethod
 	def addEntry(pl_name, entry):
 		print "addEntry:"
 		
+		token = entry[5]
 		ltype = entry[4]
 		album = entry[3]
 		artist = entry[2]
@@ -516,7 +534,7 @@ class SimplePlaylistIO:
 			else:
 				f1 = open(pl_path, 'w')
 		
-			wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/>\n' % (title, url, album, artist, ltype)
+			wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/>\n' % (title, url, album, artist, ltype, token)
 			f1.write(wdat)
 			f1.close()
 			return 1
@@ -551,6 +569,7 @@ class SimplePlaylistIO:
 						break
 					m = re.search('<title>(.*?)</<url>(.*?)</<album>(.*?)</<artist>(.*?)</', entry)
 					m2 = re.search('<ltype (.*?)/>', entry)
+					m3 = re.search('<token (.*?)/>', entry)
 					if m:
 						print "m:"
 						titel = m.group(1)
@@ -561,7 +580,11 @@ class SimplePlaylistIO:
 							ltype = m2.group(1)
 						else:
 							ltype = ''
-						list.append((titel, url, album, artist, ltype))
+						if m3:
+							token = m3.group(1)
+						else:
+							token = ''
+						list.append((titel, url, album, artist, ltype, token))
 				
 				f1.close()
 			
@@ -571,3 +594,4 @@ class SimplePlaylistIO:
 			print "Fehler:\n",e
 			print "eCode: ",e
 			f1.close()
+			return list

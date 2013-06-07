@@ -1,5 +1,5 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.decrypt import *
+from Plugins.Extensions.MediaPortal.resources.myvideolink import MyvideoLink
 
 def myVideoGenreListEntry(entry):
 	return [entry,
@@ -102,12 +102,13 @@ class myVideoFilmScreen(Screen):
 		self.chooseMenuList.l.setItemHeight(25)
 		self['roflList'] = self.chooseMenuList
 		
-		self.GK = ('WXpnME1EZGhNRGhpTTJNM01XVmhOREU0WldNNVpHTTJOakpt'
-			'TW1FMU5tVTBNR05pWkRaa05XRXhNVFJoWVRVd1ptSXhaVEV3'
-			'TnpsbA0KTVRkbU1tSTRNdz09')
+		#self.GK = ('WXpnME1EZGhNRGhpTTJNM01XVmhOREU0WldNNVpHTTJOakpt'
+		#	'TW1FMU5tVTBNR05pWkRaa05XRXhNVFJoWVRVd1ptSXhaVEV3'
+		#	'TnpsbA0KTVRkbU1tSTRNdz09')
 
 		self.onLayoutFinish.append(self.loadPage)
 
+	"""
 	def __md5(self, s):
 		return hashlib.md5(s).hexdigest()
 
@@ -126,7 +127,8 @@ class myVideoFilmScreen(Screen):
 			box[x], box[y] = box[y], box[x]
 			out.append(chr(ord(char) ^ box[(box[x] + box[y]) % 256]))
 		return ''.join(out)
-		
+	"""	
+	
 	def loadPage(self):
 		self.keyLocked = True
 		url = "http://www.myvideo.de/iframe.php?lpage=%s&function=mv_success_box&action=filme_video_list&searchGroup=%s&searchOrder=1" % (str(self.page), self.myID)
@@ -214,11 +216,19 @@ class myVideoFilmScreen(Screen):
 			return
 		mvUrl = self['roflList'].getCurrent()[0][1]
 		print mvUrl
+		"""
 		id = re.findall('/watch/(.*?)/', mvUrl)
 		if id:
 			url = "http://www.myvideo.de/dynamic/get_player_video_xml.php?ID=" + id[0]
 			getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData, id[0]).addErrback(self.dataError)
+		"""
+		id = re.findall('/watch/(.*?)/', mvUrl)
+		if id:
+			url = "http://www.myvideo.de/dynamic/get_player_video_xml.php?ID=" + id[0]
+			kiTitle = self['roflList'].getCurrent()[0][0]
+			MyvideoLink(self.session).getLink(self.playStream, self.dataError, kiTitle, url, id[0])
 
+	"""
 	def parseData(self, data, token):
 		data = data.replace("_encxml=","")
 		kiTitle = self['roflList'].getCurrent()[0][0]
@@ -241,6 +251,14 @@ class myVideoFilmScreen(Screen):
 				sref = eServiceReference(0x1001, 0, mvStream)
 				sref.setName(kiTitle)
 				self.session.open(MoviePlayer, sref)
-
+	"""
+	
+	def playStream(self, title, url):
+		if url != None:
+			print url
+			sref = eServiceReference(0x1001, 0, url)
+			sref.setName(title)
+			self.session.open(MoviePlayer, sref)
+	
 	def keyCancel(self):
 		self.close()
