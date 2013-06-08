@@ -173,7 +173,7 @@ class myvideoTop100Player(SimplePlayer):
 		print "myvideoTop100Player:"
 		print listTitle
 		
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, None, 'myvideo')
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle, ltype='myvideo')
 		
 		self.onLayoutFinish.append(self.getVideo)
 		

@@ -1,9 +1,9 @@
 ﻿#	-*-	coding:	utf-8	-*-
 
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.yt_url import *
+from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 
-YT_Version = "Youtube Search v0.99 (experimental)"
+YT_Version = "Youtube Search v1.00 (experimental)"
 
 YT_siteEncoding = 'utf-8'
 
@@ -1066,6 +1066,7 @@ class YT_ListScreen(Screen):
 			else:
 				self.session.open(YT_ListScreen, genreurl, dhTitle)
 		else:
+			"""
 			dhTitle = self['liste'].getCurrent()[0][1]
 			dhVideoId = self['liste'].getCurrent()[0][2]
 			print "Title: ",dhTitle
@@ -1078,6 +1079,17 @@ class YT_ListScreen(Screen):
 				sref = eServiceReference(0x1001, 0, dhLink)
 				sref.setName(dhTitle)
 				self.session.open(MoviePlayer, sref)
+			"""
+			
+			self.session.open(
+				YoutubePlayer,
+				self.filmliste,
+				self['liste'].getSelectedIndex(),
+				playAll = True,
+				listTitle = self.genreName,
+				plType='local',
+				title_inr=1
+				)
 
 	def keyCancel(self):
 		self.close()

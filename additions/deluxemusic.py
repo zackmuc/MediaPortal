@@ -105,7 +105,7 @@ class DeluxemusicPlayer(SimplePlayer):
 		print "Deluxemusic:"
 		self.genreVideos = genreVideos
 
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll)
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle)
 		
 	def getVideo(self):
 		title = self.playList[self.playIdx][0]

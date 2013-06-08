@@ -34,7 +34,7 @@ class ClipfishPlayer(SimplePlayer):
 		print "ClipfishPlayer:"
 		self.genreVideos = genreVideos
 
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll)
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle)
 		
 	def getVid(self, data):
 		print "getVid: "

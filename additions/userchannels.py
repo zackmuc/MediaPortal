@@ -2,7 +2,6 @@
 
 from os.path import exists
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.yt_url import *
 from Plugins.Extensions.MediaPortal.resources.youtubeplayer import YoutubePlayer
 
 USER_Version = "USER-Channels v0.95"

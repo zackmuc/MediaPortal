@@ -8,7 +8,7 @@ class YoutubePlayer(SimplePlayer):
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0):
 		print "YoutubePlayer:"
 		
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, plType, title_inr, False, 'youtube')
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle, plType=plType, title_inr=title_inr, ltype='youtube')
 		
 	def getVideo(self):
 		print "getVideo:"

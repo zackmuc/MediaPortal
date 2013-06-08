@@ -11,10 +11,10 @@ class CannaLink:
 		self._callback = None
 		
 	def getLink(self, cb_play, cb_err, sc_title, sc_artist, sc_album, url):
-		stream_url = self.getDLurl(url)
 		self._errback = cb_err
 		self._callback = cb_play
 		
+		stream_url = self.getDLurl(url)
 		if stream_url:
 			cb_play(sc_artist+' - '+sc_title, stream_url, sc_album, sc_artist)
 		else:

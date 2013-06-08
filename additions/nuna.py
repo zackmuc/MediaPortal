@@ -244,7 +244,7 @@ class NunaPlayer(SimplePlayer):
 		#self.genreVideos = genreVideos
 		self.playList = playList
 		self.playIdx = playIdx
-		SimplePlayer.__init__(self, session, playList, playIdx, playAll)
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle)
 		
 	def getVideo(self):
 		self.nunaName = self.playList[self.playIdx][0]
