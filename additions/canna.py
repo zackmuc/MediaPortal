@@ -1,6 +1,10 @@
+﻿#	-*-	coding:	utf-8	-*-
+
 from Plugins.Extensions.MediaPortal.resources.imports import *
 import Plugins.Extensions.MediaPortal.resources.mechanize as mechanize
 import random
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayerMenu, SimplePlaylistIO
+from Plugins.Extensions.MediaPortal.resources.cannalink import CannaLink
 
 def cannaGenreListEntry(entry):
 	return [entry,
@@ -136,6 +140,7 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		InfoBarSeek.__init__(self)
 
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
+			"input_date_time" : self.openMenu,
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"red": self.keyDel,
@@ -180,6 +185,36 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 			self.filmliste.append(("No Songs added.","dump"))
 			self.chooseMenuList.setList(map(cannaListEntry, self.filmliste))
 
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, 'extern')
+		
+	def cb_Menu(self, data):
+		print "cb_Menu:"
+		if data != []:
+			if data[0] == 2:
+				nm = self['streamlist'].getCurrent()[0][0]
+				p = nm.find('-')
+				if p > 0:
+					scArtist = nm[:p].strip()
+					scTitle = nm[p+1:].strip()
+				else:
+					scArtist = ''
+					scTitle = nm
+					
+				url = self['streamlist'].getCurrent()[0][1]
+				ltype = 'canna'
+				token = ''
+				album = ''
+				entry = [scTitle, url, scArtist, album, ltype, token]
+					
+				res = SimplePlaylistIO.addEntry(data[1], entry)
+				if res == 1:
+					self.session.open(MessageBox, _("Eintrag hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)
+				elif res == 0:
+					self.session.open(MessageBox, _("Eintrag schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBox, _("Fehler!"), MessageBox.TYPE_INFO, timeout=5)
+
 	def keyPlaymode(self):
 		if self.playmode == "Next":
 			self.playmode = "Random"
@@ -210,7 +245,8 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		else:
 			self["artist"].setText(cannaName)
 			
-		stream_url = self.getDLurl(cannaUrl)
+		#stream_url = self.getDLurl(cannaUrl)
+		stream_url = CannaLink(self.session).getDLurl(cannaUrl)
 		if stream_url:
 			print stream_url
 			sref = eServiceReference(0x1001, 0, stream_url)
@@ -270,7 +306,8 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		else:
 			self["artist"].setText(cannaName)
 
-		stream_url = self.getDLurl(cannaUrl)
+		#stream_url = self.getDLurl(cannaUrl)
+		stream_url = CannaLink(self.session).getDLurl(cannaUrl)
 		if stream_url:
 			print stream_url
 			sref = eServiceReference(0x1001, 0, stream_url)
@@ -292,47 +329,6 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 	def seekBack(self):
 		self['streamlist'].pageUp()
 
-	def getDLurl(self, url):
-		try:
-			content = self.getUrl(url)
-			match = re.findall('flashvars.playlist = \'(.*?)\';', content)
-			if match:
-				for url in match:
-					url = 'http://ua.canna.to/canna/'+url
-					content = self.getUrl(url)
-					match = re.findall('<location>(.*?)</location>', content)
-					if match:
-						for url in match:
-							url = 'http://ua.canna.to/canna/'+url
-							req = mechanize.Request('http://ua.canna.to/canna/single.php')
-							response = mechanize.urlopen(req)
-							req = mechanize.Request(url)
-							req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-							response = mechanize.urlopen(req)
-							response.close()
-							code=response.info().getheader('Content-Location')
-							url='http://ua.canna.to/canna/avzt/'+code
-							print url
-							return url
-							
-		except urllib2.HTTPError, error:
-			print error
-			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
-			return False
-
-		except urllib2.URLError, error:
-			print error.reason
-			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
-			return False
-				
-	def getUrl(self, url):
-		req = mechanize.Request(url)
-		req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		response = mechanize.urlopen(req)
-		link = response.read()
-		response.close()
-		return link	
-		
 class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 	
 	def __init__(self, session, genreName, genreLink):
@@ -355,6 +351,7 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		InfoBarSeek.__init__(self)
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
+			"input_date_time" : self.openMenu,
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"green": self.keyAdd,
@@ -395,46 +392,35 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 	def dataError(self, error):
 		print error
 
-	def getDLurl(self, url):
-		try:
-			content = self.getUrl(url)
-			match = re.findall('flashvars.playlist = \'(.*?)\';', content)
-			if match:
-				for url in match:
-					url = 'http://ua.canna.to/canna/'+url
-					content = self.getUrl(url)
-					match = re.findall('<location>(.*?)</location>', content)
-					if match:
-						for url in match:
-							url = 'http://ua.canna.to/canna/'+url
-							req = mechanize.Request('http://ua.canna.to/canna/single.php')
-							response = mechanize.urlopen(req)
-							req = mechanize.Request(url)
-							req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-							response = mechanize.urlopen(req)
-							response.close()
-							code=response.info().getheader('Content-Location')
-							url='http://ua.canna.to/canna/avzt/'+code
-							print url
-							return url
-							
-		except urllib2.HTTPError, error:
-			print error
-			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
-			return False
-
-		except urllib2.URLError, error:
-			print error.reason
-			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
-			return False
-				
-	def getUrl(self, url):
-		req = mechanize.Request(url)
-		req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		response = mechanize.urlopen(req)
-		link = response.read()
-		response.close()
-		return link	
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, 'extern')
+		
+	def cb_Menu(self, data):
+		print "cb_Menu:"
+		if data != []:
+			if data[0] == 2:
+				nm = self['streamlist'].getCurrent()[0][0]
+				p = nm.find('-')
+				if p > 0:
+					scArtist = nm[:p].strip()
+					scTitle = nm[p+1:].strip()
+				else:
+					scArtist = ''
+					scTitle = nm
+					
+				url = self['streamlist'].getCurrent()[0][1]
+				ltype = 'canna'
+				token = ''
+				album = ''
+				entry = [scTitle, url, scArtist, album, ltype, token]
+					
+				res = SimplePlaylistIO.addEntry(data[1], entry)
+				if res == 1:
+					self.session.open(MessageBox, _("Eintrag hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)
+				elif res == 0:
+					self.session.open(MessageBox, _("Eintrag schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBox, _("Fehler!"), MessageBox.TYPE_INFO, timeout=5)
 
 	def keyAdd(self):
 		if self.keyLocked:
@@ -508,7 +494,8 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		else:
 			self["artist"].setText(cannaName)
 
-		stream_url = self.getDLurl(cannaUrl)
+		#stream_url = self.getDLurl(cannaUrl)
+		stream_url = CannaLink(self.session).getDLurl(cannaUrl)
 		if stream_url:
 			print stream_url
 			sref = eServiceReference(0x1001, 0, stream_url)
@@ -551,7 +538,8 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		else:
 			self["artist"].setText(cannaName)
 
-		stream_url = self.getDLurl(cannaUrl)
+		#stream_url = self.getDLurl(cannaUrl)
+		stream_url = CannaLink(self.session).getDLurl(cannaUrl)
 		if stream_url:
 			print stream_url
 			sref = eServiceReference(0x1001, 0, stream_url)
@@ -671,6 +659,7 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		InfoBarSeek.__init__(self)
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions", "InfobarSeekActions"], {
+			"input_date_time" : self.openMenu,
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
 			"green": self.keyAdd,
@@ -715,46 +704,35 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 	def dataError(self, error):
 		print error
 
-	def getDLurl(self, url):
-		try:
-			content = self.getUrl(url)
-			match = re.findall('flashvars.playlist = \'(.*?)\';', content)
-			if match:
-				for url in match:
-					url = 'http://ua.canna.to/canna/'+url
-					content = self.getUrl(url)
-					match = re.findall('<location>(.*?)</location>', content)
-					if match:
-						for url in match:
-							url = 'http://ua.canna.to/canna/'+url
-							req = mechanize.Request('http://ua.canna.to/canna/single.php')
-							response = mechanize.urlopen(req)
-							req = mechanize.Request(url)
-							req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-							response = mechanize.urlopen(req)
-							response.close()
-							code=response.info().getheader('Content-Location')
-							url='http://ua.canna.to/canna/avzt/'+code
-							print url
-							return url
-							
-		except urllib2.HTTPError, error:
-			print error
-			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
-			return False
-
-		except urllib2.URLError, error:
-			print error.reason
-			message = self.session.open(MessageBox, ("Fehler: %s" % error), MessageBox.TYPE_INFO, timeout=3)
-			return False
-				
-	def getUrl(self, url):
-		req = mechanize.Request(url)
-		req.add_header('User-Agent', ' Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
-		response = mechanize.urlopen(req)
-		link = response.read()
-		response.close()
-		return link	
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, 'extern')
+		
+	def cb_Menu(self, data):
+		print "cb_Menu:"
+		if data != []:
+			if data[0] == 2:
+				nm = self['streamlist'].getCurrent()[0][0]
+				p = nm.find('-')
+				if p > 0:
+					scArtist = nm[:p].strip()
+					scTitle = nm[p+1:].strip()
+				else:
+					scArtist = ''
+					scTitle = nm
+					
+				url = self['streamlist'].getCurrent()[0][1]
+				ltype = 'canna'
+				token = ''
+				album = ''
+				entry = [scTitle, url, scArtist, album, ltype, token]
+					
+				res = SimplePlaylistIO.addEntry(data[1], entry)
+				if res == 1:
+					self.session.open(MessageBox, _("Eintrag hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)
+				elif res == 0:
+					self.session.open(MessageBox, _("Eintrag schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBox, _("Fehler!"), MessageBox.TYPE_INFO, timeout=5)
 
 	def keyAdd(self):
 		if self.keyLocked:
@@ -828,7 +806,8 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		else:
 			self["artist"].setText(cannaName)
 
-		stream_url = self.getDLurl(cannaUrl)
+		#stream_url = self.getDLurl(cannaUrl)
+		stream_url = CannaLink(self.session).getDLurl(cannaUrl)
 		if stream_url:
 			print stream_url
 			sref = eServiceReference(0x1001, 0, stream_url)
@@ -871,7 +850,8 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		else:
 			self["artist"].setText(cannaName)
 
-		stream_url = self.getDLurl(cannaUrl)
+		#stream_url = self.getDLurl(cannaUrl)
+		stream_url = CannaLink(self.session).getDLurl(cannaUrl)
 		if stream_url:
 			print stream_url
 			sref = eServiceReference(0x1001, 0, stream_url)

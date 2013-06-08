@@ -7,6 +7,7 @@ from Plugins.Extensions.MediaPortal.resources.youtubelink import YoutubeLink
 from Plugins.Extensions.MediaPortal.resources.putpattvlink import PutpattvLink
 from Plugins.Extensions.MediaPortal.resources.myvideolink import MyvideoLink
 from Plugins.Extensions.MediaPortal.resources.songstolink import SongstoLink
+from Plugins.Extensions.MediaPortal.resources.cannalink import CannaLink
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
 	from Plugins.Extensions.mediainfo.plugin import mediaInfo
 	MediainfoPresent = True
@@ -65,7 +66,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playIdx = playIdx
 		self.playLen = len(playList)
 		self.returning = False
-		self.pl_entry = ['', '', '', '', '', '']
+		self.pl_entry = ['', '', '', '', '', '', '']
 		self.plType = plType
 		self.playList2 = []
 		self.pl_name = ''
@@ -183,6 +184,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				#print "songsto",titel,artist,album,token
 				token = self.playList2[self.playIdx][6]
 				SongstoLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, token)
+			elif ltype == 'canna':
+				#print "canna",titel,artist,album,token
+				token = self.playList2[self.playIdx][6]
+				CannaLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url)
 			else:
 				self.playStream(titel, url, album, artist)
 		else:
@@ -488,9 +493,9 @@ class SimplePlaylistIO:
 		l = len(list)
 		if idx in range(0, l):
 			del list[idx]
+			l = len(list)
 			
 		j = 0
-		l = len(list)
 		try:
 			f1 = open(pl_path, 'w')
 			while j < l:
