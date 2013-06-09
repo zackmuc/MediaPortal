@@ -1,4 +1,7 @@
+﻿#	-*-	coding:	utf-8	-*-
+
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayerMenu, SimplePlaylistIO
 
 def eightiesGenreListEntry(entry):
 	return [entry,
@@ -102,10 +105,12 @@ class eightiesMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		InfoBarSeek.__init__(self)
 		
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"input_date_time" : self.openMenu,
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel
 		}, -1)
 		
+		self.token = ''
 		self.keyLocked = True
 		self["title"] = Label("eighties.to - %s" % self.genreName)
 		self["coverArt"] = Pixmap()
@@ -127,8 +132,10 @@ class eightiesMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		
 		if re.match('.*?80smusicvids.com', self.genreLink, re.S):
 			self.baseurl = "http://www.80smusicvids.com/"
+			self.token = '80'
 		else:
 			self.baseurl = "http://www.90smusicvidz.com/"
+			self.token = '90'
 			
 		getPage(self.genreLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
 		
@@ -144,6 +151,41 @@ class eightiesMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 
 	def dataError(self, error):
 		print error
+
+	def openMenu(self):
+		self.session.openWithCallback(self.cb_Menu, SimplePlayerMenu, 'extern')
+		
+	def cb_Menu(self, data):
+		print "cb_Menu:"
+		if data != []:
+			if data[0] == 2:
+				nm = self['streamlist'].getCurrent()[0][0]
+				p = nm.find(' - ')
+				if p > 0:
+					scArtist = nm[:p].strip()
+					scTitle = nm[p+3:].strip()
+				else:
+					p = nm.find('-')
+					if p > 0:
+						scArtist = nm[:p].strip()
+						scTitle = nm[p+1:].strip()
+					else:
+						scArtist = ''
+						scTitle = nm
+					
+				url = self['streamlist'].getCurrent()[0][1]
+				ltype = 'eighties'
+				token = self.token
+				album = 'self.genreName'
+				entry = [scTitle, url, scArtist, album, ltype, token]
+					
+				res = SimplePlaylistIO.addEntry(data[1], entry)
+				if res == 1:
+					self.session.open(MessageBox, _("Eintrag hinzugefügt"), MessageBox.TYPE_INFO, timeout=5)
+				elif res == 0:
+					self.session.open(MessageBox, _("Eintrag schon vorhanden"), MessageBox.TYPE_INFO, timeout=5)
+				else:
+					self.session.open(MessageBox, _("Fehler!"), MessageBox.TYPE_INFO, timeout=5)
 
 	def keyOK(self):
 		if self.keyLocked:

@@ -8,6 +8,7 @@ from Plugins.Extensions.MediaPortal.resources.putpattvlink import PutpattvLink
 from Plugins.Extensions.MediaPortal.resources.myvideolink import MyvideoLink
 from Plugins.Extensions.MediaPortal.resources.songstolink import SongstoLink
 from Plugins.Extensions.MediaPortal.resources.cannalink import CannaLink
+from Plugins.Extensions.MediaPortal.resources.eightieslink import EightiesLink
 if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo'):
 	from Plugins.Extensions.mediainfo.plugin import mediaInfo
 	MediainfoPresent = True
@@ -186,9 +187,12 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				SongstoLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, token)
 			elif ltype == 'canna':
 				#print "canna",titel,artist,album,token
-				token = self.playList2[self.playIdx][6]
 				CannaLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url)
-			else:
+			elif ltype == 'eighties':
+				#print "eighties",titel,artist,album,url,token
+				token = self.playList2[self.playIdx][6]
+				EightiesLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url, token)
+			elif url:
 				self.playStream(titel, url, album, artist)
 		else:
 			self.close()

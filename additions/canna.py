@@ -193,13 +193,18 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		if data != []:
 			if data[0] == 2:
 				nm = self['streamlist'].getCurrent()[0][0]
-				p = nm.find('-')
+				p = nm.find(' - ')
 				if p > 0:
 					scArtist = nm[:p].strip()
-					scTitle = nm[p+1:].strip()
+					scTitle = nm[p+3:].strip()
 				else:
-					scArtist = ''
-					scTitle = nm
+					p = nm.find('-')
+					if p > 0:
+						scArtist = nm[:p].strip()
+						scTitle = nm[p+1:].strip()
+					else:
+						scArtist = ''
+						scTitle = nm
 					
 				url = self['streamlist'].getCurrent()[0][1]
 				ltype = 'canna'
