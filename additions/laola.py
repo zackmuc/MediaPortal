@@ -1,7 +1,7 @@
-from Plugins.Extensions.MediaPortal.resources.imports import *
+﻿from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.decrypt import *
 
-def laola2ListEntry(entry):
+def laolaLiveListEntry(entry):
 	date_time = re.findall('(.*?,.*?),(.*?)$', entry[3], re.S)
 	info = re.findall('(.*?,.*?),(.*?)$', entry[0], re.S)
 	(time, date) = date_time[0]
@@ -14,11 +14,199 @@ def laola2ListEntry(entry):
 		(eListboxPythonMultiContent.TYPE_TEXT, 200, 0, 560, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, sport),
 		(eListboxPythonMultiContent.TYPE_TEXT, 200, 25, 560, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, teams)
 		]
+
+def laolaVideosListEntry(entry):
+	date_time = re.findall('(.*?,.*?)$', entry[3], re.S)
+	#print "date_time: "
+	#print date_time
+	info = re.findall('(.*?),(.*?)$', entry[0], re.S)
+	#print info
+	#print date_time[0]
+	(sport, teams) = info[0]
+	#print sport, teams
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 25, 0, 150, 25, 0, RT_HALIGN_RIGHT | RT_VALIGN_CENTER, date_time[0]),
+		(eListboxPythonMultiContent.TYPE_TEXT, 200, 0, 560, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, sport),
+		(eListboxPythonMultiContent.TYPE_TEXT, 200, 25, 560, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, teams)
+		]
+
+def laolaOverviewListEntry(entry):
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
+		]
 		
-class laolaScreen(Screen):
+def laolaSubOverviewListEntry(entry):
+	return [entry,
+		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[1])
+		]
+		
+class laolaVideosOverviewScreen(Screen):		
+
+	def __init__(self, session):
+		print 'laolaVideosOverviewScreen'
+		self.session = session
+		
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/defaultGenreScreen.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel
+		}, -1)
+		
+		self.lastservice = session.nav.getCurrentlyPlayingServiceReference()
+		self.playing = False
+		
+		self.keyLocked = True
+		self['title'] = Label("Laola1.tv")
+		self['ContentTitle'] = Label("Auswahl:")
+		self['name'] = Label("")
+		self['F1'] = Label("Exit")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
+		self['F3'].hide()
+		self['F4'].hide()
+
+		self.genreliste = []
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['genreList'] = self.chooseMenuList
+		self.onLayoutFinish.append(self.loadPage)
+	
+	def loadPage(self):
+		self.genreliste = [('Live', "upcoming-livestreams"), ('Neueste Videos',"neueste-videos"), ('Eishockey',"eishockey"), ('Fussball',"fussball"), ('Fussball Int.',"fussball-int"), ('Volleyball',"volleyball"), ('Mehr Sport',"mehr-sport")]
+		self.chooseMenuList.setList(map(laolaOverviewListEntry, self.genreliste))
+		self.keyLocked = False
+
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		auswahl = self['genreList'].getCurrent()[0][1]
+		print 'Auswahl: ' + auswahl
+
+		self.overviewUrl = "http://www.laola1.tv/"
+		self.overviewSelection = auswahl
+		
+		getPage(self.overviewUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getUrl).addErrback(self.dataError)
+	
+	def keyCancel(self):
+		self.close()
+	
+	def getUrl(self, data):
+		print 'getUrl init'
+		searchString = '<a href="(http://www.laola1.tv/de/at/%s/video/.*?)">' % self.overviewSelection
+		print 'searchString: '+ searchString
+		laUrl = re.findall(searchString, data, re.S)
+		print 'getUrl laUrl: '
+		print laUrl
+		
+		print laUrl[0].split('.html')[0] + ".html"
+		
+		if self.overviewSelection == "neueste-videos":
+			laolaTopVideosScreen.startUrl = laUrl[0].split('.html')[0] + ".html"
+			laolaTopVideosScreen.isLive = "false"
+			self.session.open(laolaTopVideosScreen)	
+		elif self.overviewSelection == "upcoming-livestreams":
+			laolaTopVideosScreen.startUrl = laUrl[0].split('.html')[0] + ".html"
+			laolaTopVideosScreen.isLive = "true"
+			self.session.open(laolaTopVideosScreen)	
+		else:
+			getPage(laUrl[0].split('.html')[0] + ".html", headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getSubUrl).addErrback(self.dataError)
+			
+	def getSubUrl(self, data):
+		print 'getSuburl init'
+		searchString = '<a href="(.*?)" style="color:#ffffff; font-weight:bold; font-size:12pt;">(.*?)<'
+		print 'searchString: '+ searchString
+		laUrl = re.findall(searchString, data)
+		print 'getUrl laUrl: '
+		print laUrl
+		laolaVideosSubOverviewScreen.genreliste = laUrl
+		self.session.open(laolaVideosSubOverviewScreen)	
+	
+	def dataError(self, error):
+		print error
+		
+class laolaVideosSubOverviewScreen(Screen):		
+
+	def __init__(self, session):
+		print 'laolaVideosSubOverviewScreen'
+		self.session = session
+		
+		self.plugin_path = mp_globals.pluginPath
+		self.skin_path =  mp_globals.pluginPath + "/skins"
+		
+		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		if not fileExists(path):
+			path = self.skin_path + "/original/defaultGenreScreen.xml"
+
+		with open(path, "r") as f:
+			self.skin = f.read()
+			f.close()
+			
+		Screen.__init__(self, session)
+		
+		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
+			"ok"    : self.keyOK,
+			"cancel": self.keyCancel,
+			"red": self.keyCancel
+		}, -1)
+		
+		self.lastservice = session.nav.getCurrentlyPlayingServiceReference()
+		self.playing = False
+		
+		self.keyLocked = True
+		self['title'] = Label("Laola1.tv")
+		self['ContentTitle'] = Label("Auswahl:")
+		self['name'] = Label("")
+		self['F1'] = Label("Exit")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
+		self['F3'].hide()
+		self['F4'].hide()
+
+		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
+		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
+		self.chooseMenuList.l.setItemHeight(25)
+		self['genreList'] = self.chooseMenuList
+		self.onLayoutFinish.append(self.loadPage)
+	
+	def loadPage(self):
+		self.chooseMenuList.setList(map(laolaSubOverviewListEntry, self.genreliste))
+		self.keyLocked = False
+
+	def keyOK(self):
+		if self.keyLocked:
+			return
+		auswahl = self['genreList'].getCurrent()[0][0]
+		print 'Auswahl: ' + auswahl
+
+		self.overviewUrl = auswahl
+		laolaTopVideosScreen.startUrl = self.overviewUrl
+		laolaTopVideosScreen.isLive = "false"
+		self.session.open(laolaTopVideosScreen)
+	
+	def keyCancel(self):
+		self.close()	
+
+class laolaTopVideosScreen(Screen):
 	
 	def __init__(self, session):
 		self.session = session
+		print 'Starturl:' + self.startUrl
 		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/laolaScreen.xml" % config.mediaportal.skin.value
 		if not fileExists(path):
 			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/original/laolaScreen.xml"
@@ -50,24 +238,53 @@ class laolaScreen(Screen):
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(50)
 		self['roflList'] = self.chooseMenuList
-
-		self.onLayoutFinish.append(self.loadPage)
 		
-	def loadPage(self):
+		self.onLayoutFinish.append(self.loadNewPageData)
+		
+	#def loadPage(self):
+	#	self.keyLocked = True
+	#	url = "http://www.laola1.tv/"
+	#	print url
+	#	getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadNewPageData).addErrback(self.dataError)
+	
+	#def loadNewPageData(self, data):
+	def loadNewPageData(self):
 		self.keyLocked = True
-		url = "http://www.laola1.tv/de/de/upcoming-livestreams/video/0-1369-.html"
-		print url
-		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
+		#laNewest = re.findall('<a href="(http://www.laola1.tv/de/at/neueste-videos/video/.*?)">', data, re.S)
+		laNewest = self.startUrl
+		print 'laNewest'
+		print laNewest
+		if laNewest:
+			if self.page > 1:
+				print 'newest video site: ' + laNewest.split('.html')[0] + '0-' + str(self.page) + '.html'
+				getPage(laNewest.split('.html')[0] + '0-' + str(self.page) + '.html', headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
+			else:
+				print 'newest video site: ' + laNewest
+				getPage(laNewest, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
 		
 	def loadPageData(self, data):
-		laStreams = re.findall('<div class="teaser_bild_live" title="LIVE:.(.*?)"><a href="(http://www.laola1.tv/.*?)"><img src="(.*?.jpg)" border="0" />.*?<div class="teaser_head_live".*?>(.*?)<', data, re.S)
-		if laStreams:
-			self.laListe = []
-			for (laTitle,laUrl,laImage,laTime) in laStreams:
-				self.laListe.append((laTitle,laUrl,laImage,laTime))
-			self.chooseMenuList.setList(map(laola2ListEntry, self.laListe))
-			self.keyLocked = False
-			self.showPic()
+		if self.isLive == 'false':
+			laStreams = re.findall('<div class="teaser_bild_video" title="(.*?)"><a href="(http://www.laola1.tv/.*?)"><img src="(.*?.jpg)" border="0" />.*?<div class="teaser_head_video".*?>(.*?)<', data, re.S)
+			if laStreams:
+				self.laListe = []
+				for (laTitle,laUrl,laImage,laTime) in laStreams:
+					#print 'title: ' + laTitle
+					#print 'url: ' + laUrl
+					#print 'image: ' + laImage
+					#print 'time: ' + laTime
+					self.laListe.append((laTitle,laUrl,laImage,laTime))
+				self.chooseMenuList.setList(map(laolaVideosListEntry, self.laListe))
+				self.showPic()
+		else:
+			laStreams = re.findall('<div class="teaser_bild_live" title="LIVE:.(.*?)"><a href="(http://www.laola1.tv/.*?)"><img src="(.*?.jpg)" border="0" />.*?<div class="teaser_head_live".*?>(.*?)<', data, re.S)
+			if laStreams:
+				self.laListe = []
+				for (laTitle,laUrl,laImage,laTime) in laStreams:
+					self.laListe.append((laTitle,laUrl,laImage,laTime))
+				self.chooseMenuList.setList(map(laolaLiveListEntry, self.laListe))
+				self.keyLocked = False
+				self.showPic()
+		self.keyLocked = False
 
 	def dataError(self, error):
 		print error
@@ -96,17 +313,18 @@ class laolaScreen(Screen):
 		print "PageDown"
 		if self.keyLocked:
 			return
+		print self.page	
 		if not self.page < 2:
 			self.page -= 1
-			self.loadPage()
+			self.loadNewPageData()
 		
 	def keyPageUp(self):
 		print "PageUP"
 		if self.keyLocked:
 			return
-		if not self.page > 2:
-			self.page += 1
-			self.loadPage()
+		self.page += 1
+		print self.page	
+		self.loadNewPageData()
 		
 	def keyLeft(self):
 		if self.keyLocked:
@@ -136,33 +354,63 @@ class laolaScreen(Screen):
 		if self.keyLocked:
 			return
 		laUrl = self['roflList'].getCurrent()[0][1]
-		print laUrl
+		print 'laUrl' + laUrl
 		getPage(laUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		if re.match('.*?Dieser Stream ist bereits beendet', data, re.S):
-			print "Dieser Stream ist bereits beendet."
-			message = self.session.open(MessageBox, _("Dieser Stream ist bereits beendet."), MessageBox.TYPE_INFO, timeout=3)
-		elif re.match('.*?(Dieser Stream beginnt am|This stream starts at)', data, re.S):
-			print "Dieser Stream wurde noch nicht gestartet."
-			message = self.session.open(MessageBox, _("Dieser Stream wurde noch nicht gestartet."), MessageBox.TYPE_INFO, timeout=3)
+		if self.isLive == 'true':
+			if re.match('.*?Dieser Stream ist bereits beendet', data, re.S):
+				print "Dieser Stream ist bereits beendet."
+				message = self.session.open(MessageBox, _("Dieser Stream ist bereits beendet."), MessageBox.TYPE_INFO, timeout=3)
+			elif re.match('.*?(Dieser Stream beginnt am|This stream starts at)', data, re.S):
+				print "Dieser Stream wurde noch nicht gestartet."
+				message = self.session.open(MessageBox, _("Dieser Stream wurde noch nicht gestartet."), MessageBox.TYPE_INFO, timeout=3)
+			else:
+				id = re.findall('streamid=(.*?)&', data, re.S)
+				xml = 'http://streamaccess.unas.tv/hdflash/1/hdlaola1_%s.xml?t=.smil&partnerid=1&streamid=%s' % (id[0], id[0])
+				if xml:
+					getPage(xml, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseXML).addErrback(self.dataError)
 		else:
 			id = re.findall('streamid=(.*?)&', data, re.S)
-			xml = 'http://streamaccess.unas.tv/hdflash/1/hdlaola1_%s.xml?t=.smil&partnerid=1&streamid=%s' % (id[0], id[0])
-			if xml:
-				getPage(xml, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseXML).addErrback(self.dataError)
+			hdUrl = "http://www.laola1.tv/server/hd_video.php?play=%s&partner=22&portal=2" % id[0]
+			print 'hdUrl: ' + hdUrl
+			if hdUrl:
+				getPage(hdUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseHdUrl).addErrback(self.dataError)
+			
+	def parseHdUrl(self, data):
+			streamAccessUrl = re.findall('<url>(.*?)</url>', data, re.S)
+			print 'streamAccessUrl: ' + streamAccessUrl[0].replace('&amp;','&')
+			if streamAccessUrl[0]:
+				getPage(streamAccessUrl[0].replace('&amp;','&'), headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseXML).addErrback(self.dataError)
 			
 	def parseXML(self, data):
-		laTitle = self['roflList'].getCurrent()[0][0]
-		main_url = re.findall('<meta name="httpBase" content="(.*?)"', data)
-		url_string = re.findall('<video src="(.*?)" system-bitrate="(.*?)"', data, re.S)
-		if main_url and url_string:
-			x = len(url_string)-1
-			stream_url = "%s%s%s" % (main_url[0], url_string[x][0], url_string[x][1])
-			print stream_url
-			sref = eServiceReference(0x1001, 0, stream_url)
-			sref.setName(laTitle)
-			self.session.open(MoviePlayer, sref)
-
+		if self.isLive == 'true':
+			laTitle = self['roflList'].getCurrent()[0][0]
+			main_url = re.findall('<meta name="httpBase" content="(.*?)"', data)
+			url_string = re.findall('<video src="(.*?)" system-bitrate="(.*?)"', data, re.S)
+			if main_url and url_string:
+				x = len(url_string)-1
+				stream_url = "%s%s%s" % (main_url[0], url_string[x][0], url_string[x][1])
+				print stream_url
+				sref = eServiceReference(0x1001, 0, stream_url)
+				sref.setName(laTitle)
+				self.session.open(MoviePlayer, sref)
+		else:
+			laTitle = self['roflList'].getCurrent()[0][0]
+			main_url = re.findall('<meta name="httpBase" content="(.*?)"', data)
+			print 'main_url: ' + main_url[0]
+			url_string = re.findall('<meta name="vod" content="true" value="(.*?)"', data)		
+			print 'url_string: ' + url_string[0]
+			params = re.findall('<video src="(.*?)"', data, re.S)
+			print 'params: ' + params[0]
+			if main_url and url_string and params:
+				url_params = params[0].split('?')
+				print 'url_params: ' + url_params[1].replace('&amp;','&')
+				stream_url = "%s%s%s%s%s" % (main_url[0], url_string[0][1:] + "/bitrate=0?", url_params[1].replace('&amp;','&'), "&v=2.11.3&fp=WIN%2011,7,700,202", "&r=AAAAA"+"&g=BBBBBBBBBBBB")
+				print 'stream_url: ' + stream_url
+				sref = eServiceReference(0x1001, 0, stream_url)
+				sref.setName(laTitle)
+				self.session.open(MoviePlayer, sref)
+			
 	def keyCancel(self):
 		self.close()

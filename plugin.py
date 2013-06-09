@@ -656,7 +656,7 @@ class haupt_Screen(Screen, ConfigListScreen):
 		if config.mediaportal.showputpattv.value:
 			self.funsport.append(self.hauptListEntry("putpat.tv", "putpattv"))
 		if config.mediaportal.showLaola1.value:
-			self.funsport.append(self.hauptListEntry("Laola1 Live", "laola1"))
+			self.funsport.append(self.hauptListEntry("Laola1", "laola1"))
 		if config.mediaportal.showNhl.value:
 			self.funsport.append(self.hauptListEntry("NHL", "nhl"))
 		if config.mediaportal.showRofl.value:
@@ -1041,8 +1041,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(myVideoGenreScreen)
 		elif auswahl == "SportBild":
 			self.session.open(sportBildScreen)
-		elif auswahl == "Laola1 Live":
-			self.session.open(laolaScreen)
+		elif auswahl == "Laola1":
+			self.session.open(laolaVideosOverviewScreen)
 		elif auswahl == "KinoKiste":
 			self.session.open(kinokisteGenreScreen)
 		elif auswahl == "Burning-Series":
@@ -1643,7 +1643,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		if config.mediaportal.showAutoBild.value:
 			self.plugin_liste.append(("AutoBild", "autobild", "Mediathek"))
 		if config.mediaportal.showLaola1.value:
-			self.plugin_liste.append(("Laola1 Live", "laola1", "Sport"))
+			self.plugin_liste.append(("Laola1", "laola1", "Sport"))
 		if config.mediaportal.showFocus.value:
 			self.plugin_liste.append(("Focus", "focus", "Mediathek"))
 		if config.mediaportal.showCczwei.value:
@@ -2100,9 +2100,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "SportBild":
 			self.hit_plugin("SportBild")
 			self.session.open(sportBildScreen)
-		elif auswahl == "Laola1 Live":
-			self.hit_plugin("Laola1 Live")
-			self.session.open(laolaScreen)
+		elif auswahl == "Laola1":
+			self.hit_plugin("Laola1")
+			self.session.open(laolaVideosOverviewScreen)
 		elif auswahl == "KinoKiste":
 			self.hit_plugin("KinoKiste")
 			self.session.open(kinokisteGenreScreen)
