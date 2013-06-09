@@ -176,7 +176,7 @@ class eightiesMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 				url = self['streamlist'].getCurrent()[0][1]
 				ltype = 'eighties'
 				token = self.token
-				album = 'self.genreName'
+				album = self.genreName
 				entry = [scTitle, url, scArtist, album, ltype, token]
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
