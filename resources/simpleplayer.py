@@ -19,9 +19,6 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
 	
-	#prepared for MP infobar
-	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player">\n\t\t</screen>'
-	
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=None, ltype=''):
 	
 		Screen.__init__(self, session)
@@ -56,7 +53,6 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		InfoBarSeek.__init__(self)
 
 		self.skinName = 'MediaPortal SimplePlayer'
-		#self.skinName = 'MoviePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 		
 		self.randomPlay = False
@@ -182,14 +178,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				token = self.playList2[self.playIdx][6]
 				MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
 			elif ltype == 'songsto':
-				#print "songsto",titel,artist,album,token
 				token = self.playList2[self.playIdx][6]
 				SongstoLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, token)
 			elif ltype == 'canna':
-				#print "canna",titel,artist,album,token
 				CannaLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url)
 			elif ltype == 'eighties':
-				#print "eighties",titel,artist,album,url,token
 				token = self.playList2[self.playIdx][6]
 				EightiesLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url, token)
 			elif url:
@@ -272,7 +265,6 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				self.pl_name = data[1]
 				pl_list = SimplePlaylistIO.getPL(data[1])
 				if pl_list != []:
-					#self.session.nav.stopService()
 					self.playList2 = pl_list
 					self.playIdx = 0
 					self.playLen = len(self.playList2)
@@ -310,11 +302,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		else:
 			print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
 					
-	def lockShow(self):
-		pass
+	#def lockShow(self):
+	#	pass
 		
-	def unlockShow(self):
-		pass
+	#def unlockShow(self):
+	#	pass
 		
 	def setPlaymode(self):
 		print "setPlaymode:"
@@ -393,10 +385,13 @@ class SimplePlaylist(Screen):
 			idx = self['genreList'].getSelectedIndex()
 			"""
 			del playList[idx]
-			if len(self.playList) == 0:
-				self.close([0,'del',self.playList])
+			l = len(self.playList)
+			if l == 0:
+				self.close([-1,'',self.playList])
 			else:
 				self.chooseMenuList.setList(map(self.playListEntry, self.playList))
+				if self.playIdx not in range(0, l):
+					self.playIdx -= 1
 				self['genreList'].moveToIndex(self.playIdx)
 			"""
 			self.close([idx,'del',self.playList])
@@ -405,6 +400,8 @@ class SimplePlaylist(Screen):
 		self.close([-1,'',self.playList])
 
 	def ok(self):
+		if len(self.playList) == 0:
+			self.exit()
 		idx = self['genreList'].getSelectedIndex()
 		self.close([idx,'',self.playList])
 
