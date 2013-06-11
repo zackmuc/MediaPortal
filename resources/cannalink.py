@@ -16,7 +16,7 @@ class CannaLink:
 		
 		stream_url = self.getDLurl(url)
 		if stream_url:
-			cb_play(sc_artist+' - '+sc_title, stream_url, sc_album, sc_artist)
+			cb_play(sc_title, stream_url, sc_album, sc_artist)
 		else:
 			cb_err('stream_url not found!')
 

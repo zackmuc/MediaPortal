@@ -1,5 +1,6 @@
 #	-*-	coding:	utf-8	-*-
 
+import Queue
 import random
 from Screens.InfoBarGenerics import *
 from Plugins.Extensions.MediaPortal.resources.imports import *
@@ -15,7 +16,8 @@ if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo')
 else:
 	MediainfoPresent = False
 
-class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide):
+
+class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide, InfoBarAudioSelection, InfoBarSubtitleSupport):
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
 	
@@ -48,13 +50,16 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		InfoBarNotifications.__init__(self)
 		InfoBarBase.__init__(self)
 		InfoBarShowHide.__init__(self)
-
+		InfoBarAudioSelection.__init__(self)
+		InfoBarSubtitleSupport.__init__(self)
+		
 		self.allowPiP = False
 		InfoBarSeek.__init__(self)
 
 		self.skinName = 'MediaPortal SimplePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 		
+		self.pl_open = False
 		self.randomPlay = False
 		self.playMode = ""
 		self.listTitle = listTitle
@@ -70,6 +75,8 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.title_inr = title_inr
 		self.cover = cover
 		self.ltype = ltype
+		self.playlistQ = Queue.Queue(0)
+		self.pl_status = (0, '', '', '')
 		
 		# load default cover
 		self['Cover'] = Pixmap()
@@ -99,15 +106,23 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		if url == None:
 			return
 		sref = eServiceReference(0x1001, 0, url)
-		sref.setName(title)
+		
 		pos = title.find('. ', 0, 5)
 		if pos > 0:
 			pos += 2
 			title = title[pos:]
+		if artist != '':
+			sref.setName(artist + ' - ' + title)
+		else:
+			sref.setName(title)
 			
 		self.pl_entry = [title, None, artist, album, self.ltype, '']
 		self.session.nav.stopService()
 		self.session.nav.playService(sref)
+		
+		self.pl_status = (self.playIdx, title, artist, album)
+		if self.pl_open:
+			self.playlistQ.put(self.pl_status)
 
 	def playPrevStream(self):
 		print "_prevStream:"
@@ -192,12 +207,20 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				
 	def openPlaylist(self):
 		if self.playLen > 0:
+			if self.playlistQ.empty():
+				self.playlistQ.put(self.pl_status)
+			self.pl_open = True
+			
 			if self.plType == 'local':
-				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle, plType=self.plType, title_inr=self.title_inr)
+				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle, plType=self.plType, title_inr=self.title_inr, queue=self.playlistQ)
 			else:
-				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0)
+				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0, queue=self.playlistQ)
 		
 	def cb_Playlist(self, data):
+		self.pl_open = False
+		while not self.playlistQ.empty():
+			t = self.playlistQ.get_nowait()
+			
 		if data[0] != -1:
 			self.playIdx = data[0]
 			if self.plType == 'global':
@@ -318,15 +341,15 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 
 class SimplePlaylist(Screen):
 
-	def __init__(self, session, playList, playIdx, listTitle=None, plType='local', title_inr=0):
+	def __init__(self, session, playList, playIdx, listTitle=None, plType='local', title_inr=0, queue=None):
 		self.session = session
 	
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path =  mp_globals.pluginPath + "/skins"
 		
-		path = "%s/%s/defaultGenreScreen.xml" % (self.skin_path, config.mediaportal.skin.value)
+		path = "%s/%s/showSongstoAll.xml" % (self.skin_path, config.mediaportal.skin.value)
 		if not fileExists(path):
-			path = self.skin_path + "/original/defaultGenreScreen.xml"
+			path = self.skin_path + "/original/showSongstoAll.xml"
 
 		with open(path, "r") as f:
 			self.skin = f.read()
@@ -346,7 +369,15 @@ class SimplePlaylist(Screen):
 		self.listTitle = listTitle
 		self.plType = plType
 		self.title_inr = title_inr
+		self.playlistQ = queue
 
+		self["title"] = Label("")
+		self["coverArt"] = Pixmap()
+		self["songtitle"] = Label ("")
+		self["artist"] = Label ("")
+		self["album"] = Label ("")
+
+		"""
 		self['title'] = Label("Playlist")
 		self['ContentTitle'] = Label("")
 		self['name'] = Label("")
@@ -357,14 +388,28 @@ class SimplePlaylist(Screen):
 		self['F2'] = Label("")
 		self['F3'] = Label("")
 		self['F4'] = Label("")
+		"""
 		
+		self.updateTimer = eTimer()
+		self.updateTimer.callback.append(self.updateStatus)
+
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(25)
-		self['genreList'] = self.chooseMenuList
+		self['streamlist'] = self.chooseMenuList
 		
 		self.onLayoutFinish.append(self.showPlaylist)
 
+	def updateStatus(self):
+		#print "updateStatus:"
+		if not self.playlistQ.empty():
+			t = self.playlistQ.get_nowait()
+			self["songtitle"].setText(t[1])
+			self["artist"].setText(t[2])
+			self["album"].setText(t[3])
+			self['streamlist'].moveToIndex(t[0])
+		self.updateTimer.start(1000, True)
+	
 	def playListEntry(self, entry):
 		return [entry,
 			(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[self.title_inr])
@@ -372,17 +417,19 @@ class SimplePlaylist(Screen):
 		
 	def showPlaylist(self):
 		print 'showPlaylist:'
+		self.updateTimer.start(100, True)
+		
 		if self.listTitle != None:
-			self['ContentTitle'].setText(self.listTitle)
+			self['title'].setText("MP Playlist "+self.listTitle)
 		else:
-			self['ContentTitle'].setText("Auswahl")
+			self['title'].setText("MP Playlist")
 
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
-		self['genreList'].moveToIndex(self.playIdx)
+		self['streamlist'].moveToIndex(self.playIdx)
 	
 	def red(self):
 		if self.plType == 'global':
-			idx = self['genreList'].getSelectedIndex()
+			idx = self['streamlist'].getSelectedIndex()
 			"""
 			del playList[idx]
 			l = len(self.playList)
@@ -402,7 +449,7 @@ class SimplePlaylist(Screen):
 	def ok(self):
 		if len(self.playList) == 0:
 			self.exit()
-		idx = self['genreList'].getSelectedIndex()
+		idx = self['streamlist'].getSelectedIndex()
 		self.close([idx,'',self.playList])
 
 class SimpleConfig(ConfigListScreen, Screen):

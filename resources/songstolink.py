@@ -16,7 +16,7 @@ class SongstoLink:
 		if token != '':
 			scStream = self._baseurl+token
 			print "hash: ",token
-			self._callback(sc_artist+' - '+sc_title, scStream, sc_album, sc_artist)
+			self._callback(sc_title, scStream, sc_album, sc_artist)
 		else:
 			title = urllib2.quote(sc_title.encode("utf8"))
 			artist = urllib2.quote(sc_artist.encode("utf8"))
@@ -36,7 +36,7 @@ class SongstoLink:
 				print "hash: ",scHash
 				scStream = self._baseurl+scHash
 				print scHash
-				self._callback(scArtist+' - '+scTitle, scStream, scAlbum, scArtist)
+				self._callback(scTitle, scStream, scAlbum, scArtist)
 
 		if not found:
 			self._errback('scHash not found!')

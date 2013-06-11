@@ -28,6 +28,6 @@ class EightiesLink:
 		if stream_url:
 			stream_url = "%s%s" % (self.baseurl, stream_url[0])
 			print stream_url
-			self._callback(self.artist+' - '+self.title, stream_url, self.album, self.artist)
+			self._callback(self.title, stream_url, self.album, self.artist)
 		else:
 			self._errback('stream_url not found!')			
