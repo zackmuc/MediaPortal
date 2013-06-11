@@ -198,15 +198,17 @@ class kxKino(Screen):
 		
 	def loadPage(self):
 		self.streamList = []
+		print self.kxGotLink
 		getPage(self.kxGotLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 		
 	def parseData(self, data):
+		print "daten bekommen.."
 		kxMovies = re.findall('<div class="Opt leftOpt Headlne"><a title=".*?" href="(.*?)"><h1>(.*?)</h1></a></div>.*?<div class="Thumb"><img style="width: 70px; height: 100px" src="(.*?)" /></div>.*?<div class="Descriptor">(.*?)</div>.*?src="/gr/sys/lng/(.*?).png"', data, re.S)
 		if kxMovies:
 			for (kxUrl,kxTitle,kxImage,kxHandlung,kxLang) in kxMovies:
 				kxUrl = "http://kinox.to" + kxUrl
 				self.streamList.append((decodeHtml(kxTitle),kxUrl,kxImage,kxHandlung,kxLang))
-				self.streamMenuList.setList(map(kxListEntry, self.streamList))
+			self.streamMenuList.setList(map(kxListEntry, self.streamList))
 			self.keyLocked = False
 			self.showInfos()
 
@@ -319,24 +321,28 @@ class kxNeuesteKino(Screen):
 		getPage(self.kxGotLink, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 		
 	def parseData(self, data):
-		neueste = re.findall('<div class="Opt leftOpt Headlne"><h1>.*?aus dem Kino vom.*?</h1></div>(.*?)</table>', data, re.S)
-		if neueste:
-			movies = re.findall('td class="Title"><a href="(.*?)" title=".*?" class="OverlayLabel">(.*?)</a></td>', neueste[0], re.S)
-			if movies:
-				for (kxUrl,kxTitle) in movies:
-					kxUrl = "http://kinox.to" + kxUrl
-					print kxTitle, kxUrl
-					self.streamList.append((decodeHtml(kxTitle),kxUrl))
-					self.streamMenuList.setList(map(kxList2Entry, self.streamList))
-				self.keyLocked = False
-				self.showInfos()
+		#neueste = re.findall('<div class="Opt leftOpt Headlne"><h1>.*?aus dem Kino vom.*?</h1></div>(.*?)</table>', data, re.S)
+		#if neueste:
+			#movies = re.findall('td class="Title"><a href="(.*?)" title=".*?" class="OverlayLabel">(.*?)</a></td>', neueste[0], re.S)
+		movies = re.findall('<div class="image"><a title="(.*?)" href="(.*?)"><img src="(.*?)" /></a></div>', data, re.S)
+		if movies:
+			#for (kxUrl,kxTitle) in movies:
+			for (kxTitle,kxUrl,kxImage) in movies:
+				kxUrl = "http://kinox.to" + kxUrl
+				print kxTitle, kxUrl, kxImage
+				self.streamList.append((decodeHtml(kxTitle),kxUrl,kxImage))
+			self.streamMenuList.setList(map(kxList2Entry, self.streamList))
+			self.keyLocked = False
+			self.showInfos()
 
 	def showInfos(self):
 		filmName = self['streamlist'].getCurrent()[0][0]
 		self['name'].setText(filmName)
 		url = self['streamlist'].getCurrent()[0][1]
+		image = self['streamlist'].getCurrent()[0][2]
 		print url
-		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getDetails).addErrback(self.dataError)
+		downloadPage(image, "/tmp/kxIcon.jpg").addCallback(self.showCover)
+		#getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getDetails).addErrback(self.dataError)
 		
 	def getDetails(self, data):
 		details = re.findall('<div class="Grahpics">.*?<img src="(.*?)".*?<div class="Descriptore">(.*?)</div>', data, re.S)
