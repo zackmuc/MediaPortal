@@ -347,6 +347,6 @@ class PutpatTvPlayer(SimplePlayer):
 		url = self.playList[self.playIdx][1]
 		xxxtitle = self.playList[self.playIdx][0]
 		token = self.playList[self.playIdx][2]
-		phImage = self.playList[0][3]
+		phImage = self.playList[self.playIdx][3]
 		PutpattvLink(self.session).getLink(self.playStream, self.dataError, xxxtitle, url, token, phImage)
 			
