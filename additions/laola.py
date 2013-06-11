@@ -32,7 +32,7 @@ def laolaVideosListEntry(entry):
 
 def laolaOverviewListEntry(entry):
 	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
+		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[1])
 		]
 		
 def laolaSubOverviewListEntry(entry):
@@ -62,7 +62,8 @@ class laolaVideosOverviewScreen(Screen):
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
-			"red": self.keyCancel
+			"red": self.keyCancel,
+			"green": self.keyLocale
 		}, -1)
 		
 		self.lastservice = session.nav.getCurrentlyPlayingServiceReference()
@@ -70,16 +71,18 @@ class laolaVideosOverviewScreen(Screen):
 		
 		self.keyLocked = True
 		self['title'] = Label("Laola1.tv")
-		self['ContentTitle'] = Label("Auswahl:")
+		self.locale = "de"
+		self['ContentTitle'] = Label("Auswahl Deutschland:")
 		self['name'] = Label("")
 		self['F1'] = Label("Exit")
-		self['F2'] = Label("")
+		self['F2'] = Label("Land")
 		self['F3'] = Label("")
 		self['F4'] = Label("")
 		self['F3'].hide()
 		self['F4'].hide()
 
 		self.genreliste = []
+		
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(25)
@@ -87,8 +90,39 @@ class laolaVideosOverviewScreen(Screen):
 		self.onLayoutFinish.append(self.loadPage)
 	
 	def loadPage(self):
-		self.genreliste = [('Live', "upcoming-livestreams"), ('Neueste Videos',"neueste-videos"), ('Eishockey',"eishockey"), ('Fussball',"fussball"), ('Fussball Int.',"fussball-int"), ('Volleyball',"volleyball"), ('Mehr Sport',"mehr-sport")]
+		print 'loadPage'
+		menuUrl = "http://www.laola1.tv/server/menu.php?menu=seochannels&geo=only_deu&lang=DE&ucs=style"
+		if self.locale == "at":
+			menuUrl = "http://www.laola1.tv/server/menu.php?menu=seochannels&geo=only_aut&lang=DE&ucs=style"
+		elif self.locale == "int":
+			menuUrl = "http://www.laola1.tv/server/menu.php?menu=seochannels&geo=grp_int&lang=DE&ucs=style"
+	
+		getPage(menuUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getMenuUrl).addErrback(self.dataError)
+		
+	def getMenuUrl(self, data):
+		self.genreliste = re.findall('<a\shref="(.*?)"\sclass="channel1"><h2\sstyle="margin-top:inherit;\sfont-size:inherit;">(.*?)</h2>', data, re.S)
+		print self.genreliste
+		print len(self.genreliste)
+		if self.locale == "de":
+			self.genreliste.insert(0, ('http://www.laola1.tv/de/de/neueste-videos/video/0-617-.html', 'Neueste Videos'))
+		if self.locale == "at":
+			self.genreliste.insert(0, ('http://www.laola1.tv/de/at/neueste-videos/video/0-249-.html', 'Neueste Videos'))
+		elif self.locale == "int":
+			self.genreliste.insert(0, ('http://www.laola1.tv/en/int/latest-videos/video/0-878-.html', 'Neueste Videos'))
+			
+		if self.locale == "de":	
+			self.genreliste.insert(0, ('http://www.laola1.tv/de/de/upcoming-livestreams/video/0-1369-.html', 'Live'))
+		elif self.locale == "at":
+			self.genreliste.insert(0, ('http://www.laola1.tv/de/at/upcoming-livestreams/video/0-1087-.html', 'Live'))
+		elif self.locale == "int":
+			self.genreliste.insert(0, ('http://www.laola1.tv/en/int/upcoming-livestreams/video/0-989-.html', 'Live'))
+	
 		self.chooseMenuList.setList(map(laolaOverviewListEntry, self.genreliste))
+		self['ContentTitle'].setText("Auswahl Deutschland:")
+		if self.locale == "at":
+			self['ContentTitle'].setText("Auswahl Österreich:")
+		elif self.locale == "int":
+			self['ContentTitle'].setText("Auswahl International:")		
 		self.keyLocked = False
 
 	def keyOK(self):
@@ -97,34 +131,43 @@ class laolaVideosOverviewScreen(Screen):
 		auswahl = self['genreList'].getCurrent()[0][1]
 		print 'Auswahl: ' + auswahl
 
-		self.overviewUrl = "http://www.laola1.tv/"
+		self.overviewUrl = self['genreList'].getCurrent()[0][0]
 		self.overviewSelection = auswahl
 		
 		getPage(self.overviewUrl, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getUrl).addErrback(self.dataError)
 	
 	def keyCancel(self):
 		self.close()
+		
+	def keyLocale(self):
+		print 'keyLocale'
+		if self.keyLocked:
+			return	
+		self.keyLocked = True
+		if self.locale == "de":
+			self.locale = "at"
+		elif self.locale == "at":
+			self.locale = "int"		
+		elif self.locale == "int":
+			self.locale = "de"
+		self.loadPage()
 	
 	def getUrl(self, data):
 		print 'getUrl init'
-		searchString = '<a href="(http://www.laola1.tv/de/at/%s/video/.*?)">' % self.overviewSelection
-		print 'searchString: '+ searchString
-		laUrl = re.findall(searchString, data, re.S)
+		laUrl = self.overviewUrl
 		print 'getUrl laUrl: '
 		print laUrl
 		
-		print laUrl[0].split('.html')[0] + ".html"
-		
-		if self.overviewSelection == "neueste-videos":
-			laolaTopVideosScreen.startUrl = laUrl[0].split('.html')[0] + ".html"
+		if self.overviewSelection == "Neueste Videos":
+			laolaTopVideosScreen.startUrl = laUrl.split('.html')[0] + ".html"
 			laolaTopVideosScreen.isLive = "false"
 			self.session.open(laolaTopVideosScreen)	
-		elif self.overviewSelection == "upcoming-livestreams":
-			laolaTopVideosScreen.startUrl = laUrl[0].split('.html')[0] + ".html"
+		elif self.overviewSelection == "Live":
+			laolaTopVideosScreen.startUrl = laUrl.split('.html')[0] + ".html"
 			laolaTopVideosScreen.isLive = "true"
 			self.session.open(laolaTopVideosScreen)	
 		else:
-			getPage(laUrl[0].split('.html')[0] + ".html", headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getSubUrl).addErrback(self.dataError)
+			getPage(laUrl.split('.html')[0] + ".html", headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getSubUrl).addErrback(self.dataError)
 			
 	def getSubUrl(self, data):
 		print 'getSuburl init'
