@@ -9,13 +9,15 @@ class PutpattvLink:
 		self.session = session
 		self._callback = None
 		self.title = ''
+		self.imgurl = ''
 
-	def getLink(self, cb_play, cb_err, title, url, token):
+	def getLink(self, cb_play, cb_err, title, url, token, imgurl):
 		self._callback = cb_play
 		self.title = title
+		self.imgurl = imgurl
 		
 		if url != None:
-			self._callback(title, url)
+			self._callback(title, url, imgurl=imgurl)
 		else:
 			url = 'http://www.putpat.tv/ws.xml?client=putpatplayer&partnerId=1&token=%s=&streamingMethod=http&method=Asset.getClipForToken' % token
 			getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getToken).addErrback(cb_err)
@@ -27,4 +29,4 @@ class PutpattvLink:
 			for phUrl in phClip:
 				url = phUrl.replace('&amp;','&')
 				
-		self._callback(self.title, url)
+		self._callback(self.title, url, imgurl=self.imgurl)

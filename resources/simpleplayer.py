@@ -68,7 +68,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playIdx = playIdx
 		self.playLen = len(playList)
 		self.returning = False
-		self.pl_entry = ['', '', '', '', '', '', '']
+		self.pl_entry = ['', '', '', '', '', '', '', '']
 		self.plType = plType
 		self.playList2 = []
 		self.pl_name = ''
@@ -76,7 +76,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.cover = cover
 		self.ltype = ltype
 		self.playlistQ = Queue.Queue(0)
-		self.pl_status = (0, '', '', '')
+		self.pl_status = (0, '', '', '', '')
 		
 		# load default cover
 		self['Cover'] = Pixmap()
@@ -101,7 +101,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		print error
 		self.playNextStream()
 		
-	def playStream(self, title, url=None, album='', artist=''):
+	def playStream(self, title, url=None, album='', artist='', imgurl=''):
 		print "playStream: ",title,url
 		if url == None:
 			return
@@ -116,11 +116,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		else:
 			sref.setName(title)
 			
-		self.pl_entry = [title, None, artist, album, self.ltype, '']
+		self.pl_entry = [title, None, artist, album, self.ltype, '', imgurl]
 		self.session.nav.stopService()
 		self.session.nav.playService(sref)
 		
-		self.pl_status = (self.playIdx, title, artist, album)
+		self.pl_status = (self.playIdx, title, artist, album, imgurl)
 		if self.pl_open:
 			self.playlistQ.put(self.pl_status)
 
@@ -179,29 +179,30 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			url = self.playList2[self.playIdx][2]
 			album = self.playList2[self.playIdx][3]
 			artist = self.playList2[self.playIdx][4]
+			imgurl = self.playList2[self.playIdx][7]
 			if len(self.playList2[self.playIdx]) < 6:
 				ltype = ''
 			else:
 				ltype = self.playList2[self.playIdx][5]
 				
 			if ltype == 'youtube':
-				YoutubeLink(self.session).getLink(self.playStream, self.dataError, titel, url)
+				YoutubeLink(self.session).getLink(self.playStream, self.dataError, titel, url, imgurl)
 			elif ltype == 'putpattv':
 				token = self.playList2[self.playIdx][6]
-				PutpattvLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
+				PutpattvLink(self.session).getLink(self.playStream, self.dataError, titel, url, token, imgurl)
 			elif ltype == 'myvideo':
 				token = self.playList2[self.playIdx][6]
-				MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
+				MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token, imgurl)
 			elif ltype == 'songsto':
 				token = self.playList2[self.playIdx][6]
-				SongstoLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, token)
+				SongstoLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, token, imgurl)
 			elif ltype == 'canna':
-				CannaLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url)
+				CannaLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url, imgurl)
 			elif ltype == 'eighties':
 				token = self.playList2[self.playIdx][6]
-				EightiesLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url, token)
+				EightiesLink(self.session).getLink(self.playStream, self.dataError, titel, artist, album, url, token, imgurl)
 			elif url:
-				self.playStream(titel, url, album, artist)
+				self.playStream(titel, url, album, artist, imgurl=imgurl)
 		else:
 			self.close()
 				
@@ -408,6 +409,8 @@ class SimplePlaylist(Screen):
 			self["artist"].setText(t[2])
 			self["album"].setText(t[3])
 			self['streamlist'].moveToIndex(t[0])
+			self.getCover(t[4])
+			
 		self.updateTimer.start(1000, True)
 	
 	def playListEntry(self, entry):
@@ -427,6 +430,38 @@ class SimplePlaylist(Screen):
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
 		self['streamlist'].moveToIndex(self.playIdx)
 	
+	def getCover(self, url):
+		print "getCover:", url
+		if url != None and url != '':
+			downloadPage(url, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+		else:
+			self.ShowCoverNone()
+	
+	def ShowCover(self, picData):
+		print "ShowCover:"
+		picPath = "/tmp/Icon.jpg"
+		self.ShowCoverFile(picPath)
+		
+	def ShowCoverNone(self):
+		print "ShowCoverNone:"
+		picPath = mp_globals.pluginPath+"/images/no_coverArt.png"
+		self.ShowCoverFile(picPath)
+	
+	def ShowCoverFile(self, picPath):
+		print "showCoverFile:"
+		if fileExists(picPath):
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
+			self.scale = AVSwitch().getFramebufferScale()
+			self.picload = ePicLoad()
+			size = self['coverArt'].instance.size()
+			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+			if self.picload.startDecode(picPath, 0, 0, False) == 0:
+				ptr = self.picload.getData()
+				if ptr != None:
+					self['coverArt'].instance.setPixmap(ptr)
+					self['coverArt'].show()
+					del self.picload
+					
 	def red(self):
 		if self.plType == 'global':
 			idx = self['streamlist'].getSelectedIndex()
@@ -547,7 +582,7 @@ class SimplePlaylistIO:
 		try:
 			f1 = open(pl_path, 'w')
 			while j < l:
-				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/>\n' % (list[j][1], list[j][2], list[j][3], list[j][4], list[j][5], list[j][6])
+				wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/><img %s/>\n' % (list[j][1], list[j][2], list[j][3], list[j][4], list[j][5], list[j][6], list[j][7])
 				f1.write(wdat)
 				j += 1
 					
@@ -564,6 +599,7 @@ class SimplePlaylistIO:
 	def addEntry(pl_name, entry):
 		print "addEntry:"
 		
+		imgurl = entry[6]
 		token = entry[5]
 		ltype = entry[4]
 		album = entry[3]
@@ -595,7 +631,7 @@ class SimplePlaylistIO:
 			else:
 				f1 = open(pl_path, 'w')
 		
-			wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/>\n' % (title, url, album, artist, ltype, token)
+			wdat = '<title>%s</<url>%s</<album>%s</<artist>%s</<ltype %s/><token %s/><img %s/>\n' % (title, url, album, artist, ltype, token, imgurl)
 			f1.write(wdat)
 			f1.close()
 			return 1
@@ -631,6 +667,7 @@ class SimplePlaylistIO:
 					m = re.search('<title>(.*?)</<url>(.*?)</<album>(.*?)</<artist>(.*?)</', entry)
 					m2 = re.search('<ltype (.*?)/>', entry)
 					m3 = re.search('<token (.*?)/>', entry)
+					m4 = re.search('<img (.*?)/>', entry)
 					if m:
 						print "m:"
 						titel = m.group(1)
@@ -645,7 +682,11 @@ class SimplePlaylistIO:
 							token = m3.group(1)
 						else:
 							token = ''
-						list.append(("%s - %s" % (artist, titel),titel, url, album, artist, ltype, token))
+						if m4:
+							imgurl = m4.group(1)
+						else:
+							imgurl = ''
+						list.append(("%s - %s" % (artist, titel),titel, url, album, artist, ltype, token, imgurl))
 				
 				f1.close()
 			

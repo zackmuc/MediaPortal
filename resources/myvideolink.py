@@ -11,13 +11,15 @@ class MyvideoLink:
 		print "MyvideoLink:"
 		self.session = session
 		self._callback = None
+		self.imgurl = ''
 		self.GK = ('WXpnME1EZGhNRGhpTTJNM01XVmhOREU0WldNNVpHTTJOakpt'
 			'TW1FMU5tVTBNR05pWkRaa05XRXhNVFJoWVRVd1ptSXhaVEV3'
 			'TnpsbA0KTVRkbU1tSTRNdz09')
 
-	def getLink(self, cb_play, cb_err, title, url, token):
+	def getLink(self, cb_play, cb_err, title, url, token, imgurl):
 		self._callback = cb_play
 		self.myvideoTitle = title
+		self.imgurl = imgurl
 		"""
 		id = re.findall('/watch/(.*?)/', url)
 		if id:
@@ -64,4 +66,4 @@ class MyvideoLink:
 			hinten = re.findall('\.(.*[a-zA-Z0-9])', source, re.S)
 			string23 = "/%s playpath=%s" % (hinten[0], vorne[0])
 			link = "%s%s" % (url, string23)
-		self._callback(title, link)
+		self._callback(title, link, imgurl=self.imgurl)

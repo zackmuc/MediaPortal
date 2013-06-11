@@ -9,14 +9,16 @@ class SongstoLink:
 		self._callback = None
 		self._errback = None
 		self._baseurl = "http://s.songs.to/data.php?id="
+		self.imgurl = ''
 		
-	def getLink(self, cb_play, cb_err, sc_title, sc_artist, sc_album, token):
+	def getLink(self, cb_play, cb_err, sc_title, sc_artist, sc_album, token, imgurl):
 		self._callback = cb_play
 		self._errback = cb_err
+		self.imgurl = imgurl
 		if token != '':
 			scStream = self._baseurl+token
 			print "hash: ",token
-			self._callback(sc_title, scStream, sc_album, sc_artist)
+			self._callback(sc_title, scStream, sc_album, sc_artist, imgurl)
 		else:
 			title = urllib2.quote(sc_title.encode("utf8"))
 			artist = urllib2.quote(sc_artist.encode("utf8"))
@@ -36,7 +38,7 @@ class SongstoLink:
 				print "hash: ",scHash
 				scStream = self._baseurl+scHash
 				print scHash
-				self._callback(scTitle, scStream, scAlbum, scArtist)
+				self._callback(scTitle, scStream, scAlbum, scArtist, self.imgurl)
 
 		if not found:
 			self._errback('scHash not found!')

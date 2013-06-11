@@ -77,7 +77,8 @@ class ClipfishPlayer(SimplePlayer):
 		
 		if url != None:
 			title = str(self.playIdx + 1) + '. ' + self.playList[self.playIdx][0]
-			self.playStream(title, url)
+			imgurl = self.playList[self.playIdx][2]
+			self.playStream(title, url, imgurl=imgurl)
 		else:
 			print "No video url found!"
 			self.dataError('No video data found!')

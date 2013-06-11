@@ -193,7 +193,8 @@ class showSongstoAll(Screen, InfoBarBase, InfoBarSeek):
 				ltype = 'songsto'
 				token = self['streamlist'].getCurrent()[0][4]
 				album = self['streamlist'].getCurrent()[0][2]
-				entry = [scTitle, url, scArtist, album, ltype, token]
+				imgurl = "http://songs.to/covers/"+self['streamlist'].getCurrent()[0][3]
+				entry = [scTitle, url, scArtist, album, ltype, token, imgurl]
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
 				if res == 1:
@@ -347,7 +348,7 @@ class showSongstoTop(Screen, InfoBarBase, InfoBarSeek):
 				ltype = 'songsto'
 				token = ''
 				album = self["album"].getText()
-				entry = [scTitle, url, scArtist, album, ltype, token]
+				entry = [scTitle, url, scArtist, album, ltype, token, '']
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
 				if res == 1:

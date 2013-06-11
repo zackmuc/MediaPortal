@@ -210,7 +210,7 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 				ltype = 'canna'
 				token = ''
 				album = ''
-				entry = [scTitle, url, scArtist, album, ltype, token]
+				entry = [scTitle, url, scArtist, album, ltype, token, '']
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
 				if res == 1:
@@ -417,7 +417,7 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 				ltype = 'canna'
 				token = ''
 				album = ''
-				entry = [scTitle, url, scArtist, album, ltype, token]
+				entry = [scTitle, url, scArtist, album, ltype, token, '']
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
 				if res == 1:
@@ -729,7 +729,7 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 				ltype = 'canna'
 				token = ''
 				album = ''
-				entry = [scTitle, url, scArtist, album, ltype, token]
+				entry = [scTitle, url, scArtist, album, ltype, token, '']
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
 				if res == 1:

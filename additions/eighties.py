@@ -177,7 +177,7 @@ class eightiesMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 				ltype = 'eighties'
 				token = self.token
 				album = self.genreName
-				entry = [scTitle, url, scArtist, album, ltype, token]
+				entry = [scTitle, url, scArtist, album, ltype, token, '']
 					
 				res = SimplePlaylistIO.addEntry(data[1], entry)
 				if res == 1:

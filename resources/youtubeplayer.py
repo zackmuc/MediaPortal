@@ -14,5 +14,6 @@ class YoutubePlayer(SimplePlayer):
 		print "getVideo:"
 		dhTitle = self.playList[self.playIdx][self.title_inr]
 		dhVideoId = self.playList[self.playIdx][2]
-		YoutubeLink(self.session).getLink(self.playStream, self.dataError, dhTitle, dhVideoId)
+		imgurl =  self.playList[self.playIdx][3]
+		YoutubeLink(self.session).getLink(self.playStream, self.dataError, dhTitle, dhVideoId, imgurl=imgurl)
 		

@@ -10,13 +10,13 @@ class CannaLink:
 		self._errback = None
 		self._callback = None
 		
-	def getLink(self, cb_play, cb_err, sc_title, sc_artist, sc_album, url):
+	def getLink(self, cb_play, cb_err, sc_title, sc_artist, sc_album, url, imgurl):
 		self._errback = cb_err
 		self._callback = cb_play
 		
 		stream_url = self.getDLurl(url)
 		if stream_url:
-			cb_play(sc_title, stream_url, sc_album, sc_artist)
+			cb_play(sc_title, stream_url, sc_album, sc_artist, imgurl)
 		else:
 			cb_err('stream_url not found!')
 
