@@ -111,6 +111,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		if pos > 0:
 			pos += 2
 			title = title[pos:]
+			
 		if artist != '':
 			sref.setName(artist + ' - ' + title)
 		else:
@@ -233,7 +234,8 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 						self.playIdx -= 1
 					if self.playIdx < 0:
 						self.close()
-					self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0)
+					else:
+						self.openPlaylist()
 				else:
 					self.getVideo2()
 			else:
@@ -403,7 +405,7 @@ class SimplePlaylist(Screen):
 
 	def updateStatus(self):
 		#print "updateStatus:"
-		if not self.playlistQ.empty():
+		if self.playlistQ and not self.playlistQ.empty():
 			t = self.playlistQ.get_nowait()
 			self["songtitle"].setText(t[1])
 			self["artist"].setText(t[2])
@@ -420,7 +422,6 @@ class SimplePlaylist(Screen):
 		
 	def showPlaylist(self):
 		print 'showPlaylist:'
-		self.updateTimer.start(100, True)
 		
 		if self.listTitle != None:
 			self['title'].setText("MP Playlist "+self.listTitle)
@@ -429,6 +430,7 @@ class SimplePlaylist(Screen):
 
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
 		self['streamlist'].moveToIndex(self.playIdx)
+		self.updateTimer.start(100, True)
 	
 	def getCover(self, url):
 		print "getCover:", url
@@ -444,7 +446,7 @@ class SimplePlaylist(Screen):
 		
 	def ShowCoverNone(self):
 		print "ShowCoverNone:"
-		picPath = mp_globals.pluginPath+"/images/no_coverArt.png"
+		picPath = self.skin_path+"/tec/images/no_coverArt.png"
 		self.ShowCoverFile(picPath)
 	
 	def ShowCoverFile(self, picPath):
@@ -461,6 +463,8 @@ class SimplePlaylist(Screen):
 					self['coverArt'].instance.setPixmap(ptr)
 					self['coverArt'].show()
 					del self.picload
+		else:
+			print "coverfile not found: ", picPath
 					
 	def red(self):
 		if self.plType == 'global':
@@ -686,7 +690,13 @@ class SimplePlaylistIO:
 							imgurl = m4.group(1)
 						else:
 							imgurl = ''
-						list.append(("%s - %s" % (artist, titel),titel, url, album, artist, ltype, token, imgurl))
+							
+						if artist != '':
+							name = "%s - %s" % (artist, titel)
+						else:
+							name = titel
+							
+						list.append((name, titel, url, album, artist, ltype, token, imgurl))
 				
 				f1.close()
 			
