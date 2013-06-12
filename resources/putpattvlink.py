@@ -16,8 +16,14 @@ class PutpattvLink:
 		self.title = title
 		self.imgurl = imgurl
 		
+		self.artist = ''
+		p = title.find(' - ')
+		if p > 0:
+			self.artist = title[:p].strip()
+			self.title = title[p+3:].strip()
+			
 		if url != None:
-			self._callback(title, url, imgurl=imgurl)
+			self._callback(self.title, url, imgurl=imgurl, artist=self.artist)
 		else:
 			url = 'http://www.putpat.tv/ws.xml?client=putpatplayer&partnerId=1&token=%s=&streamingMethod=http&method=Asset.getClipForToken' % token
 			getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.getToken).addErrback(cb_err)
@@ -28,5 +34,5 @@ class PutpattvLink:
 		if phClip:
 			for phUrl in phClip:
 				url = phUrl.replace('&amp;','&')
-				
-		self._callback(self.title, url, imgurl=self.imgurl)
+
+		self._callback(self.title, url, imgurl=self.imgurl, artist=self.artist)
