@@ -59,6 +59,7 @@ class SRFGenreScreen(Screen):
 			self.genreliste = []
 			for (image, title, url, handlung) in sendungen:
 				url = "http://www.srf.ch%s" % url
+				image = image.replace("width=144","width=320")
 				self.genreliste.append((decodeHtml(title), url, image, handlung))
 			self.genreliste.sort()
 			self.chooseMenuList.setList(map(SRFGenreListEntry, self.genreliste))
