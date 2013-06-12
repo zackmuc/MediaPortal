@@ -253,7 +253,7 @@ class myVideoFilmScreen(Screen):
 				self.session.open(MoviePlayer, sref)
 	"""
 	
-	def playStream(self, title, url):
+	def playStream(self, title, url, imgurl):
 		if url != None:
 			print url
 			sref = eServiceReference(0x1001, 0, url)
