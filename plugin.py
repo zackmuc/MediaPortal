@@ -140,6 +140,7 @@ config.mediaportal.youtubeprio = ConfigSelection(default = "1", choices = [("0",
 config.mediaportal.pornpin = ConfigYesNo(default = True)
 config.mediaportal.watchlistpath = ConfigText(default="/etc/enigma2/", fixed_size=False)
 config.mediaportal.sortplugins = ConfigSelection(default = "abc", choices = [("hits", _("Hits")), ("abc", _("ABC")), ("user", _("User"))])
+config.mediaportal.laola1locale = ConfigText(default="de", fixed_size=False)
 
 config.mediaportal.showDoku = ConfigYesNo(default = True)
 config.mediaportal.showRofl = ConfigYesNo(default = True)
