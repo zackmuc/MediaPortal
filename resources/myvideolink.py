@@ -55,6 +55,19 @@ class MyvideoLink:
 		sk = self.__md5(b64decode(b64decode(self.GK)) + self.__md5(str(token)))
 		dec_data = self.__rc4crypt(enc_data_b, sk)
 		link = None
+		
+		pos = title.find('. ', 0, 5)
+		if pos > 0:
+			pos += 2
+			title = title[pos:]
+			
+		scArtist = ''
+		scTitle = title
+		p = title.find(' -- ')
+		if p > 0:
+			scArtist = title[:p].strip()
+			scTitle = title[p+4:].strip()
+			
 		if dec_data:
 			url = re.findall("connectionurl='(.*?)'", dec_data, re.S)
 			source = re.findall("source='(.*?)'", dec_data, re.S)
@@ -64,4 +77,5 @@ class MyvideoLink:
 			hinten = re.findall('\.(.*[a-zA-Z0-9])', source, re.S)
 			string23 = "/%s playpath=%s" % (hinten[0], vorne[0])
 			link = "%s%s" % (url, string23)
-		self._callback(title, link, imgurl=imgurl)
+			
+		self._callback(scTitle, link, imgurl=imgurl, artist=scArtist)
