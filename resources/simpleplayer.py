@@ -379,11 +379,6 @@ class SimplePlaylist(Screen):
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
 		self["album"] = Label ("")
-
-		"""
-		self['title'] = Label("Playlist")
-		self['ContentTitle'] = Label("")
-		self['name'] = Label("")
 		if self.plType == 'global':
 			self['F1'] = Label("Löschen")
 		else:
@@ -391,7 +386,6 @@ class SimplePlaylist(Screen):
 		self['F2'] = Label("")
 		self['F3'] = Label("")
 		self['F4'] = Label("")
-		"""
 		
 		self.updateTimer = eTimer()
 		self.updateTimer.callback.append(self.updateStatus)

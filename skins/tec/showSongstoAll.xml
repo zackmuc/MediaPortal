@@ -34,11 +34,11 @@
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttongreen.png" position="305,680" size="90,36" alphatest="blend" zPosition="0" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonyellow.png" position="565,680" size="90,36" alphatest="blend" zPosition="0" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonblue.png" position="815,680" size="90,36" alphatest="blend" zPosition="0" />
-<!--    <widget name="F1" position="55,680" size="90,36" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
+    <widget name="F1" position="55,680" size="90,36" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
     <widget name="F2" position="305,680" size="90,36" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
     <widget name="F3" position="565,680" size="90,36" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" />
     <widget name="F4" position="815,680" size="90,36" transparent="1" font="mediaportal; 18" backgroundColor="#26181d20" foregroundColor="#00ffffff" valign="center" halign="center" zPosition="1" /> 
--->    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonglas.png" position="55,680" size="90,36" alphatest="blend" zPosition="2" />
+    <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonglas.png" position="55,680" size="90,36" alphatest="blend" zPosition="2" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonglas.png" position="305,680" size="90,36" alphatest="blend" zPosition="2" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonglas.png" position="565,680" size="90,36" alphatest="blend" zPosition="2" />
     <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/buttonglas.png" position="815,680" size="90,36" alphatest="blend" zPosition="2" />	
