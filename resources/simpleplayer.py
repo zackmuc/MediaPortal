@@ -450,7 +450,7 @@ class SimplePlaylist(Screen):
 		
 	def ShowCoverNone(self):
 		print "ShowCoverNone:"
-		picPath = self.skin_path+"/tec/images/no_coverArt.png"
+		picPath = self.skin_path+"/original/images/m_no_coverArt.png"
 		self.ShowCoverFile(picPath)
 	
 	def ShowCoverFile(self, picPath):
@@ -620,6 +620,16 @@ class SimplePlaylistIO:
 		url = entry[1]
 		title = entry[0].replace('\n\t', ' - ')
 		title = title.replace('\n', ' - ')
+		
+		if token == None:
+			token = ''
+			
+		if url == None:
+			url = ''
+			
+		if imgurl == None:
+			imgurl = None
+			
 		cmptup = (url, artist, title)
 
 		assert pl_name != None
