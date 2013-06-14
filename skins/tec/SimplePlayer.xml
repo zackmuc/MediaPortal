@@ -1,27 +1,28 @@
 <screen name="SimplePlayer" position="center,center" size="1280,720" title="InfoBar" backgroundColor="transparent" flags="wfNoBorder">
-  <ePixmap position="45,555" size="1200,150" zPosition="-1" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbg.png" />
-  <widget source="session.CurrentService" render="Label" position="278,575" size="700,30" font="mediaportal; 24" valign="top" halign="center" noWrap="1" backgroundColor="#00000000" transparent="1">
+  <ePixmap position="55,555" size="1200,150" zPosition="-2" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbg.png" />
+  <!--<ePixmap position="55,555" size="1200,150" zPosition="-1" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spglas.png" />-->
+  <widget source="session.CurrentService" render="Label" position="283,570" size="700,50" font="mediaportal; 24" valign="top" halign="center" noWrap="1" backgroundColor="#00000000" transparent="1">
     <convert type="ServiceName">Name</convert>
   </widget>
-  <widget source="session.CurrentService" render="Progress" position="276,622" size="700,14" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbar.png" zPosition="3" transparent="1" backgroundColor="#00000000">
+  <widget source="session.CurrentService" render="Progress" position="282,626" size="700,14" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbar.png" zPosition="3" transparent="1" backgroundColor="#00000000">
   <convert type="ServicePosition">Position</convert>
 </widget>
   <widget source="session.CurrentService" render="PositionGauge" position="280,624" size="695,12" zPosition="3" transparent="1">
   <convert type="ServicePosition">Gauge</convert>
 </widget>
-  <widget source="session.CurrentService" render="Label" position="278,649" size="100,30" font="mediaportal;22" halign="left" backgroundColor="#00000000" transparent="1">
+  <widget source="session.CurrentService" render="Label" position="283,645" size="100,30" font="mediaportal;22" halign="left" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Position</convert>
 </widget>
-  <widget source="session.CurrentService" render="Label" position="570,650" size="100,30" font="mediaportal;22" halign="center" backgroundColor="#00000000" transparent="1">
+  <widget source="session.CurrentService" render="Label" position="600,645" size="100,30" font="mediaportal;22" halign="center" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Length</convert>
 </widget>
-  <widget source="session.CurrentService" render="Label" position="876,645" size="100,30" font="mediaportal;22" halign="right" backgroundColor="#00000000" transparent="1">
+  <widget source="session.CurrentService" render="Label" position="881,645" size="100,30" font="mediaportal;22" halign="right" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Remaining,Negate</convert>
 </widget>
 <widget position="1116,354" size="120,200" zPosition="1" alphatest="on" transparent="1" name="Cover" />
   <ePixmap position="94,603" size="120,50" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/mplogo.png" alphatest="blend" />
-  <eLabel position="260,574" size="2,110" backgroundColor="#00808888" />
-  <eLabel position="990,574" size="2,110" backgroundColor="#00808888" />
+  <eLabel position="260,569" size="2,110" backgroundColor="#00808888" />
+  <eLabel position="990,569" size="2,110" backgroundColor="#00808888" />
   <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_dolby_off.png" position="1007,655" size="57,20" zPosition="1" alphatest="blend" />
   <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_dolby_on.png" position="1007,655" size="57,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">IsMultichannel</convert>
@@ -57,7 +58,7 @@
     <convert type="ServiceInfo">VideoHeight</convert>
   </widget>
   <!-- Film Endzeit -->
-<!--<widget source="session.CurrentService" render="Label" position="876,645" size="100,30" font="mediaportal;22" halign="right" backgroundColor="#00000000" transparent="1">
+<!--<widget source="session.CurrentService" render="Label" position="1100,600" size="100,30" font="mediaportal;22" halign="right" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Remaining,Negate</convert>
 </widget>-->
 </screen>
