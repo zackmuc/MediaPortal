@@ -11,12 +11,14 @@ class MyvideoLink:
 		print "MyvideoLink:"
 		self.session = session
 		self._callback = None
+		self._errback = None
 		self.GK = ('WXpnME1EZGhNRGhpTTJNM01XVmhOREU0WldNNVpHTTJOakpt'
 			'TW1FMU5tVTBNR05pWkRaa05XRXhNVFJoWVRVd1ptSXhaVEV3'
 			'TnpsbA0KTVRkbU1tSTRNdz09')
 
 	def getLink(self, cb_play, cb_err, title, url, token, imgurl=''):
 		self._callback = cb_play
+		self._errback = cb_err
 		self.myvideoTitle = title
 		"""
 		id = re.findall('/watch/(.*?)/', url)
@@ -69,6 +71,9 @@ class MyvideoLink:
 			scTitle = title[p+4:].strip()
 			
 		if dec_data:
+			if "rtmp" not in dec_data:
+				self._errback("getStream: No rtmp url found!")
+				
 			url = re.findall("connectionurl='(.*?)'", dec_data, re.S)
 			source = re.findall("source='(.*?)'", dec_data, re.S)
 			url =  unquote(url[0])
