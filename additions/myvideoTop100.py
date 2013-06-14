@@ -9,7 +9,7 @@ from time import strptime, mktime
 
 def myvideoTop100GenreListEntry(entry):
 	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
+		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 860, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
 		]
 		
 def myvideoTop100ListEntry(entry):
@@ -147,7 +147,7 @@ class myvideoTop100SongListeScreen(Screen):
 				url = "http://www.myvideo.de/dynamic/get_player_video_xml.php?flash_playertype=D&ID=%s&_countlimit=4&autorun=yes" % id
 				"""
 				url = "http://www.myvideo.de/dynamic/get_player_video_xml.php?flash_playertype=D&ID=%s" % id
-				self.filmliste.append((title,url,id))
+				self.filmliste.append((title,url,id,image))
 			self.chooseMenuList.setList(map(myvideoTop100ListEntry, self.filmliste))
 			self.keyLocked = False
 
@@ -181,6 +181,7 @@ class myvideoTop100Player(SimplePlayer):
 		titel = self.playList[self.playIdx][self.title_inr]
 		url = self.playList[self.playIdx][1]
 		token = self.playList[self.playIdx][2]
+		imgurl = self.playList[self.playIdx][3]
 		print titel, url, token
 		
-		MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token)
+		MyvideoLink(self.session).getLink(self.playStream, self.dataError, titel, url, token, imgurl=imgurl)
