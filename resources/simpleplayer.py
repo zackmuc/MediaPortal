@@ -628,7 +628,7 @@ class SimplePlaylistIO:
 			url = ''
 			
 		if imgurl == None:
-			imgurl = None
+			imgurl = ''
 			
 		cmptup = (url, artist, title)
 
