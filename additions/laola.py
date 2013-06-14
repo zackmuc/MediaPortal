@@ -70,9 +70,19 @@ class laolaVideosOverviewScreen(Screen):
 		self.playing = False
 		
 		self.keyLocked = True
+		
+		self.locale = config.mediaportal.laola1locale.value
+		print 'self.locale'
+		print self.locale
+		
 		self['title'] = Label("Laola1.tv")
-		self.locale = "de"
-		self['ContentTitle'] = Label("Auswahl Deutschland:")
+			
+		if self.locale == "de":
+			self['ContentTitle'] = Label("Auswahl Deutschland:")
+		elif self.locale == "at":
+			self['ContentTitle'] = Label("Auswahl Österreich:")
+		else:
+			self['ContentTitle'] = Label("Auswahl International:")
 		self['name'] = Label("")
 		self['F1'] = Label("Exit")
 		self['F2'] = Label("Land")
@@ -146,10 +156,16 @@ class laolaVideosOverviewScreen(Screen):
 		self.keyLocked = True
 		if self.locale == "de":
 			self.locale = "at"
+			config.mediaportal.laola1locale.value = "at"
 		elif self.locale == "at":
 			self.locale = "int"		
+			config.mediaportal.laola1locale.value = "int"
 		elif self.locale == "int":
 			self.locale = "de"
+			config.mediaportal.laola1locale.value = "de"
+			
+		config.mediaportal.laola1locale.save()
+		configfile.save()
 		self.loadPage()
 	
 	def getUrl(self, data):

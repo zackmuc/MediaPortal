@@ -154,6 +154,10 @@ class cannaPlaylist(Screen, InfoBarBase, InfoBarSeek):
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
 		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
+		self['F1'] = Label("")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
 
 		self.filmliste = []
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
@@ -370,6 +374,10 @@ class cannaMusicListeScreen(Screen, InfoBarBase, InfoBarSeek):
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
 		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
+		self['F1'] = Label("")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
 
 		self.filmliste = []
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
@@ -678,6 +686,10 @@ class cannaMusicListeScreen2(Screen, InfoBarBase, InfoBarSeek):
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
 		self["album"] = Label ("Playlist      -      Playmode      %s" % self.playmode)
+		self['F1'] = Label("")
+		self['F2'] = Label("")
+		self['F3'] = Label("")
+		self['F4'] = Label("")
 
 		self.filmliste = []
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)

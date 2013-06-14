@@ -33,7 +33,6 @@ class ClipfishPlayer(SimplePlayer):
 	def __init__(self, session, playList, genreVideos, playIdx=0, playAll=False, listTitle=None):
 		print "ClipfishPlayer:"
 		self.genreVideos = genreVideos
-
 		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle)
 		
 	def getVid(self, data):
@@ -76,9 +75,18 @@ class ClipfishPlayer(SimplePlayer):
 				url = 'http://video.clipfish.de/' + m.group(1) + m.group(2)
 		
 		if url != None:
-			title = str(self.playIdx + 1) + '. ' + self.playList[self.playIdx][0]
+			title = self.playList[self.playIdx][0]
 			imgurl = self.playList[self.playIdx][2]
-			self.playStream(title, url, imgurl=imgurl)
+			
+			scArtist = ''
+			scTitle = title
+			if re.match('.*?Musikvideo', self.listTitle):
+				p = title.find(' - ')
+				if p > 0:
+					scArtist = title[:p].strip()
+					scTitle = title[p+3:].strip()
+			
+			self.playStream(scTitle, url, imgurl=imgurl, artist=scArtist)
 		else:
 			print "No video url found!"
 			self.dataError('No video data found!')
@@ -635,7 +643,8 @@ class CF_FilmListeScreen(Screen):
 			self.musicListe,
 			self.genreVideos,
 			self['liste'].getSelectedIndex(),
-			playAll = True
+			playAll = True,
+			listTitle = self.genreName
 			)
 	
 	def keyUp(self):

@@ -77,6 +77,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.ltype = ltype
 		self.playlistQ = Queue.Queue(0)
 		self.pl_status = (0, '', '', '', '')
+		self.pl_event = SimpleEvent()
 		
 		# load default cover
 		self['Cover'] = Pixmap()
@@ -124,6 +125,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.pl_status = (self.playIdx, title, artist, album, imgurl)
 		if self.pl_open:
 			self.playlistQ.put(self.pl_status)
+			self.pl_event.genEvent()
 
 	def playPrevStream(self):
 		print "_prevStream:"
@@ -212,14 +214,16 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 			if self.playlistQ.empty():
 				self.playlistQ.put(self.pl_status)
 			self.pl_open = True
+			self.pl_event.genEvent()
 			
 			if self.plType == 'local':
-				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle, plType=self.plType, title_inr=self.title_inr, queue=self.playlistQ)
+				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList, self.playIdx, listTitle=self.listTitle, plType=self.plType, title_inr=self.title_inr, queue=self.playlistQ, mp_event=self.pl_event)
 			else:
-				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0, queue=self.playlistQ)
+				self.session.openWithCallback(self.cb_Playlist, SimplePlaylist, self.playList2, self.playIdx, listTitle=None, plType=self.plType, title_inr=0, queue=self.playlistQ, mp_event=self.pl_event)
 		
 	def cb_Playlist(self, data):
 		self.pl_open = False
+		
 		while not self.playlistQ.empty():
 			t = self.playlistQ.get_nowait()
 			
@@ -344,7 +348,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 
 class SimplePlaylist(Screen):
 
-	def __init__(self, session, playList, playIdx, listTitle=None, plType='local', title_inr=0, queue=None):
+	def __init__(self, session, playList, playIdx, listTitle=None, plType='local', title_inr=0, queue=None, mp_event=None):
 		self.session = session
 	
 		self.plugin_path = mp_globals.pluginPath
@@ -373,17 +377,13 @@ class SimplePlaylist(Screen):
 		self.plType = plType
 		self.title_inr = title_inr
 		self.playlistQ = queue
+		self.event = mp_event
 
 		self["title"] = Label("")
 		self["coverArt"] = Pixmap()
 		self["songtitle"] = Label ("")
 		self["artist"] = Label ("")
 		self["album"] = Label ("")
-
-		"""
-		self['title'] = Label("Playlist")
-		self['ContentTitle'] = Label("")
-		self['name'] = Label("")
 		if self.plType == 'global':
 			self['F1'] = Label("Löschen")
 		else:
@@ -391,20 +391,21 @@ class SimplePlaylist(Screen):
 		self['F2'] = Label("")
 		self['F3'] = Label("")
 		self['F4'] = Label("")
-		"""
 		
-		self.updateTimer = eTimer()
-		self.updateTimer.callback.append(self.updateStatus)
+		#self.updateTimer = eTimer()
+		#self.updateTimer.callback.append(self.updateStatus)
 
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(25)
 		self['streamlist'] = self.chooseMenuList
 		
+		self.onClose.append(self.resetEvent)
+		
 		self.onLayoutFinish.append(self.showPlaylist)
 
 	def updateStatus(self):
-		#print "updateStatus:"
+		print "updateStatus:"
 		if self.playlistQ and not self.playlistQ.empty():
 			t = self.playlistQ.get_nowait()
 			self["songtitle"].setText(t[1])
@@ -413,7 +414,7 @@ class SimplePlaylist(Screen):
 			self['streamlist'].moveToIndex(t[0])
 			self.getCover(t[4])
 			
-		self.updateTimer.start(1000, True)
+		#self.updateTimer.start(1000, True)
 	
 	def playListEntry(self, entry):
 		return [entry,
@@ -430,7 +431,10 @@ class SimplePlaylist(Screen):
 
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
 		self['streamlist'].moveToIndex(self.playIdx)
-		self.updateTimer.start(100, True)
+		#self.updateTimer.start(100, True)
+		
+		if self.event != None:
+			self.event.addCallback(self.updateStatus)
 	
 	def getCover(self, url):
 		print "getCover:", url
@@ -446,7 +450,7 @@ class SimplePlaylist(Screen):
 		
 	def ShowCoverNone(self):
 		print "ShowCoverNone:"
-		picPath = self.skin_path+"/tec/images/no_coverArt.png"
+		picPath = self.skin_path+"/original/images/m_no_coverArt.png"
 		self.ShowCoverFile(picPath)
 	
 	def ShowCoverFile(self, picPath):
@@ -490,6 +494,11 @@ class SimplePlaylist(Screen):
 			self.exit()
 		idx = self['streamlist'].getSelectedIndex()
 		self.close([idx,'',self.playList])
+		
+	def resetEvent(self):
+		print "resetEvent:"
+		if self.event != None:
+			self.event.reset()
 
 class SimpleConfig(ConfigListScreen, Screen):
 	skin = '\n\t\t<screen position="center,center" size="300,200" title="MP Player Konfiguration">\n\t\t\t<widget name="config" position="10,10" size="290,190" scrollbarMode="showOnDemand" />\n\t\t</screen>'
@@ -611,6 +620,16 @@ class SimplePlaylistIO:
 		url = entry[1]
 		title = entry[0].replace('\n\t', ' - ')
 		title = title.replace('\n', ' - ')
+		
+		if token == None:
+			token = ''
+			
+		if url == None:
+			url = ''
+			
+		if imgurl == None:
+			imgurl = ''
+			
 		cmptup = (url, artist, title)
 
 		assert pl_name != None
@@ -707,3 +726,29 @@ class SimplePlaylistIO:
 			print "eCode: ",e
 			f1.close()
 			return list
+
+class SimpleEvent:
+	def __init__(self):
+		self._ev_callback = None
+		self._ev_on = False
+		
+	def genEvent(self):
+		#print "genEvent:"
+		if self._ev_callback != None:
+			self._ev_on = False
+			self._ev_callback()
+		else:
+			self._ev_on = True
+			
+	def addCallback(self, cb):
+		#print "addCallback:"
+		self._ev_callback=cb
+		if self._ev_on:
+			self._ev_on = False
+			cb()
+	
+	def reset(self):
+		#print "reset"
+		self._ev_callback = None
+		self._ev_on = False
+		
