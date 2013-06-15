@@ -74,7 +74,7 @@ class moovizonGenreScreen(Screen):
 	def loadPageData(self, data):
 		genre_raw = re.findall('>Categories(.*?)>Languages', data, re.S)
 		if genre_raw:
-			genre = re.findall('<li><a href="/.*?/(.*?)/all">(.*?).:.*?</a></li>', genre_raw[0], re.S)
+			genre = re.findall('<li\sclass=""><a\shref="/.*?/(.*?)/all">(.*?).:.*?</a></li>', genre_raw[0], re.S)
 		if genre:
 			self.genreliste = []
 			for cat_id,genreName in genre:
@@ -193,7 +193,7 @@ class moovizonFilmListeScreen(Screen):
 		if countp:
 			self['page'].setText(countp[0])
 
-		movies = re.findall('<li><a\shref="(/movie/.*?)"><img\ssrc="(.*?)"\salt=".*?"\sclass="cover"></a>.*?<h2>(.*?)</h2><img\ssrc="http://static.moovizon.com/img/flag/(.*?).png"',data, re.S)
+		movies = re.findall('<li><a\shref="(/movie/.*?)"><img\ssrc="(.*?)"\salt=".*?"\sclass="cover"></a>.*?<h2>(.*?)</h2><img\ssrc="http://moovizon.com/static/img/flag/(.*?).png"',data, re.S)
 		if movies:
 			self.filmliste = []
 			for (url,image,title,lang) in movies:
