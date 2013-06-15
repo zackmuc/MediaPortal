@@ -16,7 +16,6 @@ if fileExists('/usr/lib/enigma2/python/Plugins/Extensions/mediainfo/plugin.pyo')
 else:
 	MediainfoPresent = False
 
-
 class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoBarShowHide, InfoBarAudioSelection, InfoBarSubtitleSupport):
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
@@ -48,6 +47,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		}, -1)
 		
 		InfoBarNotifications.__init__(self)
+		#InfoBarServiceNotifications.__init__(self)
 		InfoBarBase.__init__(self)
 		InfoBarShowHide.__init__(self)
 		InfoBarAudioSelection.__init__(self)

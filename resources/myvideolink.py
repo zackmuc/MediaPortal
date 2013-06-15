@@ -71,16 +71,23 @@ class MyvideoLink:
 			scTitle = title[p+4:].strip()
 			
 		if dec_data:
-			if "rtmp" not in dec_data:
-				self._errback("getStream: No rtmp url found!")
-				
 			url = re.findall("connectionurl='(.*?)'", dec_data, re.S)
 			source = re.findall("source='(.*?)'", dec_data, re.S)
 			url =  unquote(url[0])
 			source =  unquote(source[0])
 			vorne = re.findall('(.*?)\.', source, re.S)
 			hinten = re.findall('\.(.*[a-zA-Z0-9])', source, re.S)
-			string23 = "/%s playpath=%s" % (hinten[0], vorne[0])
-			link = "%s%s" % (url, string23)
 			
-		self._callback(scTitle, link, imgurl=imgurl, artist=scArtist)
+			if not url:
+				self._errback("getStream: No rtmp url found!")
+			elif 'myvideo2flash' in url:
+				url = url.replace('rtmpe://', 'rtmp://')
+				string23 = " playpath=%s.%s" % (vorne[0], hinten[0])
+				link = "%s%s" % (url, string23)
+			else:
+				string23 = "/%s playpath=%s" % (hinten[0], vorne[0])
+				link = "%s%s" % (url, string23)
+			
+			self._callback(scTitle, link, imgurl=imgurl, artist=scArtist)
+		else:
+			self._errback('No dec_data')
