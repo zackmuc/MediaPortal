@@ -90,8 +90,6 @@ class MyvideoLink:
 		dec_data = self.__rc4crypt(enc_data_b, sk)
 		rtmpurl = re.search(r_rtmpurl, dec_data).group(1)
 		video['rtmpurl'] = unquote(rtmpurl)
-		if 'myvideo2flash' in video['rtmpurl']:
-			video['rtmpurl'] = video['rtmpurl'].replace('rtmpe://', 'rtmpt://')
 		playpath = re.search(r_playpath, dec_data).group(1)
 		video['file'] = unquote(playpath)
 		m_filepath = re.search(r_path, dec_data)
@@ -110,10 +108,17 @@ class MyvideoLink:
 		elif not video['rtmpurl']:
 			video_url = video['filepath'] + video['file']
 		else:
-			video_url = (
-				'%(rtmpurl)s/%(prefix)s '
-				'playpath=%(playpath)s'
-			) % video
+			if 'myvideo2flash' in video['rtmpurl']:
+				video['rtmpurl'] = video['rtmpurl'].replace('rtmpe://', 'rtmp://')
+				video_url = (
+					'%(rtmpurl)s '
+					'playpath=%(playpath)s.%(prefix)s'
+				) % video
+			else:
+				video_url = (
+					'%(rtmpurl)s/%(prefix)s '
+					'playpath=%(playpath)s'
+				) % video
 			
 		title = self.title
 		pos = title.find('. ', 0, 5)
