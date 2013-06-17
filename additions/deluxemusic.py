@@ -3,7 +3,7 @@ from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
 
 def deluxemusicGenreListEntry(entry):
 	return [entry,
-		(eListboxPythonMultiContent.TYPE_TEXT, 0, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
+		(eListboxPythonMultiContent.TYPE_TEXT, 50, 0, 800, 25, 0, RT_HALIGN_CENTER | RT_VALIGN_CENTER, entry[0])
 		]
 		
 def deluxemusicListEntry(entry):

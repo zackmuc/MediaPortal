@@ -425,9 +425,9 @@ class SimplePlaylist(Screen):
 		print 'showPlaylist:'
 		
 		if self.listTitle != None:
-			self['title'].setText("MP Playlist "+self.listTitle)
+			self['title'].setText("MP %s Playlist - %s" %(self.plType, self.listTitle))
 		else:
-			self['title'].setText("MP Playlist")
+			self['title'].setText("MP %s Playlist" % self.plType)
 
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
 		self['streamlist'].moveToIndex(self.playIdx)
