@@ -71,6 +71,7 @@ from additions.nuna import *
 from additions.watchseries import *
 from additions.wrestlingnetwork import *
 from additions.viewster import *
+from additions.musicstreamcc import *
 
 # kids
 from additions.kinderkino import *
@@ -216,6 +217,7 @@ config.mediaportal.showWatchseries = ConfigYesNo(default = True)
 config.mediaportal.showMyvideoTop100 = ConfigYesNo(default = True)
 config.mediaportal.showWrestlingnetwork = ConfigYesNo(default = True)
 config.mediaportal.showViewster = ConfigYesNo(default = True)
+config.mediaportal.showMusicstreamcc = ConfigYesNo(default = True)
 
 # mediatheken
 config.mediaportal.showVoxnow = ConfigYesNo(default = True)
@@ -361,6 +363,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige Nuna:", config.mediaportal.showNuna))
 		self.configlist.append(getConfigListEntry("Zeige Myvideo Top 100:", config.mediaportal.showMyvideoTop100))
 		self.configlist.append(getConfigListEntry("Zeige Wrestling Network:", config.mediaportal.showWrestlingnetwork))
+		self.configlist.append(getConfigListEntry("Zeige Musicstream.cc:", config.mediaportal.showMusicstreamcc))
 
 		### mediatheken
 		self.configlist.append(getConfigListEntry("----- Mediatheken -----", config.mediaportal.fake_entry))
@@ -713,6 +716,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.funsport.append(self.hauptListEntry("Nuna", "nuna"))
 		if config.mediaportal.showMyvideoTop100.value:
 			self.funsport.append(self.hauptListEntry("Myvideo Top 100", "myvideotop100"))
+		if config.mediaportal.showMusicstreamcc.value:
+			self.funsport.append(self.hauptListEntry("Musicstream.cc", "musicstreamcc"))
 		
 		# porn
 		if config.mediaportal.showporn.value:
@@ -1171,6 +1176,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(watchseriesGenreScreen)
 		elif auswahl == "Myvideo Top 100":
 			self.session.open(myvideoTop100GenreScreen)
+		elif auswahl == "Musicstream.cc":
+			self.session.open(show_MSCC_Genre)
 			
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -1738,6 +1745,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Nuna", "nuna", "Fun"))
 		if config.mediaportal.showMyvideoTop100.value:
 			self.plugin_liste.append(("Myvideo Top 100", "myvideotop100", "Fun"))
+		if config.mediaportal.showMusicstreamcc.value:
+			self.plugin_liste.append(("Musicstream.cc", "musicstreamcc", "Fun"))
 			
 		### mediatheken	
 		if config.mediaportal.showVoxnow.value:
@@ -2299,6 +2308,9 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Myvideo Top 100":
 			self.hit_plugin("Myvideo Top 100")
 			self.session.open(myvideoTop100GenreScreen)
+		elif auswahl == "Musicstream.cc":
+			self.hit_plugin("Musicstream.cc")
+			self.session.open(show_MUSIC_Genre)
 
 		# mediatheken
 		elif auswahl == "VOXNOW":

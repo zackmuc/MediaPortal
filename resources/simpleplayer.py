@@ -122,7 +122,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.session.nav.stopService()
 		self.session.nav.playService(sref)
 		
-		self.pl_status = (self.playIdx, title, artist, album, imgurl)
+		self.pl_status = (self.playIdx, title, artist, album, imgurl, self.plType)
 		if self.pl_open:
 			self.playlistQ.put(self.pl_status)
 			self.pl_event.genEvent()
@@ -409,7 +409,8 @@ class SimplePlaylist(Screen):
 			self["songtitle"].setText(t[1])
 			self["artist"].setText(t[2])
 			self["album"].setText(t[3])
-			self['streamlist'].moveToIndex(t[0])
+			if t[5] == self.plType:
+				self['streamlist'].moveToIndex(t[0])
 			self.getCover(t[4])
 			
 		#self.updateTimer.start(1000, True)
