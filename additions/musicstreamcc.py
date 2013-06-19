@@ -3,7 +3,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
 
-MSCC_Version = "Musicstream.cc v0.90 (experimental)"
+MSCC_Version = "Musicstream.cc v0.91 (experimental)"
 
 MSCC_siteEncoding = 'utf-8'
 
@@ -14,8 +14,10 @@ def show_MSCC_GenreListEntry(entry):
 		
 class show_MSCC_Genre(Screen):
 	
-	def __init__(self, session):
+	def __init__(self, session, url='/index.php?pwd=&d=0', ctitle="Album Auswahl"):
 		self.session = session
+		self.genre_url = url
+		self.ctitle = ctitle
 		
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path =  mp_globals.pluginPath + "/skins"
@@ -38,15 +40,15 @@ class show_MSCC_Genre(Screen):
 		
 		
 		self['title'] = Label(MSCC_Version)
-		self['ContentTitle'] = Label("Album Auswahl")
+		self['ContentTitle'] = Label(self.ctitle)
 		self['name'] = Label("")
 		self['F1'] = Label("")
 		self['F2'] = Label("")
 		self['F3'] = Label("")
 		self['F4'] = Label("")
 
+		self.base_url = 'http://musicstream.cc'
 		self.keylock = True
-		self.genre_url = 'http://musicstream.cc/index.php?pwd=&d=0'
 		self.genreliste = []
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
@@ -56,10 +58,13 @@ class show_MSCC_Genre(Screen):
 		self.onLayoutFinish.append(self.layoutFinished)
 		
 	def layoutFinished(self):
-		getPage(self.genre_url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
+		getPage(self.base_url + self.genre_url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		self.genreliste = re.findall('="list_td_right"><a href="(.*?)&amp.*?<img alt="(.*?)"', data)
+		liste = re.findall('="list_td_right"><a href="(.*?)".*?<img alt="(.*?)"', data)
+		if liste:
+			for (u, a) in liste:
+				self.genreliste.append((decodeHtml(u), decodeHtml(a)))
 	
 		if not self.genreliste:
 			self.genreliste.append(('', 'Keine Alben gefunden !'))
@@ -77,7 +82,11 @@ class show_MSCC_Genre(Screen):
 			
 		album = self['genreList'].getCurrent()[0][1]
 		url = self['genreList'].getCurrent()[0][0]
-		self.session.open(show_MSCC_ListScreen, url, album)
+		
+		if '(Sammlung ->)' in album:
+			self.session.open(show_MSCC_Genre, url, 'Auswahl aus %s' % album)
+		else:
+			self.session.open(show_MSCC_ListScreen, url, album)
 
 	def keyCancel(self):
 		self.close()
