@@ -20,7 +20,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=None, ltype=''):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=None, ltype='', autoScrSaver=False):
 	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
@@ -59,6 +59,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.skinName = 'MediaPortal SimplePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 		
+		self.scrSaver = ''
+		self.saverActive = False
+		self.autoScrSaver = autoScrSaver
 		self.pl_open = False
 		self.randomPlay = False
 		self.playMode = ""
@@ -82,7 +85,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		# load default cover
 		self['Cover'] = Pixmap()
 		
+		self.SaverTimer = eTimer()
+		self.SaverTimer.callback.append(self.openSaver)
+		
 		self.setPlaymode()
+		self.configSaver()
 		self.onClose.append(self.playExit)
 		self.onFirstExecBegin.append(self.getShowCover)
 		self.onLayoutFinish.append(self.getVideo)
@@ -259,6 +266,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		if data != []:
 			if data[0] == 1:
 				self.setPlaymode()
+				self.configSaver()
 			elif data[0] == 2:
 				if self.plType != 'local':
 					self.session.open(MessageBox, _("Fehler: Service darf nur von der lok. PL hinzugefügt werden"), MessageBox.TYPE_INFO, timeout=5)
@@ -335,6 +343,28 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		
 	#def unlockShow(self):
 	#	pass
+	
+	def configSaver(self):
+		print "configSaver:"
+		self.scrSaver = config.mediaportal.sp_scrsaver.value
+		print "Savermode: ",self.scrSaver
+		if self.scrSaver == 'automatic' and self.autoScrSaver or self.scrSaver == 'on':
+			if not self.saverActive:
+				self.SaverTimer.start(1000*60, True)
+				self.saverActive = True
+				print "scrsaver timer startet"
+		else:
+			self.SaverTimer.stop()
+			self.saverActive = False
+
+	def openSaver(self):
+		print "openSaver:"
+		self.session.openWithCallback(self.cb_Saver, SimpleScreenSaver) 
+		
+	def cb_Saver(self):
+		print "cb_Saver:"
+		self.saverActive = False
+		self.configSaver()
 		
 	def setPlaymode(self):
 		print "setPlaymode:"
@@ -507,6 +537,7 @@ class SimpleConfig(ConfigListScreen, Screen):
 		self.session = session
 		self.list = []
 		self.list.append(getConfigListEntry('Random Play', config.mediaportal.sp_randomplay))
+		self.list.append(getConfigListEntry('Screensaver', config.mediaportal.sp_scrsaver))
 		self.list.append(getConfigListEntry('Youtube VideoPrio', config.mediaportal.youtubeprio))
 		ConfigListScreen.__init__(self, self.list)
 		self['setupActions'] = ActionMap(['SetupActions'],
@@ -750,4 +781,21 @@ class SimpleEvent:
 		#print "reset"
 		self._ev_callback = None
 		self._ev_on = False
+
+class SimpleScreenSaver(Screen):
+	skin = """
+		<screen position="0,0" size="1280,720" flags="wfNoBorder" zPosition="9" transparent="0">
+		</screen>"""
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.skin = SimpleScreenSaver.skin
+			
+		self["setupActions"] = ActionMap([ "SetupActions" ],
+		{
+			"cancel": self.cancel,
+			"ok": self.cancel
+		})
+
+	def cancel(self):
+		self.close()
 		

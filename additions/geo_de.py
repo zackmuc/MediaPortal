@@ -155,7 +155,7 @@ class GEOdePlayer(SimplePlayer):
 	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None):
 		print "GEOdePlayer:"
 
-		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle)
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle, autoScrSaver=True)
 		
 	def getVideo(self):
 		stvLink = self.playList[self.playIdx][2]

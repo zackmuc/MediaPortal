@@ -268,6 +268,7 @@ config.mediaportal.fake_entry = NoSave(ConfigNothing())
 
 # Konfiguration erfolgt in SimplePlayer
 config.mediaportal.sp_randomplay = ConfigYesNo(default = False)
+config.mediaportal.sp_scrsaver = ConfigSelection(default = "off", choices = [("on", _("On")),("off", _("Off")),("automatic", _("Automatic"))])
 
 class hauptScreenSetup(Screen, ConfigListScreen):
 
