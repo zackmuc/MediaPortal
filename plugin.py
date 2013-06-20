@@ -2311,7 +2311,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.session.open(myvideoTop100GenreScreen)
 		elif auswahl == "Musicstream.cc":
 			self.hit_plugin("Musicstream.cc")
-			self.session.open(show_MUSIC_Genre)
+			self.session.open(show_MSCC_Genre)
 
 		# mediatheken
 		elif auswahl == "VOXNOW":
