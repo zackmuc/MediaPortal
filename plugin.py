@@ -1040,6 +1040,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			return
 		print self.currentlist
 		auswahl = self[self.currentlist].getCurrent()[0][0]
+		icon = self[self.currentlist].getCurrent()[0][1]
+		mp_globals.activeIcon = icon
 		print auswahl
 		if auswahl == "Doku.me":
 			self.session.open(dokuScreen)
@@ -2100,6 +2102,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		
 		select_nr = self.mainlist[int(self.select_list)][int(self.selektor_index)-1]
 		auswahl = self.plugin_liste[int(select_nr)-1][0]
+		icon = self.plugin_liste[int(select_nr)-1][1]
+		mp_globals.activeIcon = icon
 		print "Plugin:", auswahl
 
 		if auswahl == "Doku.me":

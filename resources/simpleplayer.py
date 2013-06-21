@@ -27,6 +27,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.session = session
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
+		self.wallicon_path = mp_globals.pluginPath + "/icons_wall/"
 
 		path = "%s/tec/SimplePlayer.xml" % self.skin_path
 		with open(path, "r") as f:
@@ -81,10 +82,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playlistQ = Queue.Queue(0)
 		self.pl_status = (0, '', '', '', '')
 		self.pl_event = SimpleEvent()
+		self['Icon'] = Pixmap()
 		
 		# load default cover
 		self['Cover'] = Pixmap()
-		
+
 		self.SaverTimer = eTimer()
 		self.SaverTimer.callback.append(self.openSaver)
 		
@@ -92,6 +94,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.configSaver()
 		self.onClose.append(self.playExit)
 		self.onFirstExecBegin.append(self.getShowCover)
+		self.onFirstExecBegin.append(self.ShowIcon)
 		self.onLayoutFinish.append(self.getVideo)
 			
 	def playVideo(self):
@@ -337,6 +340,21 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 					del self.picload
 		else:
 			print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
+
+	def ShowIcon(self):
+		self.icon = self.wallicon_path + mp_globals.activeIcon + ".png"
+		if fileExists(self.icon):
+			self['Icon'].instance.setPixmap(gPixmapPtr())
+			self.scale = AVSwitch().getFramebufferScale()
+			self.picload = ePicLoad()
+			size = self['Icon'].instance.size()
+			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+			if self.picload.startDecode(self.icon, 0, 0, False) == 0:
+				ptr = self.picload.getData()
+				if ptr != None:
+					self['Icon'].instance.setPixmap(ptr)
+					self['Icon'].show()
+					del self.picload
 					
 	#def lockShow(self):
 	#	pass
