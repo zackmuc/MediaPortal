@@ -341,7 +341,7 @@ class pornostreamsStreamListeScreen(Screen):
 	def loadPageData(self, data):
 		print "daten bekommen"
 		parse = re.search('role="main">(.*)id="comments', data, re.S)
-		streams = re.findall('.*?"(http://.*?(streamcloud.eu|flashx|userporn|jpg).*?)".*?', parse.group(1), re.S)
+		streams = re.findall('.*?"(http://.*?(streamcloud.eu|flashx|userporn|jpg|mobileads).*?)".*?', parse.group(1), re.S)
 		if streams:
 			for (stream, hostername) in streams:
 				if re.match('.*?(streamcloud.eu|flashx|userporn)', hostername, re.S|re.I):
