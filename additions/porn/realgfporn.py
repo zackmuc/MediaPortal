@@ -49,29 +49,55 @@ class realgfpornGenreScreen(Screen):
 		
 	def layoutFinished(self):
 		self.keyLocked = True
-		url = "http://www.realgfporn.com/"
+		url = "http://www.realgfporn.com/channels/"
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.genreData).addErrback(self.dataError)
 
 	def genreData(self, data):
-		phCat = re.findall('class="col-3-cats">(.*?)class="clear">', data, re.S)
-		if phCat:
-			for CatData in phCat:
-				phCats = re.findall('140px;\'><a\shref=\'(.*?)\'>(.*?)</a>', CatData, re.S)
+		phCats = re.findall('class="video-spot">.*?<a\shref="(.*?)1.html".*?<img\s{0,3}src="(.*?)"\salt="(.*?)"', data, re.S)
 		if phCats:
-			for (phUrl, phTitle) in phCats:
-				phUrl = phUrl + "page"
-				self.genreliste.append((phTitle, phUrl))
+			for (phUrl, phImage, phTitle) in phCats:
+				self.genreliste.append((phTitle, phUrl, phImage))
 			self.genreliste.sort()
-			self.genreliste.insert(0, ("Longest", "http://www.realgfporn.com/longest/page"))
-			self.genreliste.insert(0, ("Most Popular", "http://www.realgfporn.com/most-viewed/page"))
-			self.genreliste.insert(0, ("Top Rated", "http://www.realgfporn.com/top-rated/page"))
-			self.genreliste.insert(0, ("Most Recent", "http://www.realgfporn.com/page"))
-			self.genreliste.insert(0, ("--- Search ---", "callSuchen"))
+			self.genreliste.insert(0, ("Longest", "http://www.realgfporn.com/longest/page", None))
+			self.genreliste.insert(0, ("Most Popular", "http://www.realgfporn.com/most-viewed/page", None))
+			self.genreliste.insert(0, ("Top Rated", "http://www.realgfporn.com/top-rated/page", None))
+			self.genreliste.insert(0, ("Most Recent", "http://www.realgfporn.com/most-recent/page", None))
+			self.genreliste.insert(0, ("--- Search ---", "callSuchen", None))
 			self.chooseMenuList.setList(map(realgfpornGenreListEntry, self.genreliste))
 			self.keyLocked = False
 
 	def dataError(self, error):
 		print error
+
+	def showInfos(self):
+		phImage = self['genreList'].getCurrent()[0][2]
+		print phImage
+		if not phImage == None:
+			downloadPage(phImage, "/tmp/phIcon.jpg").addCallback(self.ShowCover)
+		else:
+			self.ShowCoverNone()
+
+	def ShowCover(self, picData):
+		picPath = "/tmp/phIcon.jpg"
+		self.ShowCoverFile(picPath)
+		
+	def ShowCoverNone(self):
+		picPath = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/images/no_coverArt.png" % config.mediaportal.skin.value
+		self.ShowCoverFile(picPath)
+		
+	def ShowCoverFile(self, picPath):
+		if fileExists(picPath):
+			self['coverArt'].instance.setPixmap(gPixmapPtr())
+			self.scale = AVSwitch().getFramebufferScale()
+			self.picload = ePicLoad()
+			size = self['coverArt'].instance.size()
+			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
+			if self.picload.startDecode(picPath, 0, 0, False) == 0:
+				ptr = self.picload.getData()
+				if ptr != None:
+					self['coverArt'].instance.setPixmap(ptr)
+					self['coverArt'].show()
+					del self.picload
 
 	def keyOK(self):
 		if self.keyLocked:
@@ -97,21 +123,25 @@ class realgfpornGenreScreen(Screen):
 		if self.keyLocked:
 			return
 		self['genreList'].pageUp()
+		self.showInfos()
 		
 	def keyRight(self):
 		if self.keyLocked:
 			return
 		self['genreList'].pageDown()
-		
+		self.showInfos()		
+
 	def keyUp(self):
 		if self.keyLocked:
 			return
 		self['genreList'].up()
+		self.showInfos()
 		
 	def keyDown(self):
 		if self.keyLocked:
 			return
 		self['genreList'].down()
+		self.showInfos()
 
 	def keyCancel(self):
 		self.close()
@@ -170,7 +200,8 @@ class realgfpornFilmScreen(Screen):
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadData).addErrback(self.dataError)
 	
 	def loadData(self, data):
-		lastp = re.search('<strong>page\s.*?of\s(.*?)\sJump', data, re.S)
+		lastpparse = re.search('class="pagination(.*)</div>', data, re.S)
+		lastp = re.search('<li>.*">(.*?[0-9])<.*/li>', lastpparse.group(1), re.S)
 		if lastp:
 			lastp = lastp.group(1)
 			print lastp
@@ -178,7 +209,7 @@ class realgfpornFilmScreen(Screen):
 		else:
 			self.lastpage = 1
 		self['page'].setText(str(self.page) + ' / ' + str(self.lastpage))	
-		phMovies = re.findall('class="vidSpot\strigger">.*?<a\shref="http://www.realgfporn.com/videos(.*?)".*?<img\s.*?src="(.*?)".*?alt="(.*?)".*?post-duration">(.*?)</b>.*?post-views">(.*?)</b>', data, re.S)
+		phMovies = re.findall('class="video-spot">.*?<a\shref="http://www.realgfporn.com/videos(.*?)".*?<img\s.*?src="(.*?)".*?alt="(.*?)".*?post-duration">(.*?)</b>.*?post-views">(.*?)</b>', data, re.S)
 		if phMovies:
 			for (phUrl, phImage, phTitle, phRuntime, phViews) in phMovies:
 				phUrl = "http://www.realgfporn.com/videos" + phUrl
