@@ -57,7 +57,7 @@
   <widget source="session.CurrentService" render="Label" position="1090,630" size="40,17" backgroundColor="#00000000" transparent="1" font="mediaportal; 16" halign="left">
     <convert type="ServiceInfo">VideoHeight</convert>
   </widget>
-  <widget position="85,584" size="150,80" zPosition="1" alphatest="on" transparent="1" name="Icon" />
+  <widget position="85,584" size="150,80" zPosition="1" alphatest="blend" transparent="1" name="Icon" />
   <!-- Film Endzeit -->
 <!--<widget source="session.CurrentService" render="Label" position="1100,600" size="100,30" font="mediaportal;22" halign="right" backgroundColor="#00000000" transparent="1">
   <convert type="ServicePosition">Remaining,Negate</convert>
