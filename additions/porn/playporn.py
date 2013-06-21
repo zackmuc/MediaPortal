@@ -373,13 +373,14 @@ class playpornStreamListeScreen(Screen):
 		
 	def loadPageData(self, data):
 		print "daten bekommen"
-		streams = re.findall('<a\s{0,3}id="(.*?)".*?href="(.*?)".*?</a>', data, re.S)
+		parse = re.search('class="video">(.*)</div>', data, re.S)
+		streams = re.findall('(http://(streamcloud|flashx|[w]+.putlocker|[w]+.sockshare|userporn|).*?)"', parse.group(1), re.S)
 		if streams:
-			for (hostername, stream) in streams:
-				if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Wupfile)', hostername.strip(' '), re.S|re.I):
+			for (stream, hostername) in streams:
+				if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Wupfile|Userporn)', hostername.strip(' '), re.S|re.I):
 					print hostername, stream
-					hostername = hostername.replace('streamcloud1','Streamcloud (Teil 1)').replace('streamcloud2','Streamcloud (Teil 2)')
-					hostername = hostername.replace('flashx1','Flashx (Teil 1)').replace('flashx2','Flashx (Teil 2)')
+					hostername = hostername.strip('www.')
+					hostername = hostername.title()
 					self.filmliste.append((hostername, stream))
 		else:
 			self.filmliste.append(('Keine Streams gefunden.', None))
@@ -392,17 +393,7 @@ class playpornStreamListeScreen(Screen):
 		streamLink = self['genreList'].getCurrent()[0][1]
 		if streamLink == None:
 			return
-		getPage(streamLink, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx}).addCallback(self.getVideoPage).addErrback(self.dataError)
-
-	def getVideoPage(self, data):
-		videoPage = re.findall('iframe\ssrc="(.*?)"', data, re.S)
-		if not videoPage:
-			videoPage = re.findall('iframe.*?src="http://playporn.to/stream/all/\?file=(.*?)"', data, re.S)
-		if videoPage:
-			for phurl in videoPage:
-				url = phurl
-				url = url.replace('&amp;','&')
-				self.get_stream(url)
+		self.get_stream(streamLink)
 		
 	def get_stream(self,url):
 		get_stream_link(self.session).check_link(url, self.got_link)
