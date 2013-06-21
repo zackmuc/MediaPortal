@@ -3,7 +3,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 from Plugins.Extensions.MediaPortal.resources.simpleplayer import SimplePlayer
 
-MSCC_Version = "Musicstream.cc v0.91 (experimental)"
+MSCC_Version = "Musicstream.cc v0.92 (experimental)"
 
 MSCC_siteEncoding = 'utf-8'
 
@@ -163,10 +163,12 @@ class show_MSCC_ListScreen(Screen):
 		else:
 			img = ''
 			
-		list = re.findall('="list_td_right">.*?/index.php.*?id=(.*?)\'.*?title="(.*?)".*?="file">(.*?\s)(.*?)</span>', data)
+		list = re.findall('="list_td_right">.*?/index.php.*?id=(.*?)\'.*?="file">(.*?)</span>', data)
 		if list:
-			for (u, a, ti, t) in list:
-				self.filmliste.append((ti, decodeHtml(t), self.ctitle, u.replace('&amp;', '&'), img))
+			for (u, t) in list:
+				t = t.replace('_', ' ')
+				t.replace('.mp3', '')
+				self.filmliste.append(('', decodeHtml(t), self.ctitle, u.replace('&amp;', '&'), img))
 				#print "t: ",t
 				#print "u: ",u
 				#print "img: ",img
