@@ -357,18 +357,21 @@ class gstreaminxxxStreamListeScreen(Screen):
 	def loadPageData(self, data):
 		print "daten bekommen"
 		raw = re.findall('<table\sid="post[0-9]+"(.*?)id="post_thanks_box', data, re.S)
-		streams = re.findall('"(http://.*?(g-stream.in\/secure\/.*?\/|flashx|[w]+.putlocker|.).*?)"', raw[0], re.S)
+		streams = re.findall('"(http://.*?(g-stream.in\/secure\/.*?\/|flashx|[w]+.putlocker|[w]+.sockshare|.).*?)"', raw[0], re.S)
 		if streams:
 			for (stream, hostername) in streams:
-				if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Wupfile)', hostername.strip(' '), re.S|re.I):
+				if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|Divxmov|Putme|Zooupload|Wupfile|BitShare)', hostername.strip(' '), re.S|re.I):
 					print hostername, stream
 					if hostername == 'flashx':
 						hostername = 'Flashx'
 					if hostername == 'www.putlocker':
 						hostername = 'Putlocker'
+					if hostername == 'www.sockshare':
+						hostername = 'Sockshare'
 					hostername = hostername.replace('g-stream.in/secure/streamcloud.eu/', 'Streamcloud (Secure)')
 					hostername = hostername.replace('g-stream.in/secure/flashx.tv/', 'Flashx (Secure)')
 					hostername = hostername.replace('g-stream.in/secure/www.putlocker.com/', 'Putlocker (Secure)')
+					hostername = hostername.replace('g-stream.in/secure/www.sockshare.com/', 'Sockshare (Secure)')
 					self.filmliste.append((hostername, stream))
 		if len(self.filmliste) < 1:
 			self.filmliste.append(('Keine Streams gefunden.', None))
@@ -396,23 +399,17 @@ class gstreaminxxxStreamListeScreen(Screen):
 		elif streamHoster == 'Putlocker':
 			print 'Direct Play'
 			self.get_stream(url)
+		elif streamHoster == 'Sockshare':
+			print 'Direct Play'
+			self.get_stream(url)
 		else:
 			print 'Secured Play'
-			getPage(streamLink, agent=special_headers, headers={'Cookie': 'sitechrx='+sitechrx+'; overkill_in='+str(time())}).addCallback(self.getVideoPage).addErrback(self.dataError)
-
-	def getVideoPage(self, data):
-		# secured streamcloud url
-		videoPage = re.findall('<script.*?src="http://meta.streamcloud.eu/agever.php\?detect=1&ref=.*?src=(.*?)"></script>', data, re.S)
-		if not videoPage:
-			# secured flashx url
-			videoPage = re.findall('<meta\sproperty="og:video"\scontent=\'(.*?)\'>', data, re.S)
-		if not videoPage:
-			# secured putlocker url
-			videoPage = re.findall('src=".*?smarterdownloads.*file=(.*?)\&subid', data, re.S)
-		if videoPage:
-			for phurl in videoPage:
-				url = unquote(phurl)
-				self.get_stream(url)
+			geturl = urllib2.urlopen(streamLink)
+			print streamLink
+			url = geturl.geturl()
+			url = unquote(url)
+			print url
+			self.get_stream(url)
 
 	def get_stream(self,url):
 		get_stream_link(self.session).check_link(url, self.got_link)
