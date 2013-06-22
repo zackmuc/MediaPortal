@@ -1,5 +1,4 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.decrypt import *
 
 def radiostreamListEntry(entry):
 	return [entry,
@@ -200,7 +199,6 @@ class Radiode(Screen):
 		print error
 		
 	def getStreamTOmp3(self, data):
-		#data = urllib.urlopen(stationUrl).read()
 		if re.match('.*?"stream"', data, re.S):
 			pattern = re.compile('"stream":"(.*?)"')
 			stationStream = pattern.findall(data, re.S)
