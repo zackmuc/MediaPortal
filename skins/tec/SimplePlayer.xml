@@ -36,12 +36,12 @@
   </widget>
   <widget source="session.CurrentService" render="Pixmap" pixmap="~/tec/images/ico_hd_off.png" position="1170,655" size="29,20" zPosition="1" alphatest="blend">
     <convert type="ServiceInfo">VideoWidth</convert>
-    <convert type="ValueRange">0,720</convert>
+    <convert type="ValueRange">0,1279</convert>
     <convert type="ConditionalShowHide" />
   </widget>
   <widget source="session.CurrentService" render="Pixmap" pixmap="~/tec/images/ico_hd_on.png" position="1185,655" size="29,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">VideoWidth</convert>
-    <convert type="ValueRange">721,1980</convert>
+    <convert type="ValueRange">1280,1980</convert>
     <convert type="ConditionalShowHide" />
   </widget>
   <widget source="global.CurrentTime" render="Label" position="1022,575" size="120,24" font="mediaportal;24" transparent="1" backgroundColor="#00000000">
