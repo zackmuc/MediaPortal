@@ -453,9 +453,11 @@ class SimplePlaylist(Screen):
 			self["songtitle"].setText(t[1])
 			self["artist"].setText(t[2])
 			self["album"].setText(t[3])
-			if t[5] == self.plType:
-				self['streamlist'].moveToIndex(t[0])
 			self.getCover(t[4])
+			if t[5] == self.plType:
+				self.playIdx = t[0]
+				if self.playIdx >= len(self.playList):
+					self.playIdx = 0
 			
 		#self.updateTimer.start(1000, True)
 	
@@ -468,16 +470,18 @@ class SimplePlaylist(Screen):
 		print 'showPlaylist:'
 		
 		if self.listTitle:
-			self['title'].setText("MP %s Playlist - %s" %(self.plType, self.listTitle))
+			self['title'].setText("MP Playlist - %s" % self.listTitle)
 		else:
 			self['title'].setText("MP %s Playlist" % self.plType)
 
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
-		self['streamlist'].moveToIndex(self.playIdx)
-		#self.updateTimer.start(100, True)
 		
 		if self.event:
 			self.event.addCallback(self.updateStatus)
+			
+		self['streamlist'].moveToIndex(self.playIdx)
+		#self.updateTimer.start(100, True)
+		
 	
 	def getCover(self, url):
 		print "getCover:", url
