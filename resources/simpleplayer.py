@@ -93,8 +93,8 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.setPlaymode()
 		self.configSaver()
 		self.onClose.append(self.playExit)
-		self.onFirstExecBegin.append(self.getShowCover)
-		self.onFirstExecBegin.append(self.ShowIcon)
+		self.onFirstExecBegin.append(self.showCover)
+		self.onFirstExecBegin.append(self.showIcon)
 		self.onLayoutFinish.append(self.getVideo)
 			
 	def playVideo(self):
@@ -320,41 +320,33 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				if self.playLen > 0:
 					self.openPlaylist()
 
-	def getShowCover(self):
-		print "Simpler Player Load Cover:", self.cover
+	def showCover(self):
+		print "showCover:", self.cover
+		pm_file = "/tmp/Icon.jpg"
 		if self.cover != None:
-			downloadPage(self.cover, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+			downloadPage(self.cover, pm_file).addCallback(self.showPixmap, pm_file, 'Cover')
 	
-	def ShowCover(self, data):
-		if fileExists("/tmp/Icon.jpg"):
-			self['Cover'].instance.setPixmap(gPixmapPtr())
+	def showIcon(self):
+		print "showIcon:"
+		pm_file = self.wallicon_path + mp_globals.activeIcon + ".png"
+		self.showPixmap(None, pm_file, 'Icon')
+		
+	def showPixmap(self, dummy, pm_file, pm_name):
+		print "showPixmap: ", pm_file
+		if fileExists(pm_file):
+			self[pm_name].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
-			size = self['Cover'].instance.size()
+			size = self[pm_name].instance.size()
 			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
-			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
+			if self.picload.startDecode(pm_file, 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['Cover'].instance.setPixmap(ptr)
-					self['Cover'].show()
+					self[pm_name].instance.setPixmap(ptr)
+					self[pm_name].show()
 					del self.picload
 		else:
-			print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
-
-	def ShowIcon(self):
-		self.icon = self.wallicon_path + mp_globals.activeIcon + ".png"
-		if fileExists(self.icon):
-			self['Icon'].instance.setPixmap(gPixmapPtr())
-			self.scale = AVSwitch().getFramebufferScale()
-			self.picload = ePicLoad()
-			size = self['Icon'].instance.size()
-			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
-			if self.picload.startDecode(self.icon, 0, 0, False) == 0:
-				ptr = self.picload.getData()
-				if ptr != None:
-					self['Icon'].instance.setPixmap(ptr)
-					self['Icon'].show()
-					del self.picload
+			print "No pixmap to load: ", pm_file
 					
 	#def lockShow(self):
 	#	pass
@@ -486,21 +478,21 @@ class SimplePlaylist(Screen):
 	def getCover(self, url):
 		print "getCover:", url
 		if url != None and url != '':
-			downloadPage(url, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+			downloadPage(url, "/tmp/Icon.jpg").addCallback(self.showCover)
 		else:
-			self.ShowCoverNone()
+			self.showCoverNone()
 	
-	def ShowCover(self, picData):
-		print "ShowCover:"
+	def showCover(self, picData):
+		print "showCover:"
 		picPath = "/tmp/Icon.jpg"
-		self.ShowCoverFile(picPath)
+		self.showCoverFile(picPath)
 		
-	def ShowCoverNone(self):
-		print "ShowCoverNone:"
+	def showCoverNone(self):
+		print "showCoverNone:"
 		picPath = self.skin_path+"/original/images/m_no_coverArt.png"
-		self.ShowCoverFile(picPath)
+		self.showCoverFile(picPath)
 	
-	def ShowCoverFile(self, picPath):
+	def showCoverFile(self, picPath):
 		print "showCoverFile:"
 		if fileExists(picPath):
 			self['coverArt'].instance.setPixmap(gPixmapPtr())

@@ -1,11 +1,11 @@
 <screen name="SimplePlayer" position="center,center" size="1280,720" title="InfoBar" backgroundColor="transparent" flags="wfNoBorder">
-  <ePixmap position="55,555" size="1200,150" zPosition="-2" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbg.png" />
-  <ePixmap position="55,555" size="1200,150" zPosition="3" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spglas.png" alphatest="blend" />
-  <ePixmap position="55,555" size="1200,150" zPosition="2" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spiconframe.png" alphatest="blend" />
+  <ePixmap position="55,555" size="1200,150" zPosition="-2" pixmap="~/tec/images/spbg.png" />
+  <ePixmap position="55,555" size="1200,150" zPosition="3" pixmap="~/tec/images/spglas.png" alphatest="blend" />
+  <ePixmap position="55,555" size="1200,150" zPosition="2" pixmap="~/tec/images/spiconframe.png" alphatest="blend" />
   <widget source="session.CurrentService" render="Label" position="282,566" size="700,54" font="Regular; 24" valign="center" halign="center" backgroundColor="black" transparent="1">
       <convert type="ServiceName">Name</convert>
     </widget>
-  <widget source="session.CurrentService" render="Progress" position="282,626" size="700,14" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/spbar.png" zPosition="3" transparent="1" backgroundColor="#00000000">
+  <widget source="session.CurrentService" render="Progress" position="282,626" size="700,14" pixmap="~/tec/images/spbar.png" zPosition="3" transparent="1" backgroundColor="#00000000">
   <convert type="ServicePosition">Position</convert>
 </widget>
   <widget source="session.CurrentService" render="PositionGauge" position="280,624" size="695,12" zPosition="3" transparent="1">
@@ -21,25 +21,25 @@
   <convert type="ServicePosition">Remaining,Negate</convert>
 </widget>
 <widget position="1116,354" size="120,200" zPosition="1" alphatest="on" transparent="1" name="Cover" />
-  <ePixmap position="99,599" size="120,50" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/mplogo.png" alphatest="blend" />
+  <ePixmap position="99,599" size="120,50" pixmap="~/tec/images/mplogo.png" alphatest="blend" />
   <eLabel position="260,569" size="2,110" backgroundColor="#00808888" />
   <eLabel position="1000,569" size="2,110" backgroundColor="#00808888" />
-  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_dolby_off.png" position="1022,655" size="57,20" zPosition="1" alphatest="blend" />
-  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_dolby_on.png" position="1022,655" size="57,20" zPosition="2" alphatest="blend">
+  <ePixmap pixmap="~/tec/images/ico_dolby_off.png" position="1022,655" size="57,20" zPosition="1" alphatest="blend" />
+  <widget source="session.CurrentService" render="Pixmap" pixmap="~/tec/images/ico_dolby_on.png" position="1022,655" size="57,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">IsMultichannel</convert>
     <convert type="ConditionalShowHide" />
   </widget>
-  <ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_format_off.png" position="1115,655" size="36,20" zPosition="1" alphatest="blend" />
-  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_format_on.png" position="1115,655" size="36,20" zPosition="2" alphatest="blend">
+  <ePixmap pixmap="~/tec/images/ico_format_off.png" position="1115,655" size="36,20" zPosition="1" alphatest="blend" />
+  <widget source="session.CurrentService" render="Pixmap" pixmap="~/tec/images/ico_format_on.png" position="1115,655" size="36,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">IsWidescreen</convert>
     <convert type="ConditionalShowHide" />
   </widget>
-  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_hd_off.png" position="1170,655" size="29,20" zPosition="1" alphatest="blend">
+  <widget source="session.CurrentService" render="Pixmap" pixmap="~/tec/images/ico_hd_off.png" position="1170,655" size="29,20" zPosition="1" alphatest="blend">
     <convert type="ServiceInfo">VideoWidth</convert>
     <convert type="ValueRange">0,720</convert>
     <convert type="ConditionalShowHide" />
   </widget>
-  <widget source="session.CurrentService" render="Pixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/ico_hd_on.png" position="1185,655" size="29,20" zPosition="2" alphatest="blend">
+  <widget source="session.CurrentService" render="Pixmap" pixmap="~/tec/images/ico_hd_on.png" position="1185,655" size="29,20" zPosition="2" alphatest="blend">
     <convert type="ServiceInfo">VideoWidth</convert>
     <convert type="ValueRange">721,1980</convert>
     <convert type="ConditionalShowHide" />
