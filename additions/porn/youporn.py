@@ -216,7 +216,7 @@ class youpornFilmScreen(Screen):
 		parse = re.search('Sub menu dropdown.*?/Sub menu dropdown(.*?)Our Friends', data, re.S)
 		if not parse:
 			parse = re.search('Sub menu dropdown.*?/Sub menu dropdown(.*?)pagination', data, re.S)
-		phMovies = re.findall('class="wrapping-video-box">.*?<a href="(.*?)">.*?<img src="(.*?)" alt="(.*?)".*?class="duration">(.*?)<span>length.*?class="views">(.*?) <span>views', parse.group(1), re.S)
+		phMovies = re.findall('class="wrapping-video-box">.*?<a\shref="(.*?)">.*?<img\ssrc="(.*?)\?.*?"\salt="(.*?)".*?class="duration">(.*?)<span>length.*?class="views">(.*?)\s<span>views', parse.group(1), re.S)
 		if phMovies:
 			for (phUrl, phImage, phTitle, phRuntime, phViews) in phMovies:
 				self.filmliste.append((decodeHtml(phTitle), phUrl, phImage, phRuntime, phViews))
