@@ -458,6 +458,7 @@ class SimplePlaylist(Screen):
 				self.playIdx = t[0]
 				if self.playIdx >= len(self.playList):
 					self.playIdx = 0
+				self['streamlist'].moveToIndex(self.playIdx)
 			
 		#self.updateTimer.start(1000, True)
 	
@@ -478,8 +479,8 @@ class SimplePlaylist(Screen):
 		
 		if self.event:
 			self.event.addCallback(self.updateStatus)
-			
-		self['streamlist'].moveToIndex(self.playIdx)
+		else:
+			self['streamlist'].moveToIndex(self.playIdx)
 		#self.updateTimer.start(100, True)
 		
 	
