@@ -20,7 +20,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=None, ltype='', autoScrSaver=False):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False, ltype='', autoScrSaver=False):
 	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
@@ -93,7 +93,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.setPlaymode()
 		self.configSaver()
 		self.onClose.append(self.playExit)
-		self.onFirstExecBegin.append(self.showCover)
+		#self.onFirstExecBegin.append(self.showCover)
 		self.onFirstExecBegin.append(self.showIcon)
 		self.onLayoutFinish.append(self.getVideo)
 			
@@ -116,6 +116,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		print "playStream: ",title,url
 		if url == None:
 			return
+			
+		if self.cover:
+			self.showCover(imgurl)
+		
 		sref = eServiceReference(0x1001, 0, url)
 		
 		pos = title.find('. ', 0, 5)
@@ -320,11 +324,11 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				if self.playLen > 0:
 					self.openPlaylist()
 
-	def showCover(self):
-		print "showCover:", self.cover
+	def showCover(self, cover):
+		print "showCover:", cover
 		pm_file = "/tmp/Icon.jpg"
-		if self.cover != None:
-			downloadPage(self.cover, pm_file).addCallback(self.showPixmap, pm_file, 'Cover')
+		if cover:
+			downloadPage(cover, pm_file).addCallback(self.showPixmap, pm_file, 'Cover')
 	
 	def showIcon(self):
 		print "showIcon:"
@@ -463,7 +467,7 @@ class SimplePlaylist(Screen):
 	def showPlaylist(self):
 		print 'showPlaylist:'
 		
-		if self.listTitle != None:
+		if self.listTitle:
 			self['title'].setText("MP %s Playlist - %s" %(self.plType, self.listTitle))
 		else:
 			self['title'].setText("MP %s Playlist" % self.plType)
@@ -472,12 +476,12 @@ class SimplePlaylist(Screen):
 		self['streamlist'].moveToIndex(self.playIdx)
 		#self.updateTimer.start(100, True)
 		
-		if self.event != None:
+		if self.event:
 			self.event.addCallback(self.updateStatus)
 	
 	def getCover(self, url):
 		print "getCover:", url
-		if url != None and url != '':
+		if url:
 			downloadPage(url, "/tmp/Icon.jpg").addCallback(self.showCover)
 		else:
 			self.showCoverNone()
@@ -536,7 +540,7 @@ class SimplePlaylist(Screen):
 		
 	def resetEvent(self):
 		print "resetEvent:"
-		if self.event != None:
+		if self.event:
 			self.event.reset()
 
 class SimpleConfig(ConfigListScreen, Screen):
@@ -774,7 +778,7 @@ class SimpleEvent:
 		
 	def genEvent(self):
 		#print "genEvent:"
-		if self._ev_callback != None:
+		if self._ev_callback:
 			self._ev_on = False
 			self._ev_callback()
 		else:

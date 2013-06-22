@@ -207,7 +207,7 @@ class MusicstreamccPlayer(SimplePlayer):
 		self.base_url = 'http://musicstream.cc'
 		self.play_url = 'http://80.82.70.238/index.php?streamsid=%s&c=&file=.mp3'
 		
-		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle, title_inr=1, ltype='musicstreamcc', autoScrSaver=True)
+		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle, title_inr=1, ltype='musicstreamcc', autoScrSaver=True, cover=True)
 		
 	def getVideo(self):
 		title = self.playList[self.playIdx][1]

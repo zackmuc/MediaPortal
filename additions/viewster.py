@@ -120,7 +120,7 @@ class viewsterGenreScreen(Screen):
 		idx = self['liste'].getSelectedIndex()
 		
 		print idx, viewsterGenre, viewsterUrl
-		self.session.open(viewsterPlayer, self.genreliste, int(idx) , True, None, viewsterImage)
+		self.session.open(viewsterPlayer, self.genreliste, int(idx))
 		
 	def loadPic(self):
 		streamPic = self['liste'].getCurrent()[0][2]
@@ -184,7 +184,7 @@ class viewsterGenreScreen(Screen):
 
 class viewsterPlayer(SimplePlayer):
 
-	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None, cover=None):
+	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None, cover=True):
 		print "viewsterPlayer:"
 		
 		SimplePlayer.__init__(self, session, playList, playIdx, playAll, listTitle, 'local', 0, cover)
@@ -202,5 +202,6 @@ class viewsterPlayer(SimplePlayer):
 		stream_url = re.findall("onclick=\"playTrailer.*?'(rtmpe://.*?)'", data, re.S)
 		if stream_url:
 			print stream_url[0]
-			self.playStream(self.viewsterName, stream_url[0])
+			img = self.playList[self.playIdx][2]
+			self.playStream(self.viewsterName, stream_url[0], imgurl=img)
 			
