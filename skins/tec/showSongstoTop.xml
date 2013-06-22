@@ -28,5 +28,4 @@
     <widget source="session.CurrentService" render="Label" position="1151,645" size="90,25" backgroundColor="#26181d20" transparent="1" font="mediaportal; 20" valign="center" halign="right" foregroundColor="#00ffffff">
       <convert type="ServicePosition">Remaining</convert>
     </widget>
-    <ePixmap name="coverArt" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/tec/images/mplayer.png" position="902,614" size="350,55" transparent="1" alphatest="blend" />
   </screen>
