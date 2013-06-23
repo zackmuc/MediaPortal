@@ -51,6 +51,7 @@ class putpattvGenreScreen(Screen):
 		
 	def layoutFinished(self):
 		self.genreliste.append(("--- Search ---", "callSuchen"))
+		self.genreliste.append(("putpat TV", "46"))
 		self.genreliste.append(("Charts", "2"))
 		self.genreliste.append(("Heimat", "3"))
 		self.genreliste.append(("Retro", "4"))
@@ -83,7 +84,10 @@ class putpattvGenreScreen(Screen):
 	def showInfos(self):
 		phTitle = self['genreList'].getCurrent()[0][0]
 		phImage = self['genreList'].getCurrent()[0][1]
-		phImage = 'http://files.putpat.tv/artwork/channelgraphics/%s/channelteaser_500.png' % phImage
+		if phImage == '46':
+			phImage = 'http://fbcdn-sphotos-f-a.akamaihd.net/hphotos-ak-prn1/559467_461445814956_141502578_n.jpg'
+		else:
+			phImage = 'http://files.putpat.tv/artwork/channelgraphics/%s/channelteaser_500.png' % phImage
 		if not phImage == None:
 			downloadPage(phImage, "/tmp/phIcon.jpg").addCallback(self.ShowCover)
 		else:
@@ -230,7 +234,7 @@ class putpattvFilmScreen(Screen):
 					if len(phImage) == 4:
 						phImage = '0' + phImage
 					phImage = 'http://files.putpat.tv/artwork/posterframes/00%s/00%s/v00%s_posterframe_putpat_small.jpg' % (phImage[0:3], phImage, phImage)
-					if not (re.search('pop10_trenner.*?', phTitle, re.S) or re.search('Pop10 Trenner', phTitle, re.S) or re.search('pop10_pspot', phTitle, re.S)):
+					if not (re.search('pop10_trenner.*?', phTitle, re.S) or re.search('Pop10 Trenner', phTitle, re.S) or re.search('pop10_pspot', phTitle, re.S) or re.search('pop10_opn_neu', phTitle, re.S)):
 						self.filmliste.append((decodeHtml(phTitle), phUrl, None, phImage))
 		self.chooseMenuList.setList(map(putpattvFilmListEntry, self.filmliste))
 		self.chooseMenuList.moveToIndex(0)
