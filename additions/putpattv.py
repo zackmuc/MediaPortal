@@ -60,7 +60,6 @@ class putpattvGenreScreen(Screen):
 		self.genreliste.append(("INTRO TV", "9"))
 		self.genreliste.append(("JAZZthing.TV", "11"))
 		self.genreliste.append(("Festival Guide", "12"))
-		self.genreliste.append(("SchuelerVZ", "14"))
 		self.genreliste.append(("StudiVZ", "15"))
 		self.genreliste.append(("MeinVZ", "16"))
 		self.genreliste.append(("Rockalarm", "27"))
