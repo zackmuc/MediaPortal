@@ -5,7 +5,7 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
 def ARDGenreListEntry(entry):
-  return [entry,
+	return [entry,
 		(eListboxPythonMultiContent.TYPE_TEXT, 20, 0, 900, 25, 0, RT_HALIGN_LEFT | RT_VALIGN_CENTER, entry[0])
 		]
 
@@ -126,7 +126,7 @@ class ARDSubGenreScreen(Screen):
 		# fehlen) doch leider fehlt den RSS-Feeds ein Vorschau-Bildchen, sowie die Duration.....Beispiel...  url = "http://www.ardmediathek.de/export/rss/id=10017896" (id ist die docId)
 		# chroma_key: URL fuer eine spaetere, einzubauende Suchfunktion (wenn man zb nach "coca cola" suchen wuerde)... http://www.ardmediathek.de/suche?s=coca+cola
 		self.keyLocked = True
-		url = "http://www.ardmediathek.de/ard/servlet/ajax-cache/3474820/view=list/initial=%s" % (self.streamGenreLink)
+		url = "http://www.ardmediathek.de/ard/servlet/ajax-cache/3474820/view=list/initial=%s/index.html" % (self.streamGenreLink)
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
 		
 	def loadPageData(self, data):
@@ -447,6 +447,10 @@ class ARDFilmeListeScreen(Screen):
 				stream = stream.replace("mp4/master.m3u8","mp4")
 			if sr in stream:
 				stream = stream.replace("MP4:","mp4:")
+			# Playpath fuer neueren Dreamboxen reparieren
+			noplaypath = "mp4:"
+			if noplaypath in stream:
+				stream = stream.replace("mp4:"," playpath=mp4:")
 			# Gebe gefundenen Streamlink als kleine Textdatei aus, zum monitoren und fuer Fehlersuche
 			fobj_out = open("/tmp/ard-stream.txt","w")
 			fobj_out.write(stream)
