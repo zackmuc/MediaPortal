@@ -196,7 +196,7 @@ class MEHDFilmListeScreen(Screen):
 			folgen = re.findall('<a href="(http://streamcloud.*?)".*?target="_blank">(.*?).avi',data,re.S)
 			self.session.open(enterSerienListScreen, folgen, streamPic)
 		else:
-			stream = re.findall('href="(http://my-entertainment.biz/.*?/Non-Membe.*?.php\?mov=.*?)"', data)
+			stream = re.findall('href="(http://my-entertainment.biz/.*?/Non-Member.*?.php\?mov=.*?)"', data)
 			# Wenn nur ein Link, dann stream starten, ansonsten handelt es sich wohl um eine Collection
 			if len(stream) == 1:
 				print 'Ein Free Stream....',stream
