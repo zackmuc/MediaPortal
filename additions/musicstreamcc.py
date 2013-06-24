@@ -14,6 +14,8 @@ def show_MSCC_GenreListEntry(entry):
 		
 class show_MSCC_Genre(Screen):
 	
+	R_COMP_01 = re.compile('="list_td_right"><a href="(.*?)".*?<img alt="(.*?)"')
+
 	def __init__(self, session, url='/index.php?pwd=&d=0', ctitle="Album Auswahl"):
 		self.session = session
 		self.genre_url = url
@@ -61,7 +63,8 @@ class show_MSCC_Genre(Screen):
 		getPage(self.base_url + self.genre_url, agent=std_headers, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.parseData).addErrback(self.dataError)
 
 	def parseData(self, data):
-		liste = re.findall('="list_td_right"><a href="(.*?)".*?<img alt="(.*?)"', data)
+		#liste = re.findall('="list_td_right"><a href="(.*?)".*?<img alt="(.*?)"', data)
+		liste = re.findall(self.R_COMP_01, data)
 		if liste:
 			for (u, a) in liste:
 				self.genreliste.append((decodeHtml(u), decodeHtml(a)))
@@ -97,6 +100,8 @@ def show_MSCC_ListEntry(entry):
 		] 
 		
 class show_MSCC_ListScreen(Screen):
+	
+	R_COMP_01 = re.compile('="list_td_right">.*?/index.php.*?id=(.*?)\'.*?="file">(.*?)</span>')
 	
 	def __init__(self, session, album_url, album):
 		print "showMusicstreamccList:"
@@ -163,7 +168,7 @@ class show_MSCC_ListScreen(Screen):
 		else:
 			img = ''
 			
-		list = re.findall('="list_td_right">.*?/index.php.*?id=(.*?)\'.*?="file">(.*?)</span>', data)
+		list = re.findall(self.R_COMP_01, data)
 		if list:
 			for (u, t) in list:
 				t = t.replace('_', ' ')
@@ -205,7 +210,7 @@ class MusicstreamccPlayer(SimplePlayer):
 	def __init__(self, session, playList, playIdx=0, playAll=True, listTitle=None):
 		print "MusicstreamccPlayer:"
 		self.base_url = 'http://musicstream.cc'
-		self.play_url = 'http://80.82.70.238/index.php?streamsid=%s&c=&file=.mp3'
+		self.play_url = mp_globals.mscc_play_url
 		
 		SimplePlayer.__init__(self, session, playList, playIdx=playIdx, playAll=playAll, listTitle=listTitle, title_inr=1, ltype='musicstreamcc', autoScrSaver=True, cover=True)
 		
