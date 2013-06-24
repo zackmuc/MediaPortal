@@ -133,6 +133,7 @@ class ARDSubGenreScreen(Screen):
 		sendungen = re.findall('<img src="(.*?)".*?<a href=".*?documentId=(.*?)".*?data-xtclib=".*?">\n\s+(.*?)\n\s+</a>.*?<span class="mt-count">(.*?)</span>.*?<span class="mt-channel">(.*?)</span>', data, re.S)
 		if sendungen:
 			for (image,id,title,ausgaben,sender) in sendungen:
+				image = image.replace('bild-xs16x9','bild-s16x9')
 				image = "http://www.ardmediathek.de%s" % image
 				url = "http://www.ardmediathek.de/ard/servlet/ajax-cache/3516962/view=list/documentId=%s" %id
 				zusatzinfo = "%s - %s" % (sender,ausgaben)
@@ -263,6 +264,7 @@ class ARDFilmeListeScreen(Screen):
 		folgen = re.findall('img src="(.*?)".*?<a href="(.*?)".*?xtclib=".*?">(.*?)</a>.*?aus: (.*?)</p>.*?"mt-airtime">(.*?)</span>.*?>(.*?)</span>', data, re.S)
 		if folgen:
 			for (image,url,title,sendung,airtime,sender) in folgen:
+				image = image.replace('bild-s16x9','bild-m16x9')
 				image = "http://www.ardmediathek.de%s" % image
 				if airtime:
 					if len(airtime) == 0:
