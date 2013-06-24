@@ -1,7 +1,6 @@
 #
 # ARD-Mediathek von chroma_key
 #
-
 from Plugins.Extensions.MediaPortal.resources.imports import *
 
 def ARDGenreListEntry(entry):
@@ -15,7 +14,7 @@ def ARDFilmListEntry(entry):
 		] 
 
 class ARDGenreScreen(Screen):
-	
+
 	def __init__(self, session):
 		self.session = session
 		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/skins/%s/RTLnowGenreScreen.xml" % config.mediaportal.skin.value
@@ -24,9 +23,9 @@ class ARDGenreScreen(Screen):
 		with open(path, "r") as f:
 			self.skin = f.read()
 			f.close()
-			
+
 		Screen.__init__(self, session)
-		
+
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
@@ -35,21 +34,21 @@ class ARDGenreScreen(Screen):
 			"right" : self.keyRight,
 			"left" : self.keyLeft
 		}, -1)
-		
+
 		self['title'] = Label("ARD Mediathek")
 		self['name'] = Label("Auswahl der Sendung")
 		self['handlung'] = Label("")
 		self['Pic'] = Pixmap()
-		
+
 		self.genreliste = []
 		self.keyLocked = True
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(25)
 		self['List'] = self.chooseMenuList
-		
+
 		self.onLayoutFinish.append(self.loadPage)
-		
+
 	def loadPage(self):
 		self.genreliste = []
 		for c in xrange(26):
@@ -66,13 +65,13 @@ class ARDGenreScreen(Screen):
 			return
 		streamGenreLink = self['List'].getCurrent()[0][0]
 		self.session.open(ARDSubGenreScreen, streamGenreLink)
-		
+
 	def keyLeft(self):
 		self['List'].pageUp()
-		
+
 	def keyRight(self):
 		self['List'].pageDown()
-		
+
 	def keyUp(self):
 		self['List'].up()
 
@@ -81,9 +80,9 @@ class ARDGenreScreen(Screen):
 
 	def keyCancel(self):
 		self.close()
-		
+
 class ARDSubGenreScreen(Screen):
-	
+
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
@@ -93,9 +92,9 @@ class ARDSubGenreScreen(Screen):
 		with open(path, "r") as f:
 			self.skin = f.read()
 			f.close()
-			
+
 		Screen.__init__(self, session)
-		
+
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
@@ -104,21 +103,21 @@ class ARDSubGenreScreen(Screen):
 			"right" : self.keyRight,
 			"left" : self.keyLeft
 		}, -1)
-		
+
 		self['title'] = Label("ARD Mediathek")
 		self['name'] = Label("Auswahl der Sendung")
 		self['handlung'] = Label("")
 		self['Pic'] = Pixmap()
-		
+
 		self.genreliste = []
 		self.keyLocked = True
 		self.chooseMenuList = MenuList([], enableWrapAround=True, content=eListboxPythonMultiContent)
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(25)
 		self['List'] = self.chooseMenuList
-		
+
 		self.onLayoutFinish.append(self.loadPage)
-		
+
 	def loadPage(self):
 		# chroma_key: Beispiel-URL fuer Smartphones... http://m.ardmediathek.de/Sendungen-A-Z?pageId=13932746 .... Auf der koennte man zwar wesentlich leichter aufbauen, da man hier auch die hoechste Qualitaet leichter
 		# er-parsen kann, aber leider werden auch deutlich weniger Clips hierfuer gehostet ..... Beispiel... http://m.ardmediathek.de/coldmirror?docId=10017896&pageId=13932914
@@ -128,7 +127,7 @@ class ARDSubGenreScreen(Screen):
 		self.keyLocked = True
 		url = "http://www.ardmediathek.de/ard/servlet/ajax-cache/3474820/view=list/initial=%s/index.html" % (self.streamGenreLink)
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
-		
+
 	def loadPageData(self, data):
 		sendungen = re.findall('<img src="(.*?)".*?<a href=".*?documentId=(.*?)".*?data-xtclib=".*?">\n\s+(.*?)\n\s+</a>.*?<span class="mt-count">(.*?)</span>.*?<span class="mt-channel">(.*?)</span>', data, re.S)
 		if sendungen:
@@ -136,13 +135,7 @@ class ARDSubGenreScreen(Screen):
 				image = "http://www.ardmediathek.de%s" % image
 				url = "http://www.ardmediathek.de/ard/servlet/ajax-cache/3516962/view=list/documentId=%s" %id
 				zusatzinfo = "%s - %s" % (sender,ausgaben)
-				# chroma_key: Ohne folgende 3 Zeilen, bekomme ich (zumindest auf meiner DMM8000) trotz zuvorigem "decodehtml" weiterhin zB. ein '&#034;' statt ein Gaensefuesschen gelistet.
-				# Daher habe ich das "decodehtml" rausgeworfen, und die hartcodierte Umwandlung eingebaut, die nicht schadet. Kommt weiter unten nochmal... 
-				# Abgefangen werden hier " und ' und & (letzteres kommt zB. bei 'Quarks & Co' vor... )
-				title = title.replace("&#034;","'")
-				title = title.replace("&#039;","'")
-				title = title.replace("&amp;","&")
-				self.genreliste.append((title,url,image,zusatzinfo))
+				self.genreliste.append((decodeHtml(title),url,image,zusatzinfo))
 		else:
 			self.genreliste.append(('Keine Sendungen mit diesem Buchstaben vorhanden.', None, None, None))
 		self.chooseMenuList.setList(map(ARDGenreListEntry, self.genreliste))
@@ -161,10 +154,10 @@ class ARDSubGenreScreen(Screen):
 		streamHandlung = self['List'].getCurrent()[0][3]
 		self['handlung'].setText(streamHandlung)
 		downloadPage(streamPic, "/tmp/Icon.jpg").addCallback(self.ShowCover)
-			
+
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['Pic'].instance.setPixmap(None)
+			self['Pic'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['Pic'].instance.size()
@@ -172,7 +165,7 @@ class ARDSubGenreScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['Pic'].instance.setPixmap(ptr.__deref__())
+					self['Pic'].instance.setPixmap(ptr)
 					self['Pic'].show()
 					del self.picload
 
@@ -183,19 +176,19 @@ class ARDSubGenreScreen(Screen):
 		if streamGenreLink == None:
 			return
 		self.session.open(ARDFilmeListeScreen, streamGenreLink)
-		
+
 	def keyLeft(self):
 		if self.keyLocked:
 			return
 		self['List'].pageUp()
 		self.loadPic()
-		
+
 	def keyRight(self):
 		if self.keyLocked:
 			return
 		self['List'].pageDown()
 		self.loadPic()
-		
+
 	def keyUp(self):
 		if self.keyLocked:
 			return
@@ -212,7 +205,7 @@ class ARDSubGenreScreen(Screen):
 		self.close()
 
 class ARDFilmeListeScreen(Screen):
-	
+
 	def __init__(self, session, streamGenreLink):
 		self.session = session
 		self.streamGenreLink = streamGenreLink
@@ -223,9 +216,9 @@ class ARDFilmeListeScreen(Screen):
 		with open(path, "r") as f:
 			self.skin = f.read()
 			f.close()
-			
+
 		Screen.__init__(self, session)
-		
+
 		self["actions"]  = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", "NumberActions", "MenuActions", "EPGSelectActions"], {
 			"ok"    : self.keyOK,
 			"cancel": self.keyCancel,
@@ -248,16 +241,16 @@ class ARDFilmeListeScreen(Screen):
 		self.chooseMenuList.l.setFont(0, gFont('mediaportal', 23))
 		self.chooseMenuList.l.setItemHeight(25)
 		self['List'] = self.chooseMenuList
-		
+
 		self.onLayoutFinish.append(self.loadPage)
-		
+
 	def loadPage(self):
 		url = "%s/goto=%s" % (self.streamGenreLink,self.page)
 		getPage(url, headers={'Content-Type':'application/x-www-form-urlencoded'}).addCallback(self.loadPageData).addErrback(self.dataError)
-		
+
 	def dataError(self, error):
 		print error
-		
+
 	def loadPageData(self, data):
 		self.filmliste = []
 		# chroma_key: Aufgehobener Code fuer Versuch mit RSS... folgen = re.findall('<item>.*?<title>(.*?)</title>.*?<description>(.*?)</description>.*?<link>(.*?)</link>', data, re.S)
@@ -272,13 +265,6 @@ class ARDFilmeListeScreen(Screen):
 		if folgen:
 			for (image,url,title,sendung,airtime,sender) in folgen:
 				image = "http://www.ardmediathek.de%s" % image
-				title = title.replace("&#034;","'")
-				title = title.replace("&#039;","'")
-				title = title.replace("&amp;","&")
-				sendung = sendung.replace("&#034;","'")
-				sendung = sendung.replace("&#039;","'")
-				sendung = sendung.replace("&amp;","&")				
-
 				if airtime:
 					if len(airtime) == 0:
 						date = "Keine Angabe"
@@ -289,8 +275,8 @@ class ARDFilmeListeScreen(Screen):
 				else:
 					date = airtime[:8]
 					dur = airtime[9:]
-				handlung = "Sendung:\t%s\nClip vom:\t%s\nBroadcaster:\t%s\nDauer:\t>> %s <<\n\n%s" % (sendung,date,sender,dur,seite)
-				self.filmliste.append((title,url,handlung,image))
+				handlung = "Sendung:\t%s\nClip vom:\t%s\nBroadcaster:\t%s\nDauer:\t>> %s <<\n\n%s" % (decodeHtml(sendung),date,sender,dur,seite)
+				self.filmliste.append((decodeHtml(title),url,handlung,image))
 		else:
 			self.filmliste.append(('Keine Folgen gefunden.', None, None, None))
 		self.chooseMenuList.setList(map(ARDFilmListEntry, self.filmliste))
@@ -306,10 +292,10 @@ class ARDFilmeListeScreen(Screen):
 		streamHandlung = self['List'].getCurrent()[0][2]
 		self['handlung'].setText(streamHandlung)
 		downloadPage(streamPic, "/tmp/Icon.jpg").addCallback(self.ShowCover)
-			
+
 	def ShowCover(self, picData):
 		if fileExists("/tmp/Icon.jpg"):
-			self['Pic'].instance.setPixmap(None)
+			self['Pic'].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
 			size = self['Pic'].instance.size()
@@ -317,7 +303,7 @@ class ARDFilmeListeScreen(Screen):
 			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['Pic'].instance.setPixmap(ptr.__deref__())
+					self['Pic'].instance.setPixmap(ptr)
 					self['Pic'].show()
 					del self.picload
 
@@ -334,7 +320,7 @@ class ARDFilmeListeScreen(Screen):
 
 	def dataError(self, error):
 		print error
-		
+
 	def get_Link(self, data):
 		qualitycheck = re.findall('mediaCollection.addMediaStream\((.*?),\s+(.*?),\s+"(.*?)",\s+"(.*?)",.*?\)', data, re.S)
 		if qualitycheck:
@@ -464,13 +450,13 @@ class ARDFilmeListeScreen(Screen):
 			return
 		self['List'].pageUp()
 		self.loadPic()
-		
+
 	def keyRight(self):
 		if self.keyLocked:
 			return
 		self['List'].pageDown()
 		self.loadPic()
-		
+
 	def keyUp(self):
 		if self.keyLocked:
 			return
@@ -490,14 +476,14 @@ class ARDFilmeListeScreen(Screen):
 		if not self.page < 1:
 			self.page -= 1
 			self.loadPage()
-			
+
 	def keyPageUp(self):
 		print "PageUp"
 		if self.keyLocked:
 			return
 		self.page += 1 
 		self.loadPage()
-		
+
 	def keyCancel(self):
 		if os.path.isfile("/tmp/ard-stream.txt"):
 			os.remove("/tmp/ard-stream.txt")

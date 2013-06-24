@@ -103,6 +103,7 @@ def decodeHtml(text):
 	text = text.replace('&ldquo;','"')
 	text = text.replace('&lsquo;','\'')
 	text = text.replace('&rsquo;','\'')
+	text = text.replace('&#034;','\'')
 	text = text.replace('&#038;','&')
 	text = text.replace('&#039;','\'')
 	text = text.replace('&#160;',' ')
