@@ -1529,8 +1529,8 @@ class m4kStreamListeScreen(Screen):
 			return
 		streamLink = self['filmList'].getCurrent()[0][0]
 		print self.streamName, streamLink
-		req = urllib2.Request(streamLink)
 		try:
+			req = urllib2.Request(streamLink)
 			res = urllib2.urlopen(req)
 		except urllib2.HTTPError, e:
 			print e.code

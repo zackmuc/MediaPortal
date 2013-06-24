@@ -88,6 +88,7 @@ from additions.mediatheken.superrtlnow import *
 from additions.mediatheken.zdf import *
 from additions.mediatheken.orf import *
 from additions.mediatheken.srf import *
+from additions.mediatheken.ard import *
 
 # music
 from additions.canna import *
@@ -125,8 +126,8 @@ from additions.porn.x4tube import *
 from additions.porn.youporn import *
 
 config.mediaportal = ConfigSubsection()
-config.mediaportal.version = NoSave(ConfigText(default="431"))
-config.mediaportal.versiontext = NoSave(ConfigText(default="4.3.1"))
+config.mediaportal.version = NoSave(ConfigText(default="440"))
+config.mediaportal.versiontext = NoSave(ConfigText(default="4.4.0"))
 config.mediaportal.autoupdate = ConfigYesNo(default = True)
 config.mediaportal.pincode = ConfigPIN(default = 0000)
 config.mediaportal.showporn = ConfigYesNo(default = False)
@@ -229,6 +230,7 @@ config.mediaportal.showSUPERRTLnow = ConfigYesNo(default = True)
 config.mediaportal.showZDF = ConfigYesNo(default = True)
 config.mediaportal.showORF = ConfigYesNo(default = True)
 config.mediaportal.showSRF = ConfigYesNo(default = True)
+config.mediaportal.showARD = ConfigYesNo(default = True)
 
 # porn
 config.mediaportal.show4tube = ConfigYesNo(default = False)
@@ -268,6 +270,7 @@ config.mediaportal.fake_entry = NoSave(ConfigNothing())
 
 # Konfiguration erfolgt in SimplePlayer
 config.mediaportal.sp_randomplay = ConfigYesNo(default = False)
+config.mediaportal.sp_scrsaver = ConfigSelection(default = "off", choices = [("on", _("On")),("off", _("Off")),("automatic", _("Automatic"))])
 
 class hauptScreenSetup(Screen, ConfigListScreen):
 
@@ -393,6 +396,7 @@ class hauptScreenSetup(Screen, ConfigListScreen):
 		self.configlist.append(getConfigListEntry("Zeige SportBild:", config.mediaportal.showSportBild))
 		self.configlist.append(getConfigListEntry("Zeige Moovizon:", config.mediaportal.showMoovizon))
 		self.configlist.append(getConfigListEntry("Zeige Viewster:", config.mediaportal.showViewster))
+		self.configlist.append(getConfigListEntry("Zeige ARD Mediathek:", config.mediaportal.showARD))
 		
 		# Kinder
 		self.configlist.append(getConfigListEntry("Zeige Tivi:", config.mediaportal.showtivi))
@@ -622,6 +626,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.mediatheken.append(self.hauptListEntry("Wrestlingnetwork", "wrestlingnetwork"))
 		if config.mediaportal.showViewster.value:
 			self.mediatheken.append(self.hauptListEntry("Viewster", "viewster"))
+		if config.mediaportal.showARD.value:
+			self.mediatheken.append(self.hauptListEntry("ARD Mediathek", "ard"))
 
 		# Grauzone
 		if config.mediaportal.showSzeneStreams.value:
@@ -1039,6 +1045,8 @@ class haupt_Screen(Screen, ConfigListScreen):
 			return
 		print self.currentlist
 		auswahl = self[self.currentlist].getCurrent()[0][0]
+		icon = self[self.currentlist].getCurrent()[0][1]
+		mp_globals.activeIcon = icon
 		print auswahl
 		if auswahl == "Doku.me":
 			self.session.open(dokuScreen)
@@ -1206,7 +1214,9 @@ class haupt_Screen(Screen, ConfigListScreen):
 			self.session.open(wrestlingnetworkGenreScreen)
 		elif auswahl == "Viewster":
 			self.session.open(viewsterGenreScreen)
-
+		elif auswahl == "ARD Mediathek":
+			self.session.open(ARDGenreScreen)
+			
 		# porn
 		elif auswahl == "4Tube":
 			if config.mediaportal.pornpin.value:
@@ -1771,6 +1781,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.plugin_liste.append(("Wrestlingnetwork", "wrestlingnetwork", "Mediathek"))
 		if config.mediaportal.showViewster.value:
 			self.plugin_liste.append(("Viewster", "viewster", "Mediathek"))
+		if config.mediaportal.showARD.value:
+			self.plugin_liste.append(("ARD Mediathek", "ard", "Mediathek"))
 			
 		### porn
 		if config.mediaportal.showporn.value:
@@ -2099,6 +2111,8 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		
 		select_nr = self.mainlist[int(self.select_list)][int(self.selektor_index)-1]
 		auswahl = self.plugin_liste[int(select_nr)-1][0]
+		icon = self.plugin_liste[int(select_nr)-1][1]
+		mp_globals.activeIcon = icon
 		print "Plugin:", auswahl
 
 		if auswahl == "Doku.me":
@@ -2310,7 +2324,7 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 			self.session.open(myvideoTop100GenreScreen)
 		elif auswahl == "Musicstream.cc":
 			self.hit_plugin("Musicstream.cc")
-			self.session.open(show_MUSIC_Genre)
+			self.session.open(show_MSCC_Genre)
 
 		# mediatheken
 		elif auswahl == "VOXNOW":
@@ -2349,7 +2363,10 @@ class haupt_Screen_Wall(Screen, ConfigListScreen):
 		elif auswahl == "Viewster":
 			self.hit_plugin("Viewster")
 			self.session.open(viewsterGenreScreen)
-
+		elif auswahl == "ARD Mediathek":
+			self.hit_plugin("ARD Mediathek")
+			self.session.open(ARDGenreScreen)
+			
 		# porn
 		elif auswahl == "4Tube":
 			if config.mediaportal.pornpin.value:

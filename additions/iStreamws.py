@@ -84,7 +84,9 @@ class showIStreamGenre(Screen):
 		print "ISteam.ws:"
 		genreListe = []
 		if self.mode == "porn":
-			Genre = [("Porn", "http://istream.ws/c/porn/page/")]
+			Genre = [
+				("Porn", "http://istream.ws/c/porn/page/"),
+				("X-Art", "http://istream.ws/c/porn/x-art-porn/page/")]
 		else:
 			Genre = [
 				("Suche...", "http://istream.ws/?s=%s"),

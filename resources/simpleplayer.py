@@ -20,13 +20,14 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 	ENABLE_RESUME_SUPPORT = True
 	ALLOW_SUSPEND = True
 	
-	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=None, ltype=''):
+	def __init__(self, session, playList, playIdx=0, playAll=False, listTitle=None, plType='local', title_inr=0, cover=False, ltype='', autoScrSaver=False):
 	
 		Screen.__init__(self, session)
 		print "SimplePlayer:"
 		self.session = session
 		self.plugin_path = mp_globals.pluginPath
 		self.skin_path = mp_globals.pluginPath + "/skins"
+		self.wallicon_path = mp_globals.pluginPath + "/icons_wall/"
 
 		path = "%s/tec/SimplePlayer.xml" % self.skin_path
 		with open(path, "r") as f:
@@ -59,6 +60,9 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.skinName = 'MediaPortal SimplePlayer'
 		self.lastservice = self.session.nav.getCurrentlyPlayingServiceReference()
 		
+		self.scrSaver = ''
+		self.saverActive = False
+		self.autoScrSaver = autoScrSaver
 		self.pl_open = False
 		self.randomPlay = False
 		self.playMode = ""
@@ -78,13 +82,19 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		self.playlistQ = Queue.Queue(0)
 		self.pl_status = (0, '', '', '', '')
 		self.pl_event = SimpleEvent()
+		self['Icon'] = Pixmap()
 		
 		# load default cover
 		self['Cover'] = Pixmap()
+
+		self.SaverTimer = eTimer()
+		self.SaverTimer.callback.append(self.openSaver)
 		
 		self.setPlaymode()
+		self.configSaver()
 		self.onClose.append(self.playExit)
-		self.onFirstExecBegin.append(self.getShowCover)
+		#self.onFirstExecBegin.append(self.showCover)
+		self.onFirstExecBegin.append(self.showIcon)
 		self.onLayoutFinish.append(self.getVideo)
 			
 	def playVideo(self):
@@ -106,6 +116,10 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		print "playStream: ",title,url
 		if url == None:
 			return
+			
+		if self.cover:
+			self.showCover(imgurl)
+		
 		sref = eServiceReference(0x1001, 0, url)
 		
 		pos = title.find('. ', 0, 5)
@@ -259,6 +273,7 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 		if data != []:
 			if data[0] == 1:
 				self.setPlaymode()
+				self.configSaver()
 			elif data[0] == 2:
 				if self.plType != 'local':
 					self.session.open(MessageBox, _("Fehler: Service darf nur von der lok. PL hinzugefügt werden"), MessageBox.TYPE_INFO, timeout=5)
@@ -309,32 +324,61 @@ class SimplePlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarNotifications, InfoB
 				if self.playLen > 0:
 					self.openPlaylist()
 
-	def getShowCover(self):
-		print "Simpler Player Load Cover:", self.cover
-		if self.cover != None:
-			downloadPage(self.cover, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+	def showCover(self, cover):
+		print "showCover:", cover
+		pm_file = "/tmp/Icon.jpg"
+		if cover:
+			downloadPage(cover, pm_file).addCallback(self.showPixmap, pm_file, 'Cover')
 	
-	def ShowCover(self, data):
-		if fileExists("/tmp/Icon.jpg"):
-			self['Cover'].instance.setPixmap(gPixmapPtr())
+	def showIcon(self):
+		print "showIcon:"
+		pm_file = self.wallicon_path + mp_globals.activeIcon + ".png"
+		self.showPixmap(None, pm_file, 'Icon')
+		
+	def showPixmap(self, dummy, pm_file, pm_name):
+		print "showPixmap: ", pm_file
+		if fileExists(pm_file):
+			self[pm_name].instance.setPixmap(gPixmapPtr())
 			self.scale = AVSwitch().getFramebufferScale()
 			self.picload = ePicLoad()
-			size = self['Cover'].instance.size()
+			size = self[pm_name].instance.size()
 			self.picload.setPara((size.width(), size.height(), self.scale[0], self.scale[1], False, 1, "#FF000000"))
-			if self.picload.startDecode("/tmp/Icon.jpg", 0, 0, False) == 0:
+			if self.picload.startDecode(pm_file, 0, 0, False) == 0:
 				ptr = self.picload.getData()
 				if ptr != None:
-					self['Cover'].instance.setPixmap(ptr)
-					self['Cover'].show()
+					self[pm_name].instance.setPixmap(ptr)
+					self[pm_name].show()
 					del self.picload
 		else:
-			print "Simpler Player Load Cover:", self.cover, "kein cover vorhanden."
+			print "No pixmap to load: ", pm_file
 					
 	#def lockShow(self):
 	#	pass
 		
 	#def unlockShow(self):
 	#	pass
+	
+	def configSaver(self):
+		print "configSaver:"
+		self.scrSaver = config.mediaportal.sp_scrsaver.value
+		print "Savermode: ",self.scrSaver
+		if self.scrSaver == 'automatic' and self.autoScrSaver or self.scrSaver == 'on':
+			if not self.saverActive:
+				self.SaverTimer.start(1000*60, True)
+				self.saverActive = True
+				print "scrsaver timer startet"
+		else:
+			self.SaverTimer.stop()
+			self.saverActive = False
+
+	def openSaver(self):
+		print "openSaver:"
+		self.session.openWithCallback(self.cb_Saver, SimpleScreenSaver) 
+		
+	def cb_Saver(self):
+		print "cb_Saver:"
+		self.saverActive = False
+		self.configSaver()
 		
 	def setPlaymode(self):
 		print "setPlaymode:"
@@ -409,9 +453,12 @@ class SimplePlaylist(Screen):
 			self["songtitle"].setText(t[1])
 			self["artist"].setText(t[2])
 			self["album"].setText(t[3])
-			if t[5] == self.plType:
-				self['streamlist'].moveToIndex(t[0])
 			self.getCover(t[4])
+			if t[5] == self.plType:
+				self.playIdx = t[0]
+				if self.playIdx >= len(self.playList):
+					self.playIdx = 0
+				self['streamlist'].moveToIndex(self.playIdx)
 			
 		#self.updateTimer.start(1000, True)
 	
@@ -423,36 +470,38 @@ class SimplePlaylist(Screen):
 	def showPlaylist(self):
 		print 'showPlaylist:'
 		
-		if self.listTitle != None:
-			self['title'].setText("MP %s Playlist - %s" %(self.plType, self.listTitle))
+		if self.listTitle:
+			self['title'].setText("MP Playlist - %s" % self.listTitle)
 		else:
 			self['title'].setText("MP %s Playlist" % self.plType)
 
 		self.chooseMenuList.setList(map(self.playListEntry, self.playList))
-		self['streamlist'].moveToIndex(self.playIdx)
+		
+		if self.event:
+			self.event.addCallback(self.updateStatus)
+		else:
+			self['streamlist'].moveToIndex(self.playIdx)
 		#self.updateTimer.start(100, True)
 		
-		if self.event != None:
-			self.event.addCallback(self.updateStatus)
 	
 	def getCover(self, url):
 		print "getCover:", url
-		if url != None and url != '':
-			downloadPage(url, "/tmp/Icon.jpg").addCallback(self.ShowCover)
+		if url:
+			downloadPage(url, "/tmp/Icon.jpg").addCallback(self.showCover)
 		else:
-			self.ShowCoverNone()
+			self.showCoverNone()
 	
-	def ShowCover(self, picData):
-		print "ShowCover:"
+	def showCover(self, picData):
+		print "showCover:"
 		picPath = "/tmp/Icon.jpg"
-		self.ShowCoverFile(picPath)
+		self.showCoverFile(picPath)
 		
-	def ShowCoverNone(self):
-		print "ShowCoverNone:"
+	def showCoverNone(self):
+		print "showCoverNone:"
 		picPath = self.skin_path+"/original/images/m_no_coverArt.png"
-		self.ShowCoverFile(picPath)
+		self.showCoverFile(picPath)
 	
-	def ShowCoverFile(self, picPath):
+	def showCoverFile(self, picPath):
 		print "showCoverFile:"
 		if fileExists(picPath):
 			self['coverArt'].instance.setPixmap(gPixmapPtr())
@@ -496,7 +545,7 @@ class SimplePlaylist(Screen):
 		
 	def resetEvent(self):
 		print "resetEvent:"
-		if self.event != None:
+		if self.event:
 			self.event.reset()
 
 class SimpleConfig(ConfigListScreen, Screen):
@@ -507,6 +556,7 @@ class SimpleConfig(ConfigListScreen, Screen):
 		self.session = session
 		self.list = []
 		self.list.append(getConfigListEntry('Random Play', config.mediaportal.sp_randomplay))
+		self.list.append(getConfigListEntry('Screensaver', config.mediaportal.sp_scrsaver))
 		self.list.append(getConfigListEntry('Youtube VideoPrio', config.mediaportal.youtubeprio))
 		ConfigListScreen.__init__(self, self.list)
 		self['setupActions'] = ActionMap(['SetupActions'],
@@ -733,7 +783,7 @@ class SimpleEvent:
 		
 	def genEvent(self):
 		#print "genEvent:"
-		if self._ev_callback != None:
+		if self._ev_callback:
 			self._ev_on = False
 			self._ev_callback()
 		else:
@@ -750,4 +800,21 @@ class SimpleEvent:
 		#print "reset"
 		self._ev_callback = None
 		self._ev_on = False
+
+class SimpleScreenSaver(Screen):
+	skin = """
+		<screen position="0,0" size="1280,720" flags="wfNoBorder" zPosition="9" transparent="0">
+		</screen>"""
+	def __init__(self, session):
+		Screen.__init__(self, session)
+		self.skin = SimpleScreenSaver.skin
+			
+		self["setupActions"] = ActionMap([ "SetupActions" ],
+		{
+			"cancel": self.cancel,
+			"ok": self.cancel
+		})
+
+	def cancel(self):
+		self.close()
 		

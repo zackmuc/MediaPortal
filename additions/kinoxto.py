@@ -1452,10 +1452,24 @@ class kxStreams(Screen):
 					hosters = re.findall('rel="(.*?)".*?<div class="Named">(.*?)</div>.*?<div class="Data"><b>Hits</b>\:.(.*?)<b>Mirror</b>\:.(.*?)<br /><b>Vom</b>\:.(.*\d+)</div>',each, re.S)
 					if hosters:
 						(get_stream_url, hostername, hits, mirror, date)= hosters[0]
-						get_stream_url = "http://kinox.to/aGET/Mirror/%s" % get_stream_url.replace('&amp;','&')
-						print get_stream_url, hostername, mirror, hits.replace(',','').replace(' ',''), date
-						if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|BitShare)', hostername, re.S|re.I):
-							self.streamList.append((hostername, get_stream_url, mirror, hits.replace(',','').replace(' ',''), date))
+						#get_stream_url = get_stream_url.replace('&amp;','&')
+						#print get_stream_url, hostername, mirror, hits.replace(',','').replace(' ',''), date
+						mirrors = re.findall('[0-9]/([0-9])', mirror)
+						if mirrors:
+							print "total", mirrors[0]
+							for i in range(1,int(mirrors[0])+1):
+								if re.match('.*?Season=', get_stream_url, re.S):
+									details = re.findall('(.*?)&amp;Hoster=(.*?)&amp;Mirror=(.*?)&amp;Season=(.*?)&amp;Episode=(\d)', get_stream_url, re.S)
+									(dname, dhoster, dmirror, dseason, depisode) = details[0]
+									get_stream_url_m = "http://kinox.to/aGET/Mirror/%s&Hoster=%s&Mirror=%s&Season=%s&Episode=%s" %  (dname, dhoster, 'Mirror='+str(i), dseason, depisode)
+								else:
+									details = re.findall('(.*?)&amp;Hoster=(.*?)&amp;Mirror=(\d)', get_stream_url, re.S)
+									(dname, dhoster, dmirror) = details[0]
+									get_stream_url_m = "http://kinox.to/aGET/Mirror/%s&Hoster=%s&Mirror=%s" %  (dname, dhoster, 'Mirror='+str(i))
+
+								print get_stream_url_m
+								if re.match('.*?(putlocker|sockshare|streamclou|xvidstage|filenuke|movreel|nowvideo|xvidstream|uploadc|vreer|MonsterUploads|Novamov|Videoweed|Divxstage|Ginbig|Flashstrea|Movshare|yesload|faststream|Vidstream|PrimeShare|flashx|BitShare)', hostername, re.S|re.I):
+									self.streamList.append((hostername, get_stream_url_m, str(i)+"/"+mirrors[0], hits.replace(',','').replace(' ',''), date))
 				else:
 					hosters = re.findall('rel="(.*?)".*?<div class="Named">(.*?)</div>.*?<div class="Data"><b>Hits</b>\:.(.*\d+)<br /><b>Vom</b>\:.(.*\d+)</div>',each, re.S)
 					if hosters:

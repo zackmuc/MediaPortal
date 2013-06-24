@@ -1,5 +1,4 @@
 from Plugins.Extensions.MediaPortal.resources.imports import *
-from Plugins.Extensions.MediaPortal.resources.decrypt import *
 
 def radiostreamListEntry(entry):
 	return [entry,
@@ -78,7 +77,10 @@ class Radiode(Screen):
 			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/resources/radiode_sender"
 		else:
 			self.playList = []
-			path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/resources/radiode_playlist"
+			if not fileExists(config.mediaportal.watchlistpath.value+"mp_radiode_playlist"):
+				os.system("touch "+config.mediaportal.watchlistpath.value+"mp_radiode_playlist")
+			if fileExists(config.mediaportal.watchlistpath.value+"mp_radiode_playlist"):
+				path = config.mediaportal.watchlistpath.value+"mp_radiode_playlist"
 			
 		if fileExists(path):
 			readStations = open(path,"r")
@@ -197,7 +199,6 @@ class Radiode(Screen):
 		print error
 		
 	def getStreamTOmp3(self, data):
-		#data = urllib.urlopen(stationUrl).read()
 		if re.match('.*?"stream"', data, re.S):
 			pattern = re.compile('"stream":"(.*?)"')
 			stationStream = pattern.findall(data, re.S)
@@ -218,7 +219,7 @@ class Radiode(Screen):
 		stationImage = self['streamlist'].getCurrent()[0][2]
 		stationDesc = self['streamlist'].getCurrent()[0][3]
 
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/resources/radiode_playlist"
+		path = config.mediaportal.watchlistpath.value+"mp_radiode_playlist"
 		if fileExists(path):
 			writePlaylist = open(path,"a")
 			writePlaylist.write('"%s" "%s" "%s" "%s"\n' % (stationName, stationLink, stationImage, stationDesc))
@@ -235,10 +236,10 @@ class Radiode(Screen):
 		
 		selectedName = self['playlist'].getCurrent()[0][0]
 		
-		pathTmp = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/resources/radiode_playlist.tmp"
+		pathTmp = config.mediaportal.watchlistpath.value+"mp_radiode_playlist.tmp"
 		writeTmp = open(pathTmp,"w")
 		
-		path = "/usr/lib/enigma2/python/Plugins/Extensions/MediaPortal/resources/radiode_playlist"
+		path = config.mediaportal.watchlistpath.value+"mp_radiode_playlist"
 		if fileExists(path):
 			readStations = open(path,"r")
 			for rawData in readStations.readlines():
