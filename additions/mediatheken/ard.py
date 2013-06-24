@@ -2,6 +2,7 @@
 # ARD-Mediathek von chroma_key
 #
 from Plugins.Extensions.MediaPortal.resources.imports import *
+from Plugins.Extensions.MediaPortal.resources.playrtmpmovie import PlayRtmpMovie
 
 def ARDGenreListEntry(entry):
 	return [entry,
@@ -253,9 +254,7 @@ class ARDFilmeListeScreen(Screen):
 
 	def loadPageData(self, data):
 		self.filmliste = []
-		# chroma_key: Aufgehobener Code fuer Versuch mit RSS... folgen = re.findall('<item>.*?<title>(.*?)</title>.*?<description>(.*?)</description>.*?<link>(.*?)</link>', data, re.S)
 		seiten = re.findall('<option selected="selected".*?goto=(.*?)/.*?<span>(.*?)</span>', data, re.S)
-		# chroma_key: Wenn man auch bereits der ersten Seite ein optional angehaengtes "goto=1" unterschiebt, kann man auch bereits auf der ersten Seite er-parsen, wieviele Seiten es gibt.
 		if seiten:
 			for (a,b) in seiten:
 				seite = "Seite:\t%s%s" % (a,b)
@@ -433,17 +432,30 @@ class ARDFilmeListeScreen(Screen):
 				stream = stream.replace("mp4/master.m3u8","mp4")
 			if sr in stream:
 				stream = stream.replace("MP4:","mp4:")
-			# Playpath fuer neueren Dreamboxen reparieren
+			print stream
 			noplaypath = "mp4:"
 			if noplaypath in stream:
-				stream = stream.replace("mp4:"," playpath=mp4:")
-			# Gebe gefundenen Streamlink als kleine Textdatei aus, zum monitoren und fuer Fehlersuche
-			fobj_out = open("/tmp/ard-stream.txt","w")
-			fobj_out.write(stream)
-			fobj_out.close()
-			sref = eServiceReference(0x1001, 0, stream)
-			sref.setName(self.streamName)
-			self.session.open(MoviePlayer, sref)
+				host = stream.split('mp4:')[0]
+				playpath = stream.split('mp4:')[1]
+			if (stream[0:4] == 'rtmp' and config.mediaportal.useRtmpDump.value):
+				stream = "%s' --playpath=mp4:%s'" % (host, playpath)
+				print stream
+				movieinfo = [stream,self.streamName]
+				self.session.open(PlayRtmpMovie, movieinfo, self.streamName)
+			elif stream[0:4] == 'rtmp':
+				stream = "%s playpath=mp4:%s" % (host, playpath)
+				print stream
+				sref = eServiceReference(0x1001, 0, stream)
+				sref.setName(self.streamName)
+				self.session.open(MoviePlayer, sref)
+			else:
+				print stream
+				sref = eServiceReference(0x1001, 0, stream)
+				sref.setName(self.streamName)
+				self.session.open(MoviePlayer, sref)
+			#fobj_out = open("/tmp/ard-stream.txt","w")
+			#fobj_out.write(stream)
+			#fobj_out.close()
 
 	def keyLeft(self):
 		if self.keyLocked:
@@ -485,6 +497,6 @@ class ARDFilmeListeScreen(Screen):
 		self.loadPage()
 
 	def keyCancel(self):
-		if os.path.isfile("/tmp/ard-stream.txt"):
-			os.remove("/tmp/ard-stream.txt")
+		#if os.path.isfile("/tmp/ard-stream.txt"):
+		#	os.remove("/tmp/ard-stream.txt")
 		self.close()
